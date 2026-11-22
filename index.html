@@ -448,6 +448,74 @@ function toggleGpsMode() {
   renderAll();
 }
 
+let allStopsCache = null;
+
+function renderDiagnosticScreen(vp, statusMsg = 'INITIALIZING...') {
+  vp.innerHTML = `
+    <div class="flex-1 flex flex-col justify-between bg-[#2b2b2b] text-white p-4 font-sans select-none">
+      <div>
+        <div class="flex items-center gap-2.5 mb-4">
+          <div class="w-8 h-8 rounded-full bg-[#3b82f6] flex items-center justify-center font-black text-[10px] text-white shrink-0">
+            LIT
+          </div>
+          <span class="text-lg font-light tracking-widest text-zinc-400">TRANSIT</span>
+        </div>
+
+        <div class="text-xs text-zinc-200 leading-relaxed space-y-0.5 mb-6">
+          <div>App version: 23.06.25</div>
+          <div>Kernel version: 22.03.01</div>
+          <div>Config version: ctb_prod_v10</div>
+        </div>
+
+        <div class="text-center text-sm font-extrabold tracking-wider text-white mb-4">
+          ${statusMsg}
+        </div>
+
+        <div class="text-[11px] text-zinc-300 leading-relaxed space-y-0.5">
+          <div>DeviceID: 358709052246844</div>
+          <div>Boot info: SDCARD|PRIMARY BOOT</div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <div class="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center font-black text-xs">C</div>
+        <div class="leading-tight text-left">
+          <div class="text-xs font-bold text-white">Citybus</div>
+          <div class="text-[10px] font-bold text-zinc-200">城巴</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function ensureRouteStopsLoaded(trip) {
+  if (!trip) return [];
+  const key = `${trip.routeId}|${trip.bound}|${trip.patternId || ''}`;
+  const existing = state.stopsByTrip.get(key);
+  if (Array.isArray(existing) && existing.length > 0) {
+    return existing;
+  }
+
+  const vp = document.getElementById('mainViewport');
+  if (vp) renderDiagnosticScreen(vp, `LOADING ROUTE ${fmtRouteNo(trip)} DATA...`);
+
+  if (!Array.isArray(allStopsCache)) {
+    const sRes = await fetch('./data/stops.json');
+    const rawStops = await sRes.json();
+    allStopsCache = Array.isArray(rawStops) ? rawStops : [];
+    for (const s of allStopsCache) {
+      const k = `${s.routeId}|${s.bound}|${s.patternId || ''}`;
+      if (!state.stopsByTrip.has(k)) state.stopsByTrip.set(k, []);
+      state.stopsByTrip.get(k).push(s);
+    }
+    for (const arr of state.stopsByTrip.values()) {
+      arr.sort((a, b) => (a.seq ?? 0) - (b.seq ?? 0));
+    }
+  }
+
+  return state.stopsByTrip.get(key) || [];
+}
+
 function showToast(msg) {
   const el = document.getElementById('toastBox');
   el.textContent = msg;
@@ -490,21 +558,33 @@ setInterval(() => {
 }, 500);
 
 async function initData() {
+  state.loading = true;
+  renderMain();
   try {
-    const [rRes, sRes, aRes, lRes] = await Promise.all([
+    const [rRes, aRes] = await Promise.all([
       fetch('./data/routes.json'),
-      fetch('./data/stops.json'),
-      fetch('./data/announcements.json'),
-      fetch('./data/location_codes.json').catch(() => ({ json: async () => [] }))
+      fetch('./data/announcements.json')
     ]);
     const routes = await rRes.json();
-    const stops = await sRes.json();
     const anns = await aRes.json();
-    const locs = await lRes.json();
-    state.locationCodes = Array.isArray(locs) ? locs : [];
-    applyPackData(routes, stops, anns);
+    state.routes = Array.isArray(routes) ? routes : [];
+    state.announcements = Array.isArray(anns) ? anns : [];
+    state.loading = false;
+    state.currentTab = 'route';
+    state.routeStage = 'route';
+    renderAll();
+
+    // 背景順便預載其餘輔助資料，不阻塞進入路線畫面
+    fetch('./data/location_codes.json').then(r => r.ok ? r.json() : []).then(locs => {
+      state.locationCodes = Array.isArray(locs) ? locs : [];
+    }).catch(() => {});
+    fetch('./data/hof_routes.json').then(r => r.ok ? r.json() : null).then(hof => {
+      state.hofData = hof;
+    }).catch(() => {});
   } catch (err) {
-    document.getElementById('loadingText').textContent = '載入資料失敗：' + err.message;
+    state.loading = false;
+    state.error = String(err);
+    renderMain();
   }
 }
 
@@ -870,7 +950,7 @@ function renderMain() {
         </div>
       `;
       document.querySelectorAll('.pick-dest-btn').forEach(b => {
-        b.onclick = () => {
+        b.onclick = async () => {
           state.selectedDestTc = b.dataset.dest;
           state.routeStage = 'pattern';
           state.stagePageOffset = 0;
@@ -918,7 +998,7 @@ function renderMain() {
         </div>
       `;
       document.querySelectorAll('.pick-trip-btn').forEach(b => {
-        b.onclick = () => {
+        b.onclick = async () => {
           const t = trips[Number(b.dataset.tidx)];
           state.selectedTrip = t;
           const key = `${t.routeId}|${t.bound}|${t.patternId || ''}`;
@@ -963,7 +1043,7 @@ function renderMain() {
         </div>
       `;
       document.querySelectorAll('.pick-start-btn').forEach(b => {
-        b.onclick = () => {
+        b.onclick = async () => {
           state.currentStopIdx = Number(b.dataset.sidx);
           state.routeStage = 'stops';
           state.stopProgressPct = 20;
@@ -1031,7 +1111,7 @@ function renderMain() {
         renderMain();
       };
       document.querySelectorAll('.jump-stop-btn').forEach(b => {
-        b.onclick = () => {
+        b.onclick = async () => {
           state.currentStopIdx = Number(b.dataset.jump);
           state.stopProgressPct = 20;
           renderMain();
@@ -1092,7 +1172,7 @@ function renderMain() {
       });
     }
     document.querySelectorAll('.play-ann-btn').forEach(b => {
-      b.onclick = () => {
+      b.onclick = async () => {
         const item = pageItems[Number(b.dataset.pidx)];
         if (!item) return;
         const zh = item.ttsTc || item.titleTc || '';
@@ -1188,7 +1268,7 @@ function renderMain() {
       };
     }
     document.querySelectorAll('.pick-inc-btn').forEach(b => {
-      b.onclick = () => {
+      b.onclick = async () => {
         if (!requireStopped3s()) return;
         state.incidentLabel = b.dataset.inc;
         state.incidentActive = true;
@@ -1714,34 +1794,9 @@ try {
 initData();
 startGpsWatcher();
 </script>
-<script>
-(function runLecipBootSequence() {
-  const overlay = document.getElementById('lecipBootOverlay');
-  const pAndroid = document.getElementById('bootPhaseAndroid');
-  const pDiag = document.getElementById('bootPhaseDiag');
-  if (!overlay || !pAndroid || !pDiag) return;
-
-  let finished = false;
-  const finishBoot = () => {
-    if (finished) return;
-    finished = true;
-    overlay.style.opacity = '0';
-    setTimeout(() => overlay.remove(), 300);
-  };
-
-  overlay.addEventListener('click', finishBoot);
-
-  setTimeout(() => {
-    if (finished) return;
-    pAndroid.classList.add('hidden');
-    pDiag.classList.remove('hidden');
-  }, 1500);
-
-  setTimeout(finishBoot, 3600);
-})();
-</script>
 </body>
 </html>
+
 
 
 
