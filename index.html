@@ -138,20 +138,6 @@
         </div>
       </header>
 
-      <!-- 智駕全城即時警示橫額 -->
-      <div id="cdWarningBanner" class="hidden px-3 py-1.5 text-xs font-black flex items-center justify-between shrink-0 bg-red-600 text-white">
-        <span id="cdWarningText" class="truncate">⚠ 智駕警示</span>
-        <span class="ml-2 px-1.5 py-0.5 rounded bg-black/25 text-[10px] shrink-0">智駕全城</span>
-      </div>
-
-      <!-- 新訊息黃底彈出提示條（僅於停車 ≥3s 且有未讀文字訊息時顯示；行車時自動隱藏） -->
-      <div id="newMsgPopup" class="hidden bg-amber-400 text-black px-3 py-1.5 text-xs font-black flex items-center justify-between cursor-pointer shrink-0">
-        <span id="newMsgPopupText" class="truncate">收到新訊息，按下「立即閱讀」查閱</span>
-        <div class="flex items-center gap-1.5 shrink-0 ml-2">
-          <span class="px-2 py-0.5 rounded bg-[#007AFF] text-white text-[10px] font-black">立即閱讀</span>
-          <button id="btnDismissPopup" class="px-1.5 py-0.5 rounded bg-black/15 text-[10px]">✕</button>
-        </div>
-      </div>
 
       <!-- 五大功能分頁列 -->
       <nav id="topNavBar" class="grid grid-cols-5 bg-[#151a24] text-zinc-300 border-b border-zinc-800 shrink-0">
@@ -245,6 +231,9 @@
         </div>
       </div>
 
+      <!-- 智駕全城下方紅／黃警告卡片（實機位置：螢幕底部） -->
+      <div id="cdBottomWarning" class="hidden absolute left-1.5 right-1.5 bottom-[58px] z-[45] cursor-pointer select-none"></div>
+
       <!-- Toast -->
       <div id="toastBox" class="hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-50 px-3.5 py-2 rounded-lg bg-black/90 border border-zinc-600 text-white text-xs font-bold whitespace-nowrap shadow-lg pointer-events-none"></div>
     </div>
@@ -303,7 +292,14 @@ const state = {
   gpsSpeedKmh: 0,
   lastGpsSpeedKmh: 0,
   lastGpsTimeMs: 0,
+  gpsLat: null,
+  gpsLng: null,
   gpsDistanceM: null,
+  etaMap: {},
+  etaLastFetchKey: '',
+  etaLastFetchMs: 0,
+  etaLastLat: null,
+  etaLastLng: null,
   gpsArrivedCur: false,
   gpsMinDistToCur: Infinity,
   stopProgressPct: 25,
@@ -316,8 +312,10 @@ const state = {
     harshAccel: 0,
     harshBrake: 0,
     sharpTurn: 0,
+    slope: 0,
     overspeed: 0,
     lastEvent: '駕駛表現優良',
+    warningType: '',
     warningText: '',
     warningLevel: ''
   },
@@ -543,7 +541,7 @@ function computeTripSections(stops, trip) {
     if (idx === 0) {
       curFare = stopFareNum ?? baseFare;
       curSec = explicitSec ? Number(explicitSec) || 1 : 1;
-      isSectionChange = curFare != null;
+      isSectionChange = false;
     } else if (stopFareNum != null && (curFare == null || Math.abs(stopFareNum - curFare) >= 0.05)) {
       curFare = stopFareNum;
       curSec = explicitSec ? Number(explicitSec) || (curSec + 1) : (curSec + 1);
@@ -949,7 +947,7 @@ function triggerStopAnnouncement(idx, force = false) {
   playAnnouncementSegments(segments);
 }
 
-// ============ 智駕全城 (Clever Driving) 引擎 ============
+// ============ 智駕全城 (Clever Driving) 引擎（下方紅／黃警告卡片＋Greenroad 聲效） ============
 function getCleverDriveFaceSvg(score, sizeClass = 'w-4 h-4') {
   if (score >= 85) {
     return `<svg class="${sizeClass} shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9.5"/><circle cx="9" cy="10" r="1.25" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.25" fill="currentColor" stroke="none"/><path d="M8 14.2c1 1.9 2.4 2.8 4 2.8s3-.9 4-2.8" stroke-linecap="round"/></svg>`;
@@ -966,46 +964,162 @@ function getCleverDriveGrade(score) {
   return { label: '需改善', en: 'Need Improvement', bg: 'bg-[#ef4444]', text: 'text-white' };
 }
 
-function triggerCleverDriveEvent(kind) {
-  const cd = state.cleverDrive;
-  let msg = '';
-  let deduct = 4;
-  let danger = false;
+function getCleverDriveWarningIconSvg(type, accent) {
+  // 1. 急煞車：八角形框 + 黑色腳踩煞車腳踏
+  if (type === 'brake') {
+    return `
+      <svg class="w-[88px] h-[88px] shrink-0" viewBox="0 0 100 100" fill="none">
+        <polygon points="31,6 69,6 94,31 94,69 69,94 31,94 6,69 6,31" fill="#ffffff" stroke="${accent}" stroke-width="7" stroke-linejoin="round"/>
+        <path d="M22 45 L51 54 L59 38 L76 47 L66 67 C63 72 56 72 51 68 L22 50 Z" fill="#000000"/>
+        <path d="M23 55 L42 63 L39 68 L20 60 Z" fill="#000000"/>
+        <path d="M31 63 C28 67 24 70 19 71" stroke="#000000" stroke-width="4.5" stroke-linecap="round"/>
+        <rect x="20" y="75" width="60" height="4.5" rx="1.5" fill="#000000"/>
+      </svg>`;
+  }
+  // 2. 車身傾側／斜坡搖擺：菱形框 + 黑色傾斜雙層巴士
+  if (type === 'slope') {
+    return `
+      <svg class="w-[88px] h-[88px] shrink-0" viewBox="0 0 100 100" fill="none">
+        <rect x="20" y="20" width="60" height="60" rx="6" transform="rotate(45 50 50)" fill="#ffffff" stroke="${accent}" stroke-width="6.5"/>
+        <g transform="rotate(-17 50 54)">
+          <rect x="35" y="26" width="30" height="41" rx="3" fill="#000000"/>
+          <rect x="38" y="30" width="24" height="10" rx="1.5" fill="#ffffff"/>
+          <rect x="38" y="44" width="24" height="10" rx="1.5" fill="#ffffff"/>
+          <rect x="39" y="59" width="5" height="3.2" rx="1" fill="#ffffff"/>
+          <rect x="56" y="59" width="5" height="3.2" rx="1" fill="#ffffff"/>
+          <rect x="38" y="67" width="5" height="5" rx="1" fill="#000000"/>
+          <rect x="57" y="67" width="5" height="5" rx="1" fill="#000000"/>
+        </g>
+        <rect x="30" y="74" width="40" height="3.8" rx="1.5" fill="#000000"/>
+      </svg>`;
+  }
+  // 3. 急轉彎：方形框 + 黑色雙左箭咀
+  if (type === 'steer') {
+    return `
+      <svg class="w-[88px] h-[88px] shrink-0" viewBox="0 0 100 100" fill="none">
+        <rect x="8" y="8" width="84" height="84" rx="7" fill="#ffffff" stroke="${accent}" stroke-width="7.5"/>
+        <polygon points="48,17 20,50 48,83 34,83 12,50 34,17" fill="#000000"/>
+        <polygon points="82,17 54,50 82,83 66,83 41,50 66,17" fill="#000000"/>
+      </svg>`;
+  }
+  // 4. 急加速：實心彩色向上箭咀（內含 加速 / Acc）＋ 下方 3 條橫槓
+  if (type === 'accel') {
+    return `
+      <svg class="w-[88px] h-[88px] shrink-0" viewBox="0 0 100 100" fill="none">
+        <polygon points="50,6 90,42 68,42 68,69 32,69 32,42 10,42" fill="${accent}"/>
+        <text x="50" y="48" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="900">加速</text>
+        <text x="50" y="62" text-anchor="middle" fill="#ffffff" font-size="10.5" font-weight="900" font-family="sans-serif">Acc</text>
+        <rect x="32" y="73" width="36" height="5.5" rx="1" fill="${accent}"/>
+        <rect x="32" y="81.5" width="36" height="5.5" rx="1" fill="${accent}"/>
+        <rect x="32" y="90" width="36" height="5.5" rx="1" fill="${accent}"/>
+      </svg>`;
+  }
+  // 5. 超速警示（不扣分）：速限 70 圓牌
+  return `
+    <svg class="w-[88px] h-[88px] shrink-0" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="42" fill="#ffffff" stroke="${accent}" stroke-width="9"/>
+      <text x="50" y="62" text-anchor="middle" fill="#000000" font-size="38" font-weight="900" font-family="sans-serif">70</text>
+    </svg>`;
+}
 
-  if (kind === 'accel') {
-    cd.harshAccel++;
-    msg = '⚠ 智駕警示：偵測到急加速，請平穩起步';
-    deduct = 6;
-  } else if (kind === 'brake') {
-    cd.harshBrake++;
-    msg = '⚠ 智駕警示：偵測到急煞車，請保持安全車距';
-    deduct = 8;
-    danger = true;
-  } else if (kind === 'turn') {
-    cd.sharpTurn++;
-    msg = '⚠ 智駕警示：偵測到急轉彎，請減速慢駛';
-    deduct = 7;
-  } else if (kind === 'overspeed') {
+function renderCleverDriveBottomWarning() {
+  const el = document.getElementById('cdBottomWarning');
+  if (!el) return;
+  const cd = state.cleverDrive;
+  if (!cd.warningType || !cd.warningLevel) {
+    el.classList.add('hidden');
+    el.innerHTML = '';
+    return;
+  }
+  const isRed = cd.warningLevel === 'red' || cd.warningLevel === 'speed';
+  const accent = isRed ? '#ff0000' : '#eab308';
+  const label = cd.warningType === 'overspeed'
+    ? (state.lang === 'en' ? 'SPEED' : '超速')
+    : (state.lang === 'en' ? 'CAUTION' : '注意');
+
+  el.classList.remove('hidden');
+  el.innerHTML = `
+    <div class="w-full rounded-2xl bg-white shadow-2xl px-4 py-5 flex items-center justify-around gap-3" style="border: 7px solid ${accent};">
+      ${getCleverDriveWarningIconSvg(cd.warningType, accent)}
+      <div class="font-black leading-none tracking-wider text-center" style="color: ${accent}; font-size: ${label.length > 3 ? '36px' : '54px'};">
+        ${esc(label)}
+      </div>
+    </div>
+  `;
+  el.onclick = () => {
+    cd.warningType = '';
+    cd.warningLevel = '';
+    cd.warningText = '';
+    renderCleverDriveBottomWarning();
+  };
+}
+
+function playGreenroadSound(level) {
+  if (level === 'red') {
+    playShortAssetAudio('./assets/greenroad_breaking.mp3', [[960, 0.14, 0.05], [960, 0.14, 0.05], [960, 0.2, 0.02]]);
+  } else if (level === 'yellow') {
+    playShortAssetAudio('./assets/greenroad_bleep.mp3', [[780, 0.12, 0.06], [780, 0.12, 0.02]]);
+  } else {
+    playShortAssetAudio('./assets/speed_alert.mp3', [[880, 0.16, 0.05], [700, 0.18, 0.02]]);
+  }
+}
+
+function triggerCleverDriveEvent(kind, severity = 'yellow') {
+  const cd = state.cleverDrive;
+  const normKind = kind === 'turn' ? 'steer' : kind;
+
+  // 超速：只出提示與聲效，完全唔扣分
+  if (normKind === 'overspeed') {
     cd.overspeed++;
-    msg = '🚨 智駕警示：車速超過 70 km/h，請立即減速';
-    deduct = 10;
-    danger = true;
+    cd.lastEvent = '超速警示 (>70 km/h · 不扣分)';
+    cd.warningType = 'overspeed';
+    cd.warningLevel = 'speed';
+    cd.warningText = cd.lastEvent;
+    playGreenroadSound('speed');
+    renderTopStatus();
+    renderCleverDriveModalContent();
+    clearTimeout(window._cdBannerTimer);
+    window._cdBannerTimer = setTimeout(() => {
+      cd.warningType = '';
+      cd.warningLevel = '';
+      cd.warningText = '';
+      renderCleverDriveBottomWarning();
+    }, 3500);
+    return;
   }
 
+  const level = severity === 'red' ? 'red' : 'yellow';
+  const deduct = level === 'red' ? 5 : 3;
+  const levelLabel = level === 'red' ? '紅色警告' : '黃色警告';
+  const typeNames = {
+    accel: '急加速',
+    brake: '急煞車',
+    steer: '急轉彎',
+    slope: '車身傾側'
+  };
+
+  if (normKind === 'accel') cd.harshAccel++;
+  else if (normKind === 'brake') cd.harshBrake++;
+  else if (normKind === 'steer') cd.sharpTurn++;
+  else if (normKind === 'slope') cd.slope++;
+
   cd.score = Math.max(0, cd.score - deduct);
-  cd.lastEvent = msg;
-  cd.warningText = msg;
-  cd.warningLevel = danger ? 'danger' : 'warn';
-  playAlertBeep(danger);
+  cd.lastEvent = `${levelLabel}：${typeNames[normKind] || normKind} (-${deduct}分)`;
+  cd.warningType = normKind;
+  cd.warningLevel = level;
+  cd.warningText = cd.lastEvent;
+
+  playGreenroadSound(level);
   renderTopStatus();
   renderCleverDriveModalContent();
 
   clearTimeout(window._cdBannerTimer);
   window._cdBannerTimer = setTimeout(() => {
-    cd.warningText = '';
+    cd.warningType = '';
     cd.warningLevel = '';
-    renderTopStatus();
-  }, 4500);
+    cd.warningText = '';
+    renderCleverDriveBottomWarning();
+  }, 3600);
 }
 
 function resetCleverDrive() {
@@ -1014,8 +1128,10 @@ function resetCleverDrive() {
     harshAccel: 0,
     harshBrake: 0,
     sharpTurn: 0,
+    slope: 0,
     overspeed: 0,
     lastEvent: '駕駛表現優良',
+    warningType: '',
     warningText: '',
     warningLevel: ''
   };
@@ -1031,59 +1147,77 @@ function renderCleverDriveModalContent() {
   const g = getCleverDriveGrade(cd.score);
 
   body.innerHTML = `
-    <div class="rounded-xl p-3.5 ${g.bg} ${g.text} flex items-center justify-between shadow">
-      <div class="flex items-center gap-3">
-        ${getCleverDriveFaceSvg(cd.score, 'w-10 h-10')}
+    <div class="rounded-xl p-3 ${g.bg} ${g.text} flex items-center justify-between shadow">
+      <div class="flex items-center gap-2.5">
+        ${getCleverDriveFaceSvg(cd.score, 'w-9 h-9')}
         <div>
           <div class="text-[11px] font-extrabold opacity-80">目前智駕狀態</div>
           <div class="text-2xl font-black leading-tight">${g.label}</div>
         </div>
       </div>
       <div class="text-right">
-        <div class="text-xs font-extrabold opacity-80">實時車速</div>
+        <div class="text-[11px] font-extrabold opacity-80">實時車速</div>
         <div class="text-lg font-black font-mono leading-tight">${state.gpsSpeedKmh} km/h</div>
       </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-2 text-center">
-      <div class="p-2.5 rounded-lg bg-zinc-800/90 border border-zinc-700">
-        <div class="text-[11px] text-zinc-400 font-bold">急加速</div>
-        <div class="text-xl font-black ${cd.harshAccel > 0 ? 'text-amber-400' : 'text-[#64e800]'}">${cd.harshAccel}</div>
+    <div class="grid grid-cols-5 gap-1.5 text-center">
+      <div class="p-2 rounded-lg bg-zinc-800/90 border border-zinc-700">
+        <div class="text-[10px] text-zinc-400 font-bold">急加速</div>
+        <div class="text-lg font-black ${cd.harshAccel > 0 ? 'text-amber-400' : 'text-[#64e800]'}">${cd.harshAccel}</div>
       </div>
-      <div class="p-2.5 rounded-lg bg-zinc-800/90 border border-zinc-700">
-        <div class="text-[11px] text-zinc-400 font-bold">急煞車</div>
-        <div class="text-xl font-black ${cd.harshBrake > 0 ? 'text-red-400' : 'text-[#64e800]'}">${cd.harshBrake}</div>
+      <div class="p-2 rounded-lg bg-zinc-800/90 border border-zinc-700">
+        <div class="text-[10px] text-zinc-400 font-bold">急煞車</div>
+        <div class="text-lg font-black ${cd.harshBrake > 0 ? 'text-red-400' : 'text-[#64e800]'}">${cd.harshBrake}</div>
       </div>
-      <div class="p-2.5 rounded-lg bg-zinc-800/90 border border-zinc-700">
-        <div class="text-[11px] text-zinc-400 font-bold">急轉彎</div>
-        <div class="text-xl font-black ${cd.sharpTurn > 0 ? 'text-amber-400' : 'text-[#64e800]'}">${cd.sharpTurn}</div>
+      <div class="p-2 rounded-lg bg-zinc-800/90 border border-zinc-700">
+        <div class="text-[10px] text-zinc-400 font-bold">急轉彎</div>
+        <div class="text-lg font-black ${cd.sharpTurn > 0 ? 'text-amber-400' : 'text-[#64e800]'}">${cd.sharpTurn}</div>
       </div>
-      <div class="p-2.5 rounded-lg bg-zinc-800/90 border border-zinc-700">
-        <div class="text-[11px] text-zinc-400 font-bold">超速 (&gt;70km/h)</div>
-        <div class="text-xl font-black ${cd.overspeed > 0 ? 'text-red-400' : 'text-[#64e800]'}">${cd.overspeed}</div>
+      <div class="p-2 rounded-lg bg-zinc-800/90 border border-zinc-700">
+        <div class="text-[10px] text-zinc-400 font-bold">傾側</div>
+        <div class="text-lg font-black ${cd.slope > 0 ? 'text-amber-400' : 'text-[#64e800]'}">${cd.slope}</div>
+      </div>
+      <div class="p-2 rounded-lg bg-zinc-800/90 border border-zinc-700">
+        <div class="text-[10px] text-zinc-400 font-bold">超速</div>
+        <div class="text-lg font-black ${cd.overspeed > 0 ? 'text-sky-400' : 'text-[#64e800]'}">${cd.overspeed}</div>
       </div>
     </div>
 
-    <div class="px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-xs text-zinc-300 font-semibold">
-      最新紀錄：${esc(cd.lastEvent)}
+    <div class="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 text-[11px] text-zinc-300 font-semibold">
+      最新：${esc(cd.lastEvent)}
     </div>
 
-    <div class="pt-1 border-t border-zinc-700">
-      <div class="text-[11px] font-bold text-zinc-400 mb-2">模擬測試智駕警示</div>
-      <div class="grid grid-cols-2 gap-1.5">
-        <button id="cdSimAccel" class="py-2 rounded-lg bg-amber-600/90 text-white text-xs font-black active:scale-95">模擬急加速</button>
-        <button id="cdSimBrake" class="py-2 rounded-lg bg-red-600/90 text-white text-xs font-black active:scale-95">模擬急煞車</button>
-        <button id="cdSimTurn" class="py-2 rounded-lg bg-amber-700/90 text-white text-xs font-black active:scale-95">模擬急轉彎</button>
-        <button id="cdSimSpeed" class="py-2 rounded-lg bg-red-700/90 text-white text-xs font-black active:scale-95">模擬超速</button>
+    <div class="pt-1 border-t border-zinc-700 space-y-2">
+      <div class="text-[11px] font-bold text-amber-300">黃色警告（扣 3 分 · Greenroad_bleep）</div>
+      <div class="grid grid-cols-4 gap-1.5">
+        <button data-cdkind="accel" data-cdsev="yellow" class="cd-sim-btn py-2 rounded-lg bg-[#eab308] text-black text-[11px] font-black active:scale-95">急加速</button>
+        <button data-cdkind="brake" data-cdsev="yellow" class="cd-sim-btn py-2 rounded-lg bg-[#eab308] text-black text-[11px] font-black active:scale-95">急煞車</button>
+        <button data-cdkind="steer" data-cdsev="yellow" class="cd-sim-btn py-2 rounded-lg bg-[#eab308] text-black text-[11px] font-black active:scale-95">急轉彎</button>
+        <button data-cdkind="slope" data-cdsev="yellow" class="cd-sim-btn py-2 rounded-lg bg-[#eab308] text-black text-[11px] font-black active:scale-95">傾側</button>
       </div>
-      <button id="cdResetBtn" class="mt-2 w-full py-2 rounded-lg bg-zinc-700 text-zinc-100 text-xs font-black active:scale-95">重設今日智駕狀態</button>
+
+      <div class="text-[11px] font-bold text-red-400">紅色警告（扣 5 分 · Greenroad_Breaking）</div>
+      <div class="grid grid-cols-4 gap-1.5">
+        <button data-cdkind="accel" data-cdsev="red" class="cd-sim-btn py-2 rounded-lg bg-[#dc2626] text-white text-[11px] font-black active:scale-95">急加速</button>
+        <button data-cdkind="brake" data-cdsev="red" class="cd-sim-btn py-2 rounded-lg bg-[#dc2626] text-white text-[11px] font-black active:scale-95">急煞車</button>
+        <button data-cdkind="steer" data-cdsev="red" class="cd-sim-btn py-2 rounded-lg bg-[#dc2626] text-white text-[11px] font-black active:scale-95">急轉彎</button>
+        <button data-cdkind="slope" data-cdsev="red" class="cd-sim-btn py-2 rounded-lg bg-[#dc2626] text-white text-[11px] font-black active:scale-95">傾側</button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-1.5 pt-1">
+        <button data-cdkind="overspeed" data-cdsev="speed" class="cd-sim-btn py-2 rounded-lg bg-sky-700 text-white text-xs font-black active:scale-95">超速警示（唔扣分）</button>
+        <button id="cdResetBtn" class="py-2 rounded-lg bg-zinc-700 text-zinc-100 text-xs font-black active:scale-95">重設為「好」</button>
+      </div>
     </div>
   `;
 
-  document.getElementById('cdSimAccel').onclick = () => triggerCleverDriveEvent('accel');
-  document.getElementById('cdSimBrake').onclick = () => triggerCleverDriveEvent('brake');
-  document.getElementById('cdSimTurn').onclick = () => triggerCleverDriveEvent('turn');
-  document.getElementById('cdSimSpeed').onclick = () => triggerCleverDriveEvent('overspeed');
+  body.querySelectorAll('.cd-sim-btn').forEach(btn => {
+    btn.onclick = () => {
+      document.getElementById('cleverDriveModal').classList.add('hidden');
+      triggerCleverDriveEvent(btn.dataset.cdkind, btn.dataset.cdsev);
+    };
+  });
   document.getElementById('cdResetBtn').onclick = () => resetCleverDrive();
 }
 
@@ -1128,15 +1262,19 @@ function startGpsTracking() {
     pos => {
       const nowMs = Date.now();
       const { latitude, longitude, speed } = pos.coords;
+      state.gpsLat = latitude;
+      state.gpsLng = longitude;
       const kmh = typeof speed === 'number' && !Number.isNaN(speed) ? Math.round(speed * 3.6) : 0;
 
       if (state.lastGpsTimeMs > 0) {
         const dtSec = Math.max(0.5, (nowMs - state.lastGpsTimeMs) / 1000);
         const deltaKmh = kmh - state.lastGpsSpeedKmh;
-        if (dtSec <= 4 && deltaKmh <= -18) triggerCleverDriveEvent('brake');
-        else if (dtSec <= 4 && deltaKmh >= 18) triggerCleverDriveEvent('accel');
+        if (dtSec <= 4 && deltaKmh <= -22) triggerCleverDriveEvent('brake', 'red');
+        else if (dtSec <= 4 && deltaKmh <= -14) triggerCleverDriveEvent('brake', 'yellow');
+        else if (dtSec <= 4 && deltaKmh >= 22) triggerCleverDriveEvent('accel', 'red');
+        else if (dtSec <= 4 && deltaKmh >= 14) triggerCleverDriveEvent('accel', 'yellow');
       }
-      if (kmh > 70 && state.lastGpsSpeedKmh <= 70) triggerCleverDriveEvent('overspeed');
+      if (kmh > 70 && state.lastGpsSpeedKmh <= 70) triggerCleverDriveEvent('overspeed', 'speed');
 
       state.lastGpsSpeedKmh = kmh;
       state.lastGpsTimeMs = nowMs;
@@ -1205,19 +1343,13 @@ function startGpsTracking() {
         }
       }
 
-      const gpsLabel = document.getElementById('gpsLiveText');
-      if (gpsLabel && state.gpsEnabled) {
-        const isLast = state.currentStopIdx >= state.tripStops.length - 1;
-        if (state.gpsArrivedCur) {
-          gpsLabel.textContent = isLast ? 'GPS 自動 · 已到達終點站' : 'GPS 自動 · 已到站（離站後播下站）';
-        } else if (state.gpsDistanceM != null) {
-          gpsLabel.textContent = `GPS 自動 · 距本站 ${state.gpsDistanceM}m`;
-        } else {
-          gpsLabel.textContent = 'GPS 定位中...';
-        }
+      const distEl = document.getElementById('etaCurDist');
+      if (distEl && state.gpsEnabled && state.gpsDistanceM != null) {
+        distEl.textContent = formatDistanceLabel(state.gpsDistanceM);
       }
       const bar = document.getElementById('stopProgressFill');
       if (bar) bar.style.width = `${state.stopProgressPct}%`;
+      if (state.routeStage === 'stops') refreshRouteEtas(false);
     },
     err => {
       if (err.code === 1) {
@@ -1376,12 +1508,7 @@ function renderTopStatus() {
   const dispBox = document.getElementById('btnDisplayBox');
   const dispTxt = document.getElementById('displayBoxText');
   const isNis = state.trainingMode || inIncident || state.routeStage !== 'stops';
-  if (dispTxt) {
-    if (state.displayFault) dispTxt.textContent = 'ERR';
-    else if (state.trainingMode || inIncident) dispTxt.textContent = '暫停';
-    else if (state.routeStage === 'stops' && state.selectedRouteNo) dispTxt.textContent = state.selectedRouteNo.slice(0, 4);
-    else dispTxt.textContent = '123';
-  }
+  if (dispTxt) dispTxt.textContent = '123';
   if (dispBox) {
     if (state.displayFault) {
       dispBox.className = 'h-[20px] px-2 rounded-[4px] bg-red-600 text-white flex items-center justify-center active:scale-95';
@@ -1413,16 +1540,7 @@ function renderTopStatus() {
   if (cdIcon) cdIcon.innerHTML = getCleverDriveFaceSvg(cd.score, 'w-4 h-4');
   if (cdLabel) cdLabel.textContent = g.label;
 
-  const cdBanner = document.getElementById('cdWarningBanner');
-  if (cdBanner) {
-    if (cd.warningText) {
-      cdBanner.classList.remove('hidden');
-      cdBanner.className = `px-3 py-1.5 text-xs font-black flex items-center justify-between shrink-0 ${cd.warningLevel === 'danger' ? 'bg-red-600 text-white' : 'bg-amber-400 text-black'}`;
-      document.getElementById('cdWarningText').textContent = cd.warningText;
-    } else {
-      cdBanner.classList.add('hidden');
-    }
-  }
+  renderCleverDriveBottomWarning();
 
   const unread = state.messages.filter(m => m.unread).length;
   const badge = document.getElementById('msgUnreadBadge');
@@ -1449,7 +1567,7 @@ function renderTabs() {
       iconEl.innerHTML = '<span class="w-5 h-5 rounded-full bg-[#0068FF] text-white font-black text-[11px] flex items-center justify-center">M</span>';
       labelEl.textContent = state.lang === 'en' ? 'Manual' : '手動';
     } else if (state.routeStage === 'stops' && state.gpsEnabled) {
-      iconEl.innerHTML = '<span class="w-5 h-5 rounded-full bg-emerald-500 text-white font-black text-[9px] flex items-center justify-center">GPS</span>';
+      iconEl.innerHTML = '<span class="w-5 h-5 rounded-full bg-[#0074f0] text-white font-black text-[11px] flex items-center justify-center">A</span>';
       labelEl.textContent = state.lang === 'en' ? 'Auto' : '自動';
     } else {
       iconEl.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18h4a3 3 0 0 0 3-3V9a3 3 0 0 1 3-3"/></svg>';
@@ -2171,81 +2289,232 @@ function renderStartStopList(vp, bar) {
   document.getElementById('botQuickStart').onclick = () => { if (state.tripStops.length > 0) enterStops(0); };
 }
 
-// ============ 報站主畫面 ============
+// ============ 地圖 API (OSRM) 實時距離與 ETA 分鐘計算 ============
+function formatDistanceLabel(meters) {
+  if (meters == null || !Number.isFinite(Number(meters))) return '--';
+  const m = Math.max(0, Math.round(Number(meters)));
+  if (m >= 1000) return `${(m / 1000).toFixed(1)}km`;
+  return `${m}m`;
+}
+
+function estimateFallbackEtas(curIdx) {
+  const stops = state.tripStops || [];
+  if (!stops[curIdx]) return;
+
+  const hasLiveGps = state.gpsEnabled && Number.isFinite(state.gpsLat) && Number.isFinite(state.gpsLng);
+  let prevLat = null;
+  let prevLng = null;
+
+  if (hasLiveGps) {
+    prevLat = state.gpsLat;
+    prevLng = state.gpsLng;
+  } else if (curIdx > 0) {
+    const pLat = getStopLat(stops[curIdx - 1]);
+    const pLng = getStopLng(stops[curIdx - 1]);
+    if (Number.isFinite(pLat) && Number.isFinite(pLng)) {
+      prevLat = pLat;
+      prevLng = pLng;
+    }
+  }
+
+  let cumSec = 0;
+  const maxIdx = Math.min(stops.length - 1, curIdx + 6);
+  for (let i = curIdx; i <= maxIdx; i++) {
+    const lat = getStopLat(stops[i]);
+    const lng = getStopLng(stops[i]);
+    let legDistM = 450;
+    if (Number.isFinite(lat) && Number.isFinite(lng) && Number.isFinite(prevLat) && Number.isFinite(prevLng)) {
+      legDistM = Math.round(calcDistanceMeters(prevLat, prevLng, lat, lng) * 1.32);
+    } else if (i === curIdx && !hasLiveGps && curIdx === 0) {
+      legDistM = 0;
+    }
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      prevLat = lat;
+      prevLng = lng;
+    }
+    const legSec = (legDistM / 7.8) + (i > curIdx ? 22 : 0); // 約 28 km/h 市區巴士均速 + 停站
+    cumSec += legSec;
+    if (!state.etaMap[i] || state.etaMap[i].source !== 'osrm') {
+      state.etaMap[i] = {
+        mins: Math.max(1, Math.round(cumSec / 60)),
+        distM: legDistM,
+        source: 'est'
+      };
+    }
+  }
+}
+
+function updateEtaDomInPlace() {
+  const curIdx = state.currentStopIdx;
+  const curEta = state.etaMap[curIdx];
+  const minEl = document.getElementById('etaCurMins');
+  const distEl = document.getElementById('etaCurDist');
+  if (minEl && curEta) {
+    minEl.textContent = state.lang === 'en' ? `${curEta.mins} min` : `${curEta.mins}分鐘`;
+  }
+  if (distEl) {
+    const d = (state.gpsEnabled && state.gpsDistanceM != null && curEta?.source !== 'osrm')
+      ? state.gpsDistanceM
+      : (curEta ? curEta.distM : state.gpsDistanceM);
+    distEl.textContent = formatDistanceLabel(d);
+  }
+  document.querySelectorAll('[data-eta-idx]').forEach(el => {
+    const idx = Number(el.dataset.etaIdx);
+    const info = state.etaMap[idx];
+    if (info) el.textContent = String(info.mins);
+  });
+}
+
+async function refreshRouteEtas(force = false) {
+  if (state.routeStage !== 'stops' || !state.tripStops.length) return;
+  const curIdx = state.currentStopIdx;
+  estimateFallbackEtas(curIdx);
+  updateEtaDomInPlace();
+
+  const now = Date.now();
+  const hasLiveGps = state.gpsEnabled && Number.isFinite(state.gpsLat) && Number.isFinite(state.gpsLng);
+  const fetchKey = `${state.selectedTrip?.routeId || ''}|${state.selectedTrip?.bound || ''}|${curIdx}|${hasLiveGps ? 'gps' : 'sim'}`;
+
+  if (!force && state.etaLastFetchKey === fetchKey) {
+    const elapsed = now - state.etaLastFetchMs;
+    const movedM = (hasLiveGps && Number.isFinite(state.etaLastLat) && Number.isFinite(state.etaLastLng))
+      ? calcDistanceMeters(state.etaLastLat, state.etaLastLng, state.gpsLat, state.gpsLng)
+      : 0;
+    if (elapsed < 12000 && movedM < 80) return;
+  }
+
+  const coords = [];
+  const stopIndices = [];
+  let startIsCurStop = false;
+
+  if (hasLiveGps) {
+    coords.push(`${state.gpsLng.toFixed(6)},${state.gpsLat.toFixed(6)}`);
+  } else if (curIdx > 0) {
+    const pLat = getStopLat(state.tripStops[curIdx - 1]);
+    const pLng = getStopLng(state.tripStops[curIdx - 1]);
+    if (Number.isFinite(pLat) && Number.isFinite(pLng)) {
+      coords.push(`${pLng.toFixed(6)},${pLat.toFixed(6)}`);
+    } else {
+      startIsCurStop = true;
+    }
+  } else {
+    startIsCurStop = true;
+  }
+
+  const maxIdx = Math.min(state.tripStops.length - 1, curIdx + 6);
+  for (let i = curIdx; i <= maxIdx; i++) {
+    const lat = getStopLat(state.tripStops[i]);
+    const lng = getStopLng(state.tripStops[i]);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      coords.push(`${lng.toFixed(6)},${lat.toFixed(6)}`);
+      stopIndices.push(i);
+    }
+  }
+
+  if (coords.length < 2) return;
+
+  state.etaLastFetchKey = fetchKey;
+  state.etaLastFetchMs = now;
+  if (hasLiveGps) {
+    state.etaLastLat = state.gpsLat;
+    state.etaLastLng = state.gpsLng;
+  }
+
+  try {
+    const url = `https://router.project-osrm.org/route/v1/driving/${coords.join(';')}?overview=false&steps=false`;
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const data = await res.json();
+    const legs = data?.routes?.[0]?.legs;
+    if (!Array.isArray(legs) || legs.length === 0) return;
+
+    // 確認回覆時仍停留在同一個班次與站位
+    if (state.routeStage !== 'stops' || state.currentStopIdx !== curIdx) return;
+
+    let cumSec = 0;
+    if (startIsCurStop) {
+      // 起點本身就是目前站 (curIdx)
+      state.etaMap[stopIndices[0]] = { mins: 1, distM: 0, source: 'osrm' };
+      for (let li = 0; li < legs.length && (li + 1) < stopIndices.length; li++) {
+        const leg = legs[li];
+        cumSec += (leg.duration || 0) * 1.22 + 22;
+        state.etaMap[stopIndices[li + 1]] = {
+          mins: Math.max(1, Math.round(cumSec / 60)),
+          distM: Math.round(leg.distance || 0),
+          source: 'osrm'
+        };
+      }
+    } else {
+      for (let li = 0; li < legs.length && li < stopIndices.length; li++) {
+        const leg = legs[li];
+        cumSec += (leg.duration || 0) * 1.22 + (li > 0 ? 22 : 0);
+        state.etaMap[stopIndices[li]] = {
+          mins: Math.max(1, Math.round(cumSec / 60)),
+          distM: Math.round(leg.distance || 0),
+          source: 'osrm'
+        };
+      }
+    }
+    updateEtaDomInPlace();
+  } catch (_) {
+    // 離線或限流時維持本地推算 ETA
+  }
+}
+
+// ============ 報站主畫面（還原實機排版：分段框、正常路線、綠進度條、時鐘＋巴士站距離、右側疊排 ETA 分鐘） ============
 function renderStopsView(vp, bar) {
   const th = themeClasses();
-  vp.className = th.vp;
+  vp.className = th.dark
+    ? 'flex-1 flex flex-col overflow-hidden bg-[#141923] text-white'
+    : 'flex-1 flex flex-col overflow-hidden bg-[#9ab5dc] text-zinc-900';
+
   const cur = state.tripStops[state.currentStopIdx];
   if (!cur) {
     vp.innerHTML = `<div class="flex-1 flex items-center justify-center ${th.muted} font-bold">無站點資料</div>`;
     return;
   }
 
+  estimateFallbackEtas(state.currentStopIdx);
+  const curEta = state.etaMap[state.currentStopIdx] || { mins: 1, distM: state.gpsDistanceM ?? 0 };
   const sections = computeTripSections(state.tripStops, state.selectedTrip);
   const curSec = sections[state.currentStopIdx] || { sectionNo: 1, activeFare: null, badgeFare: null };
   const trip = state.selectedTrip || {};
   const dest = state.lang === 'en' ? (getDestEn(trip) || getDestTc(trip)) : (getDestTc(trip) || getDestEn(trip));
-  const remark = getRealTripRemark(trip);
+  const remark = getRealTripRemark(trip) || (state.lang === 'en' ? 'Normal Route' : '正常路線');
   const upcoming = state.tripStops.slice(state.currentStopIdx + 1, state.currentStopIdx + 6);
   const curName = state.lang === 'en' ? (getStopNameEn(cur) || getStopNameTc(cur)) : getStopNameTc(cur);
   const curSub = getStopSub(cur);
-  const hasAudio = !!getEffectiveStopAudio(cur);
 
-  const curPanelCls = th.dark ? 'bg-[#12161f] border-b border-zinc-700/80' : 'bg-white border-b border-zinc-300';
-  const secBoxCls = th.dark ? 'border-zinc-500/80 bg-[#141923] text-white' : 'border-zinc-400 bg-white text-zinc-900';
-  const gpsBtnCls = th.dark ? 'bg-zinc-800 border-zinc-600 text-zinc-200' : 'bg-zinc-100 border-zinc-300 text-zinc-800';
-  const modeStatusBadge = state.gpsEnabled && state.currentStopIdx === 0
-    ? '自動靜音'
-    : (!state.gpsEnabled && state.currentStopIdx === 0
-      ? (getWelcomeAudioFile() ? 'HKOWS 歡迎詞' : 'G-TTS 歡迎詞')
-      : (state.gpsEnabled && state.currentStopIdx === 1
-        ? '歡迎詞+站名'
-        : (hasAudio ? 'HKOWS' : 'G-TTS')));
+  const headerBg = th.dark ? 'bg-[#1b2230] border-b border-zinc-700 text-white' : 'bg-[#a4bce0] border-b border-[#7a92b8] text-[#111827]';
+  const secBoxCls = th.dark ? 'border-zinc-500/90 bg-[#141923]/60 text-white' : 'border-[#647b9e] bg-[#a4bce0] text-[#111827]';
+  const curPanelCls = th.dark ? 'bg-[#12161f] border-b border-zinc-700 text-white' : 'bg-white border-b border-zinc-400 text-[#111827]';
+  const upRowCls = th.dark ? 'bg-[#171d29] active:bg-zinc-800 text-zinc-100 border-zinc-800' : 'bg-white active:bg-blue-50 text-[#111827] border-zinc-400';
+
+  const curMinsText = state.lang === 'en' ? `${curEta.mins} min` : `${curEta.mins}分鐘`;
+  const curDistText = formatDistanceLabel(curEta.distM);
 
   vp.innerHTML = `
-    <div class="px-3.5 py-2.5 ${th.subBar} flex items-center justify-between gap-2 shrink-0">
-      <div class="min-w-0">
-        <div class="text-xl font-black tracking-tight truncate">${esc(state.selectedRouteNo)}-${esc(dest || '終點')}-${esc(state.selectedTripSeq || 1)}</div>
-        ${remark ? `<div class="text-xs font-bold ${th.muted} truncate mt-0.5">${esc(remark)}</div>` : ''}
+    <!-- 路線與分段標頭（實機排版：A21-機場-1 / 正常路線 + 右側「分段 / 數字」） -->
+    <div class="px-3.5 py-2 ${headerBg} flex items-stretch justify-between gap-2 shrink-0">
+      <div class="min-w-0 flex flex-col justify-center">
+        <div class="text-[20px] font-black tracking-tight leading-snug truncate">${esc(state.selectedRouteNo)}-${esc(dest || '終點')}-${esc(state.selectedTripSeq || 1)}</div>
+        <div class="text-[15px] font-extrabold leading-snug truncate mt-0.5 opacity-90">${esc(remark)}</div>
       </div>
-      <div class="min-w-[68px] px-2 py-1 rounded border ${secBoxCls} text-center shrink-0">
-        <div class="text-[10px] font-bold ${th.muted} leading-none">分段 ${esc(curSec.sectionNo)}</div>
-        ${curSec.activeFare != null
-          ? `<div class="mt-0.5 px-1.5 py-0.5 rounded bg-emerald-600 text-white text-xs font-black leading-none">${esc(fmtFare(curSec.activeFare))}</div>`
-          : `<div class="text-xl font-black leading-tight mt-0.5">${esc(curSec.sectionNo)}</div>`
-        }
+      <div class="w-[74px] py-1 rounded-[3px] border ${secBoxCls} flex flex-col items-center justify-center shrink-0">
+        <div class="text-[12px] font-extrabold leading-none opacity-85">分段</div>
+        <div class="text-[26px] font-black leading-none mt-1">${esc(curSec.sectionNo)}</div>
       </div>
     </div>
 
+    <!-- 當前車站卡片（自動模式：時鐘＋分鐘、距離＋巴士站牌圖示、綠色進度條；手動模式：停止／下一站） -->
     <div class="px-3.5 py-3 ${curPanelCls} shrink-0">
       <button id="btnReplayCurrent" class="w-full text-left active:opacity-80">
-        <div class="flex items-start justify-between gap-2">
-          <div class="text-2xl font-black leading-snug">${state.currentStopIdx + 1}. ${esc(curName)}</div>
-          <div class="flex items-center gap-1 shrink-0 mt-1">
-            ${curSec.badgeFare != null ? `<span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black">${esc(fmtFare(curSec.badgeFare))}</span>` : ''}
-            <span class="px-1.5 py-0.5 rounded ${th.dark ? 'bg-zinc-800 border border-zinc-600 text-emerald-400' : 'bg-zinc-100 border border-zinc-300 text-emerald-700'} text-[10px] font-black">
-              ${modeStatusBadge}
-            </span>
-          </div>
-        </div>
+        <div class="text-[23px] font-black leading-snug">${state.currentStopIdx + 1}. ${esc(curName)}</div>
         ${curSub ? `<div class="text-xs font-bold ${th.muted} mt-0.5 truncate">${esc(curSub)}</div>` : ''}
       </button>
 
-      <div class="flex items-center justify-between mt-3 mb-2">
-        <span id="gpsLiveText" class="text-xs font-black ${state.gpsEnabled ? 'text-emerald-500' : th.muted}">
-          ${state.gpsEnabled
-            ? (state.gpsArrivedCur
-              ? (state.currentStopIdx >= state.tripStops.length - 1 ? 'GPS 自動 · 已到達終點站' : 'GPS 自動 · 已到站（離站後播下站）')
-              : (state.gpsDistanceM != null ? `GPS 自動 · 距本站 ${state.gpsDistanceM}m` : 'GPS 自動報站中'))
-            : '手動模式'}
-        </span>
-        <button id="btnToggleGpsInline" class="px-2.5 py-1 rounded border ${gpsBtnCls} text-[11px] font-black active:scale-95">
-          切換${state.gpsEnabled ? '手動 (M)' : 'GPS 自動'}
-        </button>
-      </div>
-
       ${!state.gpsEnabled ? `
-        <div class="grid grid-cols-2 gap-3 mt-1">
+        <div class="grid grid-cols-2 gap-3 mt-3.5">
           <button id="btnManualStop" class="h-14 rounded-xl bg-[#d92b1c] active:brightness-90 text-white font-black text-lg shadow">
             停止
           </button>
@@ -2254,31 +2523,55 @@ function renderStopsView(vp, bar) {
           </button>
         </div>
       ` : `
-        <div class="mt-1 space-y-2">
-          <div class="w-full h-4 ${th.dark ? 'bg-zinc-800 border-zinc-600' : 'bg-zinc-200 border-zinc-400'} rounded overflow-hidden border">
-            <div id="stopProgressFill" class="h-full bg-[#0068FF] transition-all duration-300" style="width:${state.stopProgressPct}%"></div>
+        <div class="mt-3 space-y-1.5">
+          <!-- 進度條上方：時鐘 icon + 分鐘 ｜ 巴士站距離 + 巴士站牌 icon -->
+          <div class="flex items-center justify-end gap-5 text-[15px] font-extrabold ${th.dark ? 'text-zinc-200' : 'text-[#2b303a]'}">
+            <div class="flex items-center gap-1.5">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9.5"/>
+                <polyline points="8.2 10.5 12 13 16.2 9.5"/>
+              </svg>
+              <span id="etaCurMins">${esc(curMinsText)}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span id="etaCurDist" class="font-mono font-extrabold">${esc(curDistText)}</span>
+              <svg class="w-5 h-6 shrink-0" viewBox="0 0 22 26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 5.5C5 3.5 7 2 11 2s6 1.5 6 3.5V17H5V5.5z"/>
+                <line x1="5" y1="6.5" x2="17" y2="6.5"/>
+                <line x1="8" y1="9.5" x2="14" y2="9.5"/>
+                <line x1="8" y1="12.5" x2="14" y2="12.5"/>
+                <line x1="8" y1="15" x2="14" y2="15"/>
+                <line x1="6.5" y1="17" x2="6.5" y2="24"/>
+              </svg>
+            </div>
           </div>
-          <div class="flex justify-between text-[11px] font-bold ${th.muted}">
-            <span>離開本站後 (&gt;55m) 自動播下站</span>
-            <span>第 ${state.currentStopIdx + 1} / ${state.tripStops.length} 站</span>
+
+          <!-- 實機圓角綠色進度條 -->
+          <div class="w-full h-[26px] rounded-full bg-[#454b54] overflow-hidden shadow-inner">
+            <div id="stopProgressFill" class="h-full bg-[#00a846] transition-all duration-300" style="width:${Math.max(12, state.stopProgressPct)}%"></div>
           </div>
         </div>
       `}
     </div>
 
-    <div class="flex-1 overflow-y-auto no-scrollbar divide-y ${th.divider}">
+    <!-- 後續站位列表（右側顯示實機疊排 ETA 分鐘） -->
+    <div class="flex-1 overflow-y-auto no-scrollbar">
       ${upcoming.length === 0 ? `
-        <div class="px-4 py-6 text-center text-sm font-bold text-amber-500">已到達本班次終點站</div>
+        <div class="px-4 py-6 text-center text-sm font-black ${th.dark ? 'text-amber-400' : 'text-zinc-800'}">已到達本班次終點站</div>
       ` : upcoming.map((st, offset) => {
         const targetIdx = state.currentStopIdx + 1 + offset;
         const nm = state.lang === 'en' ? (getStopNameEn(st) || getStopNameTc(st)) : getStopNameTc(st);
         const sInfo = sections[targetIdx] || {};
+        const uEta = state.etaMap[targetIdx] || { mins: Math.max(2, (offset + 1) * 3) };
         return `
-          <button data-jump="${targetIdx}" class="jump-stop-btn w-full px-4 py-3.5 text-left ${th.row} flex items-center justify-between gap-2">
-            <span class="text-lg font-extrabold truncate">${targetIdx + 1}. ${esc(nm)}</span>
-            <div class="flex items-center gap-1.5 shrink-0">
-              ${sInfo.badgeFare != null ? `<span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black">${esc(fmtFare(sInfo.badgeFare))}</span>` : ''}
-              ${st.approachAudioFile ? '<span class="px-1.5 py-0.5 rounded bg-blue-600/20 text-[#0068FF] text-[10px] font-bold">+提示</span>' : ''}
+          <button data-jump="${targetIdx}" class="jump-stop-btn w-full px-3.5 py-3 text-left border-b ${upRowCls} flex items-center justify-between gap-2">
+            <div class="min-w-0 flex items-center gap-2">
+              <span class="text-[20px] font-bold truncate">${targetIdx + 1}. ${esc(nm)}</span>
+              ${sInfo.badgeFare != null ? `<span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black shrink-0">${esc(fmtFare(sInfo.badgeFare))}</span>` : ''}
+            </div>
+            <div class="shrink-0 text-center leading-tight min-w-[38px]">
+              <div data-eta-idx="${targetIdx}" class="text-[19px] font-black leading-none">${uEta.mins}</div>
+              <div class="text-[11px] font-bold opacity-80 mt-0.5">${state.lang === 'en' ? 'min' : '分鐘'}</div>
             </div>
           </button>
         `;
@@ -2288,11 +2581,12 @@ function renderStopsView(vp, bar) {
 
   const canPrev = state.currentStopIdx > 0;
   const canNext = state.currentStopIdx < state.tripStops.length - 1;
+  bar.className = 'grid grid-cols-4 gap-1.5 p-1.5 bg-[#0d1118] border-t border-zinc-800 shrink-0';
   bar.innerHTML = `
-    <button id="botBack" class="h-11 rounded-lg bg-[#d92b1c] text-white font-black text-xl flex items-center justify-center active:brightness-90">‹</button>
-    <button id="botPrev" class="h-11 rounded-lg ${canPrev ? 'bg-[#0068FF] text-white' : 'bg-zinc-600 text-zinc-300'} font-black text-xl flex items-center justify-center active:brightness-90">↑</button>
-    <button id="botNext" class="h-11 rounded-lg ${canNext ? 'bg-[#0068FF] text-white' : 'bg-zinc-600 text-zinc-300'} font-black text-xl flex items-center justify-center active:brightness-90">↓</button>
-    <button id="botMore" class="h-11 rounded-lg bg-[#0068FF] text-white font-black text-lg flex items-center justify-center active:brightness-90">•••</button>
+    <button id="botBack" class="h-11 rounded-lg bg-[#e53935] text-white font-black text-2xl flex items-center justify-center active:brightness-90">‹</button>
+    <button id="botPrev" class="h-11 rounded-lg ${canPrev ? 'bg-[#0074f0] text-white' : 'bg-[#5a6069] text-zinc-200'} font-black text-2xl flex items-center justify-center active:brightness-90">↑</button>
+    <button id="botNext" class="h-11 rounded-lg ${canNext ? 'bg-[#0074f0] text-white' : 'bg-[#5a6069] text-zinc-200'} font-black text-2xl flex items-center justify-center active:brightness-90">↓</button>
+    <button id="botMore" class="h-11 rounded-lg bg-[#0074f0] text-white font-black text-xl flex items-center justify-center active:brightness-90">•••</button>
   `;
 
   const advanceStop = () => {
@@ -2302,6 +2596,7 @@ function renderStopsView(vp, bar) {
       state.gpsDistanceM = null;
       state.gpsArrivedCur = false;
       state.gpsMinDistToCur = Infinity;
+      state.etaMap = {};
       renderAll();
       triggerStopAnnouncement(state.currentStopIdx, true);
     } else {
@@ -2315,6 +2610,7 @@ function renderStopsView(vp, bar) {
       state.gpsDistanceM = null;
       state.gpsArrivedCur = false;
       state.gpsMinDistToCur = Infinity;
+      state.etaMap = {};
       renderAll();
       triggerStopAnnouncement(state.currentStopIdx, true);
     }
@@ -2329,7 +2625,6 @@ function renderStopsView(vp, bar) {
     triggerStopAnnouncement(state.currentStopIdx, true);
     showToast(state.currentStopIdx === 0 ? '重播歡迎詞' : '重播報站');
   };
-  document.getElementById('btnToggleGpsInline').onclick = () => toggleGpsMode();
 
   const btnStop = document.getElementById('btnManualStop');
   if (btnStop) {
@@ -2351,6 +2646,7 @@ function renderStopsView(vp, bar) {
       state.gpsDistanceM = null;
       state.gpsArrivedCur = false;
       state.gpsMinDistToCur = Infinity;
+      state.etaMap = {};
       renderAll();
       triggerStopAnnouncement(state.currentStopIdx, true);
     };
@@ -2365,6 +2661,9 @@ function renderStopsView(vp, bar) {
   document.getElementById('botPrev').onclick = prevStop;
   document.getElementById('botNext').onclick = advanceStop;
   document.getElementById('botMore').onclick = () => document.getElementById('moreModal').classList.remove('hidden');
+
+  // 非同步向 OSRM 地圖 API 查詢實際道路距離與預計分鐘
+  refreshRouteEtas(true);
 }
 
 // ============ 特別廣播分頁（實機螢光綠 ▶ / 紅 ■ ＋ 內嵌 2×5 鍵盤 3 秒自動播） ============
@@ -2856,7 +3155,7 @@ function renderSettingsView(vp, bar) {
       <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">診斷模式</div>
       <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5 text-xs">
         <div class="p-3 rounded-xl border ${th.card} space-y-1.5">
-          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v46)</div>
+          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v48)</div>
           <div>App Version：<b>23.06.25</b> ｜ Config：<b>ctb_prod_v10</b></div>
           <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
           <div>站點資料庫：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
@@ -3258,7 +3557,8 @@ function bindGlobalEvents() {
   document.getElementById('btnCloseCD').onclick = () => document.getElementById('cleverDriveModal').classList.add('hidden');
   document.getElementById('btnDriverBadge').onclick = () => openStaffIdModal();
 
-  document.getElementById('newMsgPopup').onclick = e => {
+  const _nmp = document.getElementById('newMsgPopup');
+  if (_nmp) _nmp.onclick = e => {
     if (e.target.id === 'btnDismissPopup') {
       state.dismissedPopup = true;
       renderTopStatus();
