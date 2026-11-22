@@ -79,7 +79,6 @@
         <div class="flex items-center gap-1.5">
           <span id="gpsStatusChip" class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-700 text-white">GPS 待命</span>
           <span id="speedChip" class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-amber-300">0 km/h</span>
-          <!-- 實車右上角地球連線圖示 -->
           <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8M12 3a14.5 14.5 0 010 18M12 3a14.5 14.5 0 000 18"/></svg>
         </div>
       </div>
@@ -109,7 +108,6 @@
         </button>
       </div>
 
-      <!-- 訓練模式 / 事故警示條 -->
       <div id="trainingBanner" class="hidden bg-yellow-400 text-black text-xs font-bold px-3 py-1 text-center shrink-0">訓練模式已啟動</div>
       <div id="incidentBanner" class="hidden bg-red-600 text-white text-xs font-bold px-3 py-1 text-center shrink-0">事故模式已啟動</div>
 
@@ -121,7 +119,7 @@
         </div>
       </div>
 
-      <!-- 4. 螢幕內部底部功能列 (依頁面動態還原實車色彩與按鈕) -->
+      <!-- 4. 螢幕內部底部功能列 -->
       <div id="screenBottomBar" class="bg-black p-1 grid gap-1 shrink-0"></div>
     </div>
 
@@ -151,11 +149,6 @@
     </div>
   </div>
 
-  <!-- 過站 / 模式快速選單彈窗 -->
-  <div id="popupOverlay" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4">
-    <div id="popupCard" class="bg-white text-black rounded-xl w-full max-w-[300px] p-4 shadow-2xl space-y-2.5"></div>
-  </div>
-
   <div id="toastBox" class="hidden fixed top-12 left-1/2 -translate-x-1/2 bg-black/90 text-white text-xs font-bold px-3.5 py-2 rounded-full border border-zinc-600 z-50 shadow-lg"></div>
   <input type="file" id="zipInput" accept=".zip" class="hidden" />
 
@@ -164,16 +157,18 @@ const state = {
   routes: [],
   stopsByTrip: new Map(),
   announcements: [],
-  currentTab: 'route',       // route | broadcast | message | incident | settings
-  routeStage: 'route',       // route | pattern | start_stop | stops
+  currentTab: 'route',
+  routeStage: 'route',
+  showRouteInput: false,   // 預設隱藏輸入框與鍵盤，撳放大鏡先打開
   routeQuery: '',
   routeListOffset: 0,
+  activeLetterKey: null,   // 長撳數字鍵後展開的字母選擇列 ('1'..'0')
   selectedRouteId: null,
   selectedTrip: null,
   tripStops: [],
   currentStopIdx: 0,
   stopProgressPct: 35,
-  stopMode: 'auto',          // auto | manual
+  stopMode: 'auto',
   volume: 1.0,
   brightnessDim: 0.0,
   darkMode: false,
@@ -192,37 +187,19 @@ const state = {
   cleverScore: 100
 };
 
-// T9 多擊循環表 (對齊 LECIP_route.png 10鍵盤)
+// 對齊 LECIP_route_1lm_open.png / 2lm_open.png / 3lm_open.png 鍵盤與長撳字母表
 const T9_KEYS = [
-  { main: '1', sub: 'ABC', seq: ['1', 'A', 'B', 'C'] },
-  { main: '2', sub: 'DEF', seq: ['2', 'D', 'E', 'F'] },
-  { main: '3', sub: 'GHI', seq: ['3', 'G', 'H', 'I'] },
-  { main: '4', sub: 'JKL', seq: ['4', 'J', 'K', 'L'] },
-  { main: '5', sub: 'MNO', seq: ['5', 'M', 'N', 'O'] },
-  { main: '6', sub: 'PQR', seq: ['6', 'P', 'Q', 'R'] },
-  { main: '7', sub: 'STU', seq: ['7', 'S', 'T', 'U'] },
-  { main: '8', sub: 'VWX', seq: ['8', 'V', 'W', 'X'] },
-  { main: '9', sub: 'YZ',  seq: ['9', 'Y', 'Z'] },
-  { main: '0', sub: '.',   seq: ['0', '.'] }
+  { main: '1', sub: 'ABC', letters: ['A', 'B', 'C'] },
+  { main: '2', sub: 'DEF', letters: ['D', 'E', 'F'] },
+  { main: '3', sub: 'GHI', letters: ['G', 'H', 'I'] },
+  { main: '4', sub: 'JKL', letters: ['J', 'K', 'L'] },
+  { main: '5', sub: 'MNO', letters: ['M', 'N', 'O'] },
+  { main: '6', sub: 'PQR', letters: ['P', 'Q', 'R'] },
+  { main: '7', sub: 'STU', letters: ['S', 'T', 'U'] },
+  { main: '8', sub: 'VWX', letters: ['V', 'W', 'X'] },
+  { main: '9', sub: 'YZ',  letters: ['Y', 'Z'] },
+  { main: '0', sub: '.',   letters: ['.'] }
 ];
-let lastT9Key = null;
-let lastT9Time = 0;
-let lastT9CycleIdx = 0;
-
-function pressT9Key(keyObj) {
-  const now = Date.now();
-  if (lastT9Key === keyObj.main && (now - lastT9Time) < 950 && state.routeQuery.length > 0) {
-    lastT9CycleIdx = (lastT9CycleIdx + 1) % keyObj.seq.length;
-    state.routeQuery = state.routeQuery.slice(0, -1) + keyObj.seq[lastT9CycleIdx];
-  } else {
-    lastT9Key = keyObj.main;
-    lastT9CycleIdx = 0;
-    state.routeQuery += keyObj.seq[0];
-  }
-  lastT9Time = now;
-  state.routeListOffset = 0;
-  renderMain();
-}
 
 function fmtRouteNo(rOrId) {
   if (rOrId && typeof rOrId === 'object') {
@@ -362,7 +339,6 @@ function renderTabs() {
   const screen = document.getElementById('lecipScreen');
   screen.classList.toggle('dark-mode', state.darkMode);
 
-  // 對齊實車：選路線時顯示路徑節點圖示＋「路線」；報站中顯示藍底白字 A/M 圓章＋「自動／手動」
   const inStops = (state.routeStage === 'stops');
   const iconWrap = document.getElementById('routeTabIconWrap');
   if (inStops) {
@@ -397,7 +373,6 @@ function getFilteredRouteList() {
   }
   const q = state.routeQuery.toUpperCase();
   const arr = [...routeMap.entries()].filter(([disp]) => !q || disp.toUpperCase().startsWith(q) || disp.toUpperCase().includes(q));
-  // 優先把開頭完全吻合排喺最前
   arr.sort((a, b) => {
     const aStarts = q && a[0].toUpperCase().startsWith(q) ? 0 : 1;
     const bStarts = q && b[0].toUpperCase().startsWith(q) ? 0 : 1;
@@ -414,74 +389,191 @@ function renderMain() {
 
   if (state.currentTab === 'route') {
     if (state.routeStage === 'route') {
-      // 對齊 LECIP_route.png：頂部「輸入路線」＋白底框＋藍色退格鍵 + 3行候選路線 + 10格藍色T9鍵盤
       const filtered = getFilteredRouteList();
-      const maxOffset = Math.max(0, filtered.length - 3);
-      state.routeListOffset = Math.min(state.routeListOffset, maxOffset);
-      const visible3 = filtered.slice(state.routeListOffset, state.routeListOffset + 3);
 
-      vp.innerHTML = `
-        <div class="${bgBanner} px-2.5 py-2 flex items-center gap-2 border-b border-zinc-500 shrink-0">
-          <span class="font-black text-[17px] shrink-0">輸入路線</span>
-          <div class="flex-1 h-11 bg-white border border-zinc-500 rounded-lg px-2.5 flex items-center justify-between">
-            <span class="font-black text-2xl text-black tracking-wide">${state.routeQuery}</span>
-            <span class="text-[11px] text-zinc-400 font-bold">${filtered.length}條</span>
+      if (!state.showRouteInput) {
+        // 未撳放大鏡：緊湊路線列表，只顯示路線號＋右箭咀（唔顯示去邊、卡片唔過大）
+        const pageRows = 7;
+        const maxOff = Math.max(0, filtered.length - pageRows);
+        state.routeListOffset = Math.min(state.routeListOffset, maxOff);
+        const visibleRows = filtered.slice(state.routeListOffset, state.routeListOffset + pageRows);
+
+        vp.innerHTML = `
+          <div class="${bgBanner} px-3 py-2 border-b border-zinc-500 flex items-center justify-between shrink-0">
+            <span class="font-black text-base">選擇路線</span>
+            <span class="text-xs font-extrabold opacity-75">${state.routeQuery ? '篩選：' + state.routeQuery : '全部路線'}</span>
           </div>
-          <button id="t9Backspace" class="w-14 h-11 rounded-lg bg-[#0068FF] active:brightness-90 text-white flex items-center justify-center shrink-0">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M9 5h11a1 1 0 011 1v12a1 1 0 01-1 1H9l-6-7 6-7z"/><path d="M13 10l4 4m0-4l-4 4"/></svg>
-          </button>
-        </div>
+          <div class="flex-1 flex flex-col divide-y divide-zinc-400 overflow-hidden">
+            ${Array.from({ length: pageRows }).map((_, slot) => {
+              const item = visibleRows[slot];
+              if (!item) {
+                return `<div class="flex-1 ${rowBg} px-4 flex items-center justify-end"><span class="text-zinc-300 font-black text-xl">›</span></div>`;
+              }
+              const [disp, rObj] = item;
+              return `
+                <button data-rid="${rObj.routeId}" class="pick-route-row flex-1 ${rowBg} px-4 flex items-center justify-between active:bg-blue-100">
+                  <span class="font-black text-2xl tracking-wide">${disp}</span>
+                  <span class="text-zinc-500 font-black text-2xl">›</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        `;
+        document.querySelectorAll('.pick-route-row').forEach(btn => {
+          btn.onclick = () => {
+            state.selectedRouteId = btn.dataset.rid;
+            state.routeStage = 'pattern';
+            renderMain();
+          };
+        });
 
-        <!-- 3 行候選路線列 (對齊 LECIP_route.png 白底＋灰右箭咀) -->
-        <div class="flex-1 flex flex-col divide-y divide-zinc-400 overflow-hidden">
-          ${[0, 1, 2].map(slot => {
-            const item = visible3[slot];
-            if (!item) {
-              return `<div class="flex-1 ${rowBg} px-3 flex items-center justify-end"><span class="text-zinc-400 font-black text-2xl">›</span></div>`;
-            }
-            const [disp, rObj] = item;
-            const dest = rObj.destTc || rObj.endStopNameTc || '';
-            return `
-              <button data-rid="${rObj.routeId}" class="pick-route-row flex-1 ${rowBg} px-3 flex items-center justify-between active:bg-blue-100">
-                <div class="flex items-baseline gap-2.5 truncate">
-                  <span class="font-black text-2xl">${disp}</span>
-                  <span class="text-sm font-bold opacity-75 truncate">往 ${dest}</span>
-                </div>
-                <span class="text-zinc-500 font-black text-2xl ml-2 shrink-0">›</span>
-              </button>
-            `;
-          }).join('')}
-        </div>
+      } else {
+        // 已撳放大鏡：顯示「輸入路線」白底框＋退格鍵 + 緊湊3行候選列(只顯示路線號) + 5x2鍵盤(長撳展開字母列)
+        const maxOffset = Math.max(0, filtered.length - 3);
+        state.routeListOffset = Math.min(state.routeListOffset, maxOffset);
+        const visible3 = filtered.slice(state.routeListOffset, state.routeListOffset + 3);
+        const openKeyObj = T9_KEYS.find(k => k.main === state.activeLetterKey);
 
-        <!-- 5x2 實車藍色 T9 數位鍵盤 -->
-        <div class="bg-[#0068FF] grid grid-cols-5 border-t border-zinc-600 shrink-0">
-          ${T9_KEYS.map((k, idx) => `
-            <button data-kidx="${idx}" class="t9-key-btn py-1.5 border-r border-b border-[#004ec2] active:bg-[#004ec2] text-white flex flex-col items-center justify-center leading-none">
-              <span class="text-[22px] font-black">${k.main}</span>
-              <span class="text-[11px] font-extrabold tracking-tight mt-0.5">${k.sub}</span>
+        vp.innerHTML = `
+          <div class="${bgBanner} px-2.5 py-1.5 flex items-center gap-2 border-b border-zinc-500 shrink-0">
+            <span class="font-black text-[16px] shrink-0">輸入路線</span>
+            <div class="flex-1 h-10 bg-white border border-zinc-500 rounded-lg px-2.5 flex items-center">
+              <span class="font-black text-2xl text-black tracking-wide">${state.routeQuery}</span>
+            </div>
+            <button id="t9Backspace" class="w-13 h-10 px-3 rounded-lg bg-[#0068FF] active:brightness-90 text-white flex items-center justify-center shrink-0">
+              <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M9 5h11a1 1 0 011 1v12a1 1 0 01-1 1H9l-6-7 6-7z"/><path d="M13 10l4 4m0-4l-4 4"/></svg>
             </button>
-          `).join('')}
-        </div>
-      `;
+          </div>
 
-      document.getElementById('t9Backspace').onclick = () => {
-        if (state.routeQuery.length > 0) {
-          state.routeQuery = state.routeQuery.slice(0, -1);
-          state.routeListOffset = 0;
-          lastT9Key = null;
-          renderMain();
-        }
-      };
-      document.querySelectorAll('.pick-route-row').forEach(btn => {
-        btn.onclick = () => {
-          state.selectedRouteId = btn.dataset.rid;
-          state.routeStage = 'pattern';
+          <!-- 緊湊 3 行候選列 (只顯示路線號碼，唔寫目的地) -->
+          <div class="flex-1 flex flex-col divide-y divide-zinc-400 overflow-hidden">
+            ${[0, 1].map(slot => {
+              const item = visible3[slot];
+              if (!item) {
+                return `<div class="flex-1 ${rowBg} px-4 flex items-center justify-end"><span class="text-zinc-400 font-black text-2xl">›</span></div>`;
+              }
+              const [disp, rObj] = item;
+              return `
+                <button data-rid="${rObj.routeId}" class="pick-route-row flex-1 ${rowBg} px-4 flex items-center justify-between active:bg-blue-100">
+                  <span class="font-black text-2xl tracking-wide">${disp}</span>
+                  <span class="text-zinc-500 font-black text-2xl">›</span>
+                </button>
+              `;
+            }).join('')}
+
+            ${openKeyObj ? `
+              <!-- 長撳數字鍵後展開的英文字母選擇列 (對齊 LECIP_route_1lm_open.png) -->
+              <div class="flex-1 bg-white grid grid-cols-5 divide-x divide-zinc-400 border-t border-zinc-400">
+                <button id="closeLetterRow" class="flex items-center justify-center text-zinc-400 font-black text-lg active:bg-zinc-100">✕</button>
+                ${[0, 1, 2].map(li => {
+                  const ch = openKeyObj.letters[li];
+                  if (!ch) return `<div></div>`;
+                  return `
+                    <button data-ch="${ch}" class="pick-letter-btn flex items-center justify-center text-[#0068FF] font-black text-3xl active:bg-blue-100">
+                      ${ch}
+                    </button>
+                  `;
+                }).join('')}
+                <button id="closeLetterNext" class="flex items-center justify-center text-zinc-500 font-black text-2xl active:bg-zinc-100">›</button>
+              </div>
+            ` : (() => {
+              const item = visible3[2];
+              if (!item) {
+                return `<div class="flex-1 ${rowBg} px-4 flex items-center justify-end"><span class="text-zinc-400 font-black text-2xl">›</span></div>`;
+              }
+              const [disp, rObj] = item;
+              return `
+                <button data-rid="${rObj.routeId}" class="pick-route-row flex-1 ${rowBg} px-4 flex items-center justify-between active:bg-blue-100">
+                  <span class="font-black text-2xl tracking-wide">${disp}</span>
+                  <span class="text-zinc-500 font-black text-2xl">›</span>
+                </button>
+              `;
+            })()}
+          </div>
+
+          <!-- 5x2 實車藍色數位鍵盤 (短撳數字、長撳展開字母) -->
+          <div class="bg-[#0068FF] grid grid-cols-5 border-t border-zinc-600 shrink-0">
+            ${T9_KEYS.map((k, idx) => {
+              const isSelected = state.activeLetterKey === k.main;
+              return `
+                <button data-kidx="${idx}" class="t9-key-btn py-1.5 border-r border-b border-[#004ec2] ${isSelected ? 'bg-white text-[#0068FF]' : 'bg-[#0068FF] text-white active:bg-white active:text-[#0068FF]'} flex flex-col items-center justify-center leading-none">
+                  <span class="text-[21px] font-black">${k.main}</span>
+                  <span class="text-[10px] font-extrabold tracking-tight mt-0.5">${k.sub}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        `;
+
+        document.getElementById('t9Backspace').onclick = () => {
+          if (state.routeQuery.length > 0) {
+            state.routeQuery = state.routeQuery.slice(0, -1);
+            state.routeListOffset = 0;
+          }
+          state.activeLetterKey = null;
           renderMain();
         };
-      });
-      document.querySelectorAll('.t9-key-btn').forEach(btn => {
-        btn.onclick = () => pressT9Key(T9_KEYS[Number(btn.dataset.kidx)]);
-      });
+        document.querySelectorAll('.pick-route-row').forEach(btn => {
+          btn.onclick = () => {
+            state.selectedRouteId = btn.dataset.rid;
+            state.routeStage = 'pattern';
+            state.activeLetterKey = null;
+            renderAll();
+          };
+        });
+        if (document.getElementById('closeLetterRow')) {
+          document.getElementById('closeLetterRow').onclick = () => { state.activeLetterKey = null; renderMain(); };
+        }
+        if (document.getElementById('closeLetterNext')) {
+          document.getElementById('closeLetterNext').onclick = () => { state.activeLetterKey = null; renderMain(); };
+        }
+        document.querySelectorAll('.pick-letter-btn').forEach(btn => {
+          btn.onclick = () => {
+            state.routeQuery += btn.dataset.ch;
+            state.routeListOffset = 0;
+            state.activeLetterKey = null;
+            renderMain();
+          };
+        });
+
+        // 綁定短撳數字 + 長撳 (350ms) 顯示英文字母選擇列
+        document.querySelectorAll('.t9-key-btn').forEach(btn => {
+          const kObj = T9_KEYS[Number(btn.dataset.kidx)];
+          let pressTimer = null;
+          let longPressed = false;
+
+          const startPress = (e) => {
+            e.preventDefault();
+            longPressed = false;
+            pressTimer = setTimeout(() => {
+              longPressed = true;
+              state.activeLetterKey = (state.activeLetterKey === kObj.main) ? null : kObj.main;
+              renderMain();
+            }, 350);
+          };
+          const endPress = (e) => {
+            e.preventDefault();
+            if (pressTimer) {
+              clearTimeout(pressTimer);
+              pressTimer = null;
+            }
+            if (!longPressed) {
+              state.routeQuery += kObj.main;
+              state.routeListOffset = 0;
+              state.activeLetterKey = null;
+              renderMain();
+            }
+          };
+          const cancelPress = () => {
+            if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+          };
+
+          btn.addEventListener('pointerdown', startPress);
+          btn.addEventListener('pointerup', endPress);
+          btn.addEventListener('pointerleave', cancelPress);
+          btn.addEventListener('pointercancel', cancelPress);
+        });
+      }
 
     } else if (state.routeStage === 'pattern') {
       const trips = state.routes.filter(r => r.routeId === state.selectedRouteId);
@@ -497,9 +589,9 @@ function renderMain() {
             const pat = t.patternNameTc || (t.patternId ? `特別班次 (${t.patternId})` : '正常班次');
             const fare = t.fullFare != null ? `$${Number(t.fullFare).toFixed(1)}` : '';
             return `
-              <button data-tidx="${idx}" class="pick-trip-btn w-full text-left px-3 py-3 ${rowBg} active:bg-blue-100 flex items-center justify-between">
+              <button data-tidx="${idx}" class="pick-trip-btn w-full text-left px-3 py-2.5 ${rowBg} active:bg-blue-100 flex items-center justify-between">
                 <div class="pr-2">
-                  <div class="font-black text-lg">往 ${dest}</div>
+                  <div class="font-black text-base">往 ${dest}</div>
                   <div class="text-xs font-bold opacity-75 mt-0.5">${start}${dest}</div>
                   <div class="text-xs text-[#0068FF] font-extrabold mt-0.5">${pat} ${fare ? '· 全程 ' + fare : ''}</div>
                 </div>
@@ -528,15 +620,15 @@ function renderMain() {
       vp.innerHTML = `
         <div class="${bgBanner} px-3 py-1.5 border-b border-zinc-500 shrink-0">
           <div class="text-xs font-bold opacity-80">${dispNo}-${dest}-${t.bound}</div>
-          <div class="font-black text-lg">選擇開始站位</div>
+          <div class="font-black text-base">選擇開始站位</div>
         </div>
         <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar divide-y divide-zinc-400">
           ${state.tripStops.map((s, idx) => {
             const name = s.nameTc || s.nameZh || s.name || `第 ${idx+1} 站`;
             return `
-              <button data-sidx="${idx}" class="pick-start-btn w-full text-left px-3 py-3 flex items-center justify-between ${idx === 0 ? 'bg-[#f4f728] text-black font-black' : rowBg}">
-                <span class="text-lg font-bold truncate">${idx + 1}. ${name}</span>
-                <span class="text-zinc-500 font-black text-2xl ml-2">›</span>
+              <button data-sidx="${idx}" class="pick-start-btn w-full text-left px-3 py-2.5 flex items-center justify-between ${idx === 0 ? 'bg-[#f4f728] text-black font-black' : rowBg}">
+                <span class="text-base font-bold truncate">${idx + 1}. ${name}</span>
+                <span class="text-zinc-500 font-black text-xl ml-2">›</span>
               </button>
             `;
           }).join('')}
@@ -554,8 +646,6 @@ function renderMain() {
       });
 
     } else if (state.routeStage === 'stops') {
-      // 對齊 LECIP_start_E11.png & LECIP_start.png：
-      // 淺藍紫標題欄(上行大字目前站/下車提示 + 下行起點開出) + 大格目前站與綠灰膠囊進度條 + 下方3站＋右欄「N 分鐘」
       const t = state.selectedTrip;
       const dispNo = fmtRouteNo(t);
       const originName = t.startStopNameTc || (state.tripStops[0]?.nameTc) || '';
@@ -570,8 +660,7 @@ function renderMain() {
           <div class="text-sm font-extrabold mt-0.5 truncate">${originName ? originName + '開出' : ''} ${curFare ? '· $' + curFare : ''}</div>
         </div>
 
-        <!-- 當前/下一站大主格 + 實車綠灰膠囊進度條 -->
-        <button id="replayCurStop" class="w-full text-left ${rowBg} px-3.5 py-3 border-b border-zinc-500 flex flex-col justify-between shrink-0 active:bg-yellow-100" style="min-height: 118px;">
+        <button id="replayCurStop" class="w-full text-left ${rowBg} px-3.5 py-3 border-b border-zinc-500 flex flex-col justify-between shrink-0 active:bg-yellow-100" style="min-height: 112px;">
           <div class="flex items-baseline gap-2">
             <span class="font-black text-2xl">${state.currentStopIdx + 1}.</span>
             <span class="font-black text-2xl leading-snug truncate">${curName}</span>
@@ -581,7 +670,6 @@ function renderMain() {
           </div>
         </button>
 
-        <!-- 下方 3 行後續站位 + 右側分鐘數 (對齊 LECIP_start_E11.png) -->
         <div class="flex-1 flex flex-col divide-y divide-zinc-400 overflow-hidden">
           ${[0, 1, 2].map(offset => {
             const s = next3[offset];
@@ -627,7 +715,6 @@ function renderMain() {
     }
 
   } else if (state.currentTab === 'broadcast') {
-    // 對齊 LECIP_SPA_without_keyboard_*.png：淺藍紫「播放特別訊息」+ 5行項目配右側實車螢光綠大播放鍵
     const list = state.announcements.filter(a => {
       if (!state.broadcastQuery) return true;
       const q = state.broadcastQuery.toLowerCase();
@@ -652,9 +739,7 @@ function renderMain() {
       <div class="flex-1 flex flex-col divide-y divide-zinc-400 overflow-hidden">
         ${[0, 1, 2, 3, 4].map(slot => {
           const item = pageItems[slot];
-          if (!item) {
-            return `<div class="flex-1 ${rowBg}"></div>`;
-          }
+          if (!item) return `<div class="flex-1 ${rowBg}"></div>`;
           const code = item.code != null ? item.code : (state.broadcastPage * pageSize + slot + 1);
           const title = item.titleTc || `特別訊息 ${code}`;
           return `
@@ -805,12 +890,10 @@ function renderMain() {
   }
 }
 
-// 動態渲染螢幕底部 4 格實車功能掣 (對齊不同畫面色彩與形狀)
 function renderBottomBar() {
   const bar = document.getElementById('screenBottomBar');
 
   if (state.currentTab === 'broadcast') {
-    // 對齊 LECIP_SPA_without_keyboard_*.png：大粒藍 ↑、大粒藍 ↓、右側藍 🔍
     bar.style.gridTemplateColumns = '1.5fr 1.5fr 0.85fr';
     bar.innerHTML = `
       <button id="bUp" class="h-12 rounded-lg bg-[#0068FF] active:brightness-90 text-white flex items-center justify-center">
@@ -839,7 +922,7 @@ function renderBottomBar() {
   }
 
   if (state.currentTab === 'route' && state.routeStage === 'route') {
-    // 對齊 LECIP_route.png：藍底白圈小機械人 + 灰 ↑ + 藍 ↓ + 白底藍 🔍
+    const step = state.showRouteInput ? 3 : 7;
     bar.style.gridTemplateColumns = '0.85fr 1.3fr 1.3fr 0.85fr';
     bar.innerHTML = `
       <button id="rBot" class="h-12 rounded-lg bg-[#0068FF] active:brightness-90 flex items-center justify-center">
@@ -851,37 +934,35 @@ function renderBottomBar() {
       <button id="rDown" class="h-12 rounded-lg bg-[#0068FF] active:brightness-90 text-white flex items-center justify-center">
         <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
       </button>
-      <button id="rSearch" class="h-12 rounded-lg bg-white active:brightness-90 text-[#0068FF] flex items-center justify-center">
+      <button id="rSearch" class="h-12 rounded-lg ${state.showRouteInput ? 'bg-white text-[#0068FF]' : 'bg-[#0068FF] text-white'} active:brightness-90 flex items-center justify-center">
         <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
       </button>
     `;
     document.getElementById('rBot').onclick = () => {
       state.routeQuery = '';
       state.routeListOffset = 0;
-      showToast('已清除輸入');
+      state.activeLetterKey = null;
+      showToast('已重設路線清單');
       renderMain();
     };
     document.getElementById('rUp').onclick = () => {
-      state.routeListOffset = Math.max(0, state.routeListOffset - 3);
+      state.routeListOffset = Math.max(0, state.routeListOffset - step);
       renderMain();
     };
     document.getElementById('rDown').onclick = () => {
-      state.routeListOffset += 3;
+      state.routeListOffset += step;
       renderMain();
     };
+    // 撳放大鏡先打開/收起「輸入路線」輸入框＋T9鍵盤
     document.getElementById('rSearch').onclick = () => {
-      const filtered = getFilteredRouteList();
-      if (filtered.length > 0) {
-        state.selectedRouteId = filtered[0][1].routeId;
-        state.routeStage = 'pattern';
-        renderMain();
-      }
+      state.showRouteInput = !state.showRouteInput;
+      state.activeLetterKey = null;
+      renderAll();
     };
     return;
   }
 
   if (state.currentTab === 'route' && state.routeStage === 'stops') {
-    // 對齊 LECIP_start.png：紅底白 < + 灰 ↑ + 藍 ↓ + 藍底三點 ⋯
     bar.style.gridTemplateColumns = '0.85fr 1.3fr 1.3fr 0.85fr';
     bar.innerHTML = `
       <button id="sBack" class="h-12 rounded-lg bg-[#ef1a1a] active:brightness-90 text-white flex items-center justify-center">
@@ -925,7 +1006,6 @@ function renderBottomBar() {
     return;
   }
 
-  // 其他頁面通用導航列
   bar.style.gridTemplateColumns = '0.85fr 1.3fr 1.3fr 0.85fr';
   bar.innerHTML = `
     <button id="gBack" class="h-12 rounded-lg bg-[#2a313d] active:bg-blue-700 text-white flex items-center justify-center">
@@ -982,19 +1062,22 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 window.addEventListener('keydown', (e) => {
   if (state.currentTab === 'route' && state.routeStage === 'route') {
     if (/^[0-9A-Za-z.]$/.test(e.key)) {
+      state.showRouteInput = true;
       state.routeQuery += e.key.toUpperCase();
       state.routeListOffset = 0;
-      renderMain();
+      state.activeLetterKey = null;
+      renderAll();
     } else if (e.key === 'Backspace') {
       state.routeQuery = state.routeQuery.slice(0, -1);
       state.routeListOffset = 0;
+      state.activeLetterKey = null;
       renderMain();
     } else if (e.key === 'Enter') {
       const filtered = getFilteredRouteList();
       if (filtered.length > 0) {
         state.selectedRouteId = filtered[0][1].routeId;
         state.routeStage = 'pattern';
-        renderMain();
+        renderAll();
       }
     }
   }
@@ -1020,7 +1103,6 @@ document.getElementById('hwBrightUp').onclick = () => {
   showToast(`螢幕亮度：${Math.round((1 - state.brightnessDim) * 100)}%`);
 };
 
-// 匯入自訂 ZIP 路線包
 document.getElementById('zipInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
