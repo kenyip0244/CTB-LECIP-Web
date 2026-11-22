@@ -656,7 +656,7 @@ function renderTopStatus() {
   // 停車3秒安全鎖狀態切換按鈕
   const stopBtn = document.getElementById('simStopToggle');
   if (state.isStopped3s) {
-    stopBtn.textContent = '${state.isStopped3s ? '已停 ≥3s' : ('行駛 ' + state.gpsSpeedKmh + 'km/h')}';
+    stopBtn.textContent = '已停 ≥3s';
     stopBtn.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-700 text-white';
   } else {
     stopBtn.textContent = `${state.gpsSpeedKmh || 32} km/h`;
