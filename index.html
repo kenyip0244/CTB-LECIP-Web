@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="referrer" content="no-referrer" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#111318" />
@@ -47,43 +48,36 @@
       <span class="w-3 h-3 rounded-full bg-zinc-900 border border-zinc-700"></span>
     </div>
 
-    <!-- 螢幕主顯示區（所有開機畫面、彈窗、報站均鎖定於此框內） -->
+    <!-- 螢幕主顯示區 -->
     <div id="screenBox" class="relative flex-1 flex flex-col overflow-hidden rounded-lg bg-[#12151c] border border-zinc-800 shadow-inner transition-[filter] duration-150">
 
-      <!-- 機身內嵌開機序列：階段一 Android -> 階段二 LIT TRANSIT / Citybus 診斷畫面 -->
+      <!-- 機身內嵌開機序列：Android -> LIT TRANSIT / Citybus 診斷畫面 -->
       <div id="lecipBootOverlay" class="absolute inset-0 z-40 bg-black text-white flex flex-col transition-opacity duration-300 cursor-pointer">
-        <!-- 階段一：Android -->
         <div id="bootPhaseAndroid" class="flex-1 flex flex-col items-center justify-center px-6">
           <img src="./assets/android_boot.gif" alt="android"
                onerror="this.style.display='none';document.getElementById('bootAndroidFallback').classList.remove('hidden');"
                class="max-h-[55%] w-auto object-contain" />
           <div id="bootAndroidFallback" class="hidden text-5xl font-semibold tracking-tight text-white">android</div>
         </div>
-
-        <!-- 階段二：診斷初始化畫面 -->
         <div id="bootPhaseDiag" class="hidden flex-1 flex flex-col justify-between bg-[#2b2b2b] p-5 font-sans">
           <div>
             <div class="flex items-center gap-3 mb-5">
               <div class="w-9 h-9 rounded-full bg-[#3b82f6] flex items-center justify-center font-black text-xs text-white shrink-0">LIT</div>
               <span class="text-xl font-light tracking-widest text-zinc-400">TRANSIT</span>
             </div>
-
             <div class="text-xs text-zinc-200 leading-relaxed space-y-0.5 mb-8">
               <div>App version: 23.06.25</div>
               <div>Kernel version: 22.03.01</div>
               <div>Config version: ctb_prod_v10</div>
             </div>
-
             <div id="bootDiagStatus" class="text-center text-base font-extrabold tracking-wider text-white mb-6">
               INITIALIZING...
             </div>
-
             <div class="text-[11px] text-zinc-200 leading-relaxed space-y-0.5">
               <div>DeviceID: 358709052246844</div>
               <div>Boot info: SDCARD|PRIMARY BOOT</div>
             </div>
           </div>
-
           <div class="flex items-center justify-end gap-2 pt-4">
             <div class="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center font-black text-xs">C</div>
             <div class="leading-tight text-left">
@@ -94,7 +88,7 @@
         </div>
       </div>
 
-      <!-- 頂部狀態列 -->
+      <!-- 頂部狀態列（含智駕全城狀態條、八達通、日夜間切換、語言） -->
       <header class="bg-[#0d1118] text-white px-2.5 py-1.5 border-b border-zinc-800 shrink-0">
         <div class="flex items-center justify-between gap-1.5">
           <div class="min-w-0">
@@ -108,25 +102,41 @@
               <button id="btnOctopus" class="px-2 py-0.5 rounded bg-yellow-400 text-black text-[10px] font-black leading-tight active:scale-95">
                 八達通正常
               </button>
+              <button id="btnThemeToggle" title="切換日間／夜間模式" class="px-1.5 py-0.5 rounded bg-zinc-800 text-amber-300 text-[10px] font-black border border-zinc-700 active:scale-95">
+                🌙
+              </button>
               <button id="btnLangToggle" class="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 text-[10px] font-bold border border-zinc-700 active:scale-95">
                 繁
               </button>
             </div>
-            <button id="btnStopState" class="px-2.5 py-0.5 rounded bg-emerald-600 text-white text-[10px] font-extrabold leading-tight min-w-[76px] text-center active:scale-95">
-              已停 ≥3s
-            </button>
+            <div class="flex items-center gap-1">
+              <!-- 智駕全城 (Clever Driving) 狀態條 -->
+              <button id="btnCleverDriveBar" class="px-2.5 py-0.5 rounded bg-emerald-500 text-black text-[10px] font-black leading-tight min-w-[78px] text-center active:scale-95">
+                ☺ 好 · 100
+              </button>
+              <!-- 停車/車速狀態 -->
+              <button id="btnStopState" class="px-2 py-0.5 rounded bg-zinc-700 text-zinc-100 text-[10px] font-extrabold leading-tight active:scale-95">
+                已停
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      <!-- 新訊息提示條（停車 ≥3s 且有未讀訊息時顯示） -->
+      <!-- 智駕全城即時警示橫額 -->
+      <div id="cdWarningBanner" class="hidden px-3 py-1.5 text-xs font-black flex items-center justify-between shrink-0 bg-red-600 text-white">
+        <span id="cdWarningText" class="truncate">⚠ 智駕警示：請注意車速</span>
+        <span id="cdWarningBadge" class="ml-2 px-1.5 py-0.5 rounded bg-black/25 text-[10px] shrink-0">智駕全城</span>
+      </div>
+
+      <!-- 新訊息提示條 -->
       <div id="newMsgPopup" class="hidden bg-amber-400 text-black px-3 py-1.5 text-xs font-black flex items-center justify-between cursor-pointer shrink-0">
         <span id="newMsgPopupText" class="truncate">收到新車務控制中心訊息，點擊查看</span>
         <button id="btnDismissPopup" class="ml-2 px-1.5 py-0.5 rounded bg-black/15 text-[10px]">關閉</button>
       </div>
 
       <!-- 五大功能分頁列 -->
-      <nav class="grid grid-cols-5 bg-[#151a24] text-zinc-300 border-b border-zinc-800 shrink-0">
+      <nav id="topNavBar" class="grid grid-cols-5 bg-[#151a24] text-zinc-300 border-b border-zinc-800 shrink-0">
         <button id="tabRouteBtn" data-tab="route" class="tab-btn flex flex-col items-center justify-center py-1.5 gap-0.5 transition-colors">
           <span id="tabRouteIcon" class="h-5 flex items-center justify-center"></span>
           <span id="tabRouteLabel" class="text-[11px] font-bold">路線</span>
@@ -153,12 +163,12 @@
       </nav>
 
       <!-- 主內容視窗 -->
-      <main id="mainViewport" class="flex-1 flex flex-col overflow-hidden bg-white text-black"></main>
+      <main id="mainViewport" class="flex-1 flex flex-col overflow-hidden"></main>
 
       <!-- 底部四鍵控制列 -->
       <footer id="bottomBar" class="grid grid-cols-4 gap-1.5 p-1.5 bg-[#0d1118] border-t border-zinc-800 shrink-0"></footer>
 
-      <!-- 路線鍵盤搜尋覆蓋層（鎖定於螢幕框內） -->
+      <!-- 路線搜尋鍵盤覆蓋層 -->
       <div id="keypadModal" class="hidden absolute inset-0 z-30 bg-[#12161f]/95 text-white flex flex-col p-3">
         <div class="flex items-center justify-between mb-2">
           <span class="text-sm font-black">搜尋路線編號</span>
@@ -173,6 +183,20 @@
         <button id="btnKeypadConfirm" class="mt-2 h-11 rounded-lg bg-[#0068FF] font-black text-base active:brightness-90">套用搜尋</button>
       </div>
 
+      <!-- 智駕全城 (Clever Driving) 實時評分與監測彈窗 -->
+      <div id="cleverDriveModal" class="hidden absolute inset-0 z-30 bg-black/80 flex items-center justify-center p-3">
+        <div class="w-full max-h-full overflow-y-auto no-scrollbar rounded-xl bg-[#161b26] border border-zinc-700 text-white p-3.5 space-y-3 shadow-2xl">
+          <div class="flex items-center justify-between border-b border-zinc-700 pb-2">
+            <div>
+              <div class="text-sm font-black tracking-wide text-emerald-400">智駕全城 Clever Driving</div>
+              <div class="text-[11px] text-zinc-400 font-semibold">實時安全駕駛評分與車速監測</div>
+            </div>
+            <button id="btnCloseCD" class="px-2.5 py-1 rounded bg-zinc-700 text-xs font-bold">關閉</button>
+          </div>
+          <div id="cdModalBody" class="space-y-3"></div>
+        </div>
+      </div>
+
       <!-- 更多選項覆蓋層（•••） -->
       <div id="moreModal" class="hidden absolute inset-0 z-30 bg-black/75 flex items-end p-3">
         <div class="w-full rounded-xl bg-[#1a1f2b] border border-zinc-700 p-3 text-white space-y-2">
@@ -182,12 +206,14 @@
           </div>
           <button id="moreReplayAudio" class="w-full py-2.5 rounded-lg bg-emerald-600 font-black text-sm">重播當前站報站</button>
           <button id="moreToggleGps" class="w-full py-2.5 rounded-lg bg-[#0068FF] font-black text-sm">切換 手動模式 / GPS 自動</button>
+          <button id="moreToggleTheme" class="w-full py-2.5 rounded-lg bg-amber-600 font-black text-sm">切換 日間 / 夜間模式</button>
+          <button id="moreOpenCD" class="w-full py-2.5 rounded-lg bg-teal-600 font-black text-sm">查看 智駕全城 評分</button>
           <button id="morePickStart" class="w-full py-2.5 rounded-lg bg-zinc-700 font-black text-sm">重新選擇開始站位</button>
           <button id="moreBackRoutes" class="w-full py-2.5 rounded-lg bg-red-700 font-black text-sm">結束班次返回選擇路線</button>
         </div>
       </div>
 
-      <!-- 提示訊息 Toast -->
+      <!-- Toast -->
       <div id="toastBox" class="hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-50 px-3.5 py-2 rounded-lg bg-black/90 border border-zinc-600 text-white text-xs font-bold whitespace-nowrap shadow-lg pointer-events-none"></div>
     </div>
 
@@ -221,21 +247,45 @@
 const AUDIO_CDN_BASE = 'https://kenyip0244.github.io/CTB-LECIP-Audio';
 const PAGE_SIZE = 5;
 
+function detectInitialTheme() {
+  try {
+    const saved = localStorage.getItem('ctb_lecip_theme');
+    if (saved === 'day' || saved === 'night') return saved;
+  } catch (_) {}
+  const hr = new Date().getHours();
+  return (hr >= 6 && hr < 19) ? 'day' : 'night';
+}
+
 const state = {
   lang: 'tc',
+  theme: detectInitialTheme(), // 'day' | 'night'
   driverId: '0001 KEN YIP',
-  octopusMode: 0, // 0: 正常, 1: 暫停收費, 2: 未連
+  octopusMode: 0,
   isStopped3s: true,
-  gpsEnabled: false, // 預設手動模式（電腦即刻有停止/下一站大掣，手機可一鍵切換 GPS 自動）
+  gpsEnabled: false,
   gpsWatchId: null,
   gpsSpeedKmh: 0,
+  lastGpsSpeedKmh: 0,
+  lastGpsTimeMs: 0,
   gpsDistanceM: null,
   stopProgressPct: 25,
   volume: 1.0,
   brightness: 1.0,
 
-  currentTab: 'route', // route | announce | message | incident | settings
-  routeStage: 'route', // route | bound | trip | start_stop | stops
+  // 智駕全城 (Clever Driving) 狀態
+  cleverDrive: {
+    score: 100,
+    harshAccel: 0,
+    harshBrake: 0,
+    sharpTurn: 0,
+    overspeed: 0,
+    lastEvent: '駕駛表現優良',
+    warningText: '',
+    warningLevel: '' // '' | 'warn' | 'danger'
+  },
+
+  currentTab: 'route',
+  routeStage: 'route',
   pageOffset: 0,
   announcePage: 0,
   searchQuery: '',
@@ -246,6 +296,8 @@ const state = {
   stopsLoaded: false,
   stopsByTrip: new Map(),
   stopsByRouteBound: new Map(),
+  audioByStopName: new Map(),
+  audioByBaseName: new Map(),
   audioManifest: [],
   audioStemMap: new Map(),
 
@@ -264,7 +316,7 @@ const state = {
       time: '20:10',
       sender: '車務控制中心',
       title: '系統已就緒',
-      body: '城巴報站資料庫與 HKOWS 語音索引已連線，可於報站介面切換手動或 GPS 自動模式。',
+      body: '城巴報站、HKOWS 同站名語音及智駕全城系統已連線。',
       unread: true
     },
     {
@@ -272,7 +324,7 @@ const state = {
       time: '19:45',
       sender: '港島區車務部',
       title: '安全駕駛提示',
-      body: '駛經繁忙路段及轉車站時，請提醒乘客緊握扶手及留意落車提示。',
+      body: '駛經繁忙路段及轉車站時，請保持安全車距並留意智駕提示。',
       unread: true
     }
   ],
@@ -281,6 +333,10 @@ const state = {
 
 let currentAudio = null;
 let audioPlaySeqId = 0;
+
+function isNight() {
+  return state.theme === 'night';
+}
 
 function esc(v) {
   return String(v ?? '')
@@ -313,6 +369,14 @@ function cleanJointName(raw) {
   if (/\/\s+/.test(s) || (p1 === p1.toUpperCase() && p2 !== p2.toUpperCase())) return p2;
   return s;
 }
+
+function normStopName(raw) {
+  return cleanJointName(raw).replace(/[\s,，\.。\-－·・]/g, '').toLowerCase();
+}
+function normBaseName(raw) {
+  return cleanJointName(raw).replace(/[\(（][^\)）]*[\)）]/g, '').replace(/[\s,，\.。\-－·・]/g, '').toLowerCase();
+}
+
 function getRouteNo(r) {
   return String(r?.routeNo || r?.route || r?.lineNo || String(r?.routeId || '').replace(/^CTB-/i, '') || '').trim().toUpperCase();
 }
@@ -334,26 +398,26 @@ function getDestEn(r) {
 function getDestGroupKey(r) {
   return getDestTc(r) || getDestEn(r) || getBound(r);
 }
-function getTripDesc(r) {
-  if (state.lang === 'en') {
-    return cleanJointName(r?.descEn || r?.remarksEn || r?.patternDescEn || r?.serviceTypeNameEn || r?.viaEn || r?.remarkEn || '');
-  }
-  return cleanJointName(r?.descTc || r?.remarksTc || r?.patternDescTc || r?.serviceTypeNameTc || r?.viaTc || r?.remarkTc || r?.remark || '');
+// 只回傳真正有意義嘅班次備註；唔再重複輸出「往 XXX（班次 1）」
+function getRealTripRemark(r) {
+  const raw = state.lang === 'en'
+    ? cleanJointName(r?.descEn || r?.remarksEn || r?.patternDescEn || r?.serviceTypeNameEn || r?.viaEn || r?.remarkEn || '')
+    : cleanJointName(r?.descTc || r?.remarksTc || r?.patternDescTc || r?.serviceTypeNameTc || r?.viaTc || r?.remarkTc || r?.remark || '');
+  if (!raw) return '';
+  const dest = state.lang === 'en' ? getDestEn(r) : getDestTc(r);
+  if (dest && normStopName(raw) === normStopName(dest)) return '';
+  if (/^往\s*.+（班次\s*\d+）$/.test(raw)) return '';
+  return raw;
 }
-function formatTripSubtitle(r, fallbackSeq) {
-  const raw = getTripDesc(r);
-  if (raw) return raw;
-  const orig = state.lang === 'en' ? (getOrigEn(r) || getOrigTc(r)) : (getOrigTc(r) || getOrigEn(r));
-  const dest = state.lang === 'en' ? (getDestEn(r) || getDestTc(r)) : (getDestTc(r) || getDestEn(r));
-  if (orig && dest) return `${orig} → ${dest}`;
-  if (dest) return state.lang === 'en' ? `To ${dest}` : `往 ${dest}（班次 ${fallbackSeq || 1}）`;
-  return state.lang === 'en' ? 'Normal Service' : '正常班次';
-}
-function getTripFare(r) {
+function getTripFareNum(r) {
   const f = r?.fare ?? r?.fullFare ?? r?.price;
-  if (f == null || f === '') return '';
-  const n = Number(f);
-  return Number.isFinite(n) ? `$${n.toFixed(1)}` : String(f);
+  if (f == null || f === '') return null;
+  const n = Number(String(f).replace(/^\$/, ''));
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+function fmtFare(n) {
+  if (n == null || !Number.isFinite(Number(n))) return '';
+  return `$${Number(n).toFixed(1)}`;
 }
 function getStopNameTc(s) {
   return cleanJointName(s?.nameTc || s?.stopNameTc || s?.name_tc || s?.tc || s?.name || '未命名車站');
@@ -361,9 +425,13 @@ function getStopNameTc(s) {
 function getStopNameEn(s) {
   return cleanJointName(s?.nameEn || s?.stopNameEn || s?.name_en || s?.en || '');
 }
+// 中文模式下絕不顯示車站英文名！
 function getStopSub(s) {
-  if (state.lang === 'en') return getStopNameTc(s);
-  return cleanJointName(s?.roadTc || s?.locationTc || s?.subTc || getStopNameEn(s) || '');
+  if (state.lang === 'en') return '';
+  const loc = cleanJointName(s?.roadTc || s?.locationTc || s?.subTc || '');
+  if (!loc) return '';
+  if (normStopName(loc) === normStopName(getStopNameTc(s))) return '';
+  return loc;
 }
 function getStopLat(s) {
   return Number(s?.lat ?? s?.latitude ?? s?.y);
@@ -372,16 +440,61 @@ function getStopLng(s) {
   return Number(s?.lng ?? s?.lon ?? s?.longitude ?? s?.x);
 }
 
+// 計算每一站嘅分段編號與分段車費（綠色價錢標誌只顯示在有分段收費起點/變動嘅指定車站）
+function computeTripSections(stops, trip) {
+  const baseFare = getTripFareNum(trip);
+  let curSec = 1;
+  let curFare = baseFare;
+  return (stops || []).map((st, idx) => {
+    const rawStopFare = st?.sectionFare ?? st?.fare ?? st?.price;
+    const stopFareNum = (rawStopFare != null && rawStopFare !== '' && Number.isFinite(Number(String(rawStopFare).replace(/^\$/, ''))))
+      ? Number(String(rawStopFare).replace(/^\$/, ''))
+      : null;
+    const explicitSec = st?.section ?? st?.fareStage;
+
+    let isSectionChange = false;
+    if (idx === 0) {
+      curFare = stopFareNum ?? baseFare;
+      curSec = explicitSec ? Number(explicitSec) || 1 : 1;
+      isSectionChange = curFare != null;
+    } else if (stopFareNum != null && (curFare == null || Math.abs(stopFareNum - curFare) >= 0.05)) {
+      curFare = stopFareNum;
+      curSec = explicitSec ? Number(explicitSec) || (curSec + 1) : (curSec + 1);
+      isSectionChange = true;
+    } else if (explicitSec && Number(explicitSec) > curSec) {
+      curSec = Number(explicitSec);
+      isSectionChange = curFare != null;
+    }
+
+    return {
+      sectionNo: curSec,
+      activeFare: curFare,
+      badgeFare: isSectionChange ? curFare : null
+    };
+  });
+}
+
+// 跨路線按站名尋找 HKOWS 音檔
+function getEffectiveStopAudio(st) {
+  if (!st) return '';
+  if (st.stopAudioFile) return st.stopAudioFile;
+  const tc = getStopNameTc(st);
+  const en = normStopName(tc);
+  if (en && state.audioByStopName.has(en)) return state.audioByStopName.get(en);
+  const bn = normBaseName(tc);
+  if (bn && bn.length >= 2 && state.audioByBaseName.has(bn)) return state.audioByBaseName.get(bn);
+  if (st.stopId) {
+    const guess = `${String(st.stopId).replace(/^0+/, '')}_a`.toLowerCase();
+    if (state.audioStemMap.has(guess)) return state.audioStemMap.get(guess);
+  }
+  return '';
+}
+
 function compareRouteNo(a, b) {
   const parse = s => {
     const m = s.match(/^([A-Z]*)(\d+)([A-Z]*)$/);
     if (!m) return { hasPrefix: 2, prefix: s, num: 99999, suffix: '' };
-    return {
-      hasPrefix: m[1] ? 1 : 0,
-      prefix: m[1],
-      num: parseInt(m[2], 10),
-      suffix: m[3]
-    };
+    return { hasPrefix: m[1] ? 1 : 0, prefix: m[1], num: parseInt(m[2], 10), suffix: m[3] };
   };
   const pa = parse(a);
   const pb = parse(b);
@@ -391,7 +504,7 @@ function compareRouteNo(a, b) {
   return pa.suffix.localeCompare(pb.suffix);
 }
 
-// ============ 音檔播放與 TTS 引擎 ============
+// ============ 音檔播放與 Google TTS 引擎 ============
 function stopAllAudio() {
   audioPlaySeqId++;
   if (currentAudio) {
@@ -417,9 +530,7 @@ function resolveManifestPath(rawPath) {
   if (state.audioManifest.includes(clean)) return clean;
   const stem = clean.split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
   const candidates = [stem];
-  if (/^\d+$/.test(stem)) {
-    candidates.push(stem.padStart(2, '0'), stem.replace(/^0+/, ''));
-  }
+  if (/^\d+$/.test(stem)) candidates.push(stem.padStart(2, '0'), stem.replace(/^0+/, ''));
   for (const c of candidates) {
     if (c && state.audioStemMap.has(c)) return state.audioStemMap.get(c);
   }
@@ -429,28 +540,72 @@ function resolveManifestPath(rawPath) {
   return clean;
 }
 
-function speakTtsFallback(tcText, enText) {
+function buildGoogleTtsUrl(text, tl) {
+  const q = String(text || '').trim().slice(0, 180);
+  if (!q) return '';
+  return `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${encodeURIComponent(tl)}&q=${encodeURIComponent(q)}`;
+}
+
+function speakWebSpeechFallback(tcText, enText, scText) {
   if (!('speechSynthesis' in window)) return;
   try {
     window.speechSynthesis.cancel();
-    const queue = [];
-    if (tcText) {
-      const u1 = new SpeechSynthesisUtterance(tcText);
-      u1.lang = 'zh-HK';
-      u1.volume = state.volume;
-      queue.push(u1);
+    const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+    const pickGoogleVoice = (langPrefix) =>
+      voices.find(v => /google/i.test(v.name) && v.lang.toLowerCase().startsWith(langPrefix)) ||
+      voices.find(v => v.lang.toLowerCase().startsWith(langPrefix)) ||
+      null;
+
+    const items = [];
+    if (tcText) items.push({ text: tcText, lang: 'zh-HK', voice: pickGoogleVoice('zh-hk') || pickGoogleVoice('yue') });
+    if (enText) items.push({ text: enText, lang: 'en-GB', voice: pickGoogleVoice('en-gb') || pickGoogleVoice('en') });
+    if (scText) items.push({ text: scText, lang: 'zh-CN', voice: pickGoogleVoice('zh-cn') });
+
+    for (const it of items) {
+      const u = new SpeechSynthesisUtterance(it.text);
+      u.lang = it.lang;
+      if (it.voice) u.voice = it.voice;
+      u.volume = state.volume;
+      window.speechSynthesis.speak(u);
     }
-    if (enText) {
-      const u2 = new SpeechSynthesisUtterance(enText);
-      u2.lang = 'en-GB';
-      u2.volume = state.volume;
-      queue.push(u2);
-    }
-    queue.forEach(u => window.speechSynthesis.speak(u));
   } catch (_) {}
 }
 
-function playAudioSequence(relPaths, fallbackTc, fallbackEn) {
+// 優先使用 Google Translate TTS（粵語 yue -> 英語 en -> 普通話 zh-CN），若離線則自動降級至 Web Speech Google 聲線
+function speakGoogleTts(tcText, enText, scText, seqToken) {
+  const ttsUrls = [];
+  if (tcText) ttsUrls.push(buildGoogleTtsUrl(tcText, 'yue'));
+  if (enText) ttsUrls.push(buildGoogleTtsUrl(enText, 'en'));
+  if (scText) ttsUrls.push(buildGoogleTtsUrl(scText, 'zh-CN'));
+  const cleanUrls = ttsUrls.filter(Boolean);
+  if (cleanUrls.length === 0) return;
+
+  let idx = 0;
+  let playedAny = false;
+  const playClip = () => {
+    if (seqToken !== audioPlaySeqId) return;
+    if (idx >= cleanUrls.length) {
+      if (!playedAny) speakWebSpeechFallback(tcText, enText, scText);
+      return;
+    }
+    const url = cleanUrls[idx++];
+    const audio = new Audio(url);
+    audio.volume = state.volume;
+    currentAudio = audio;
+    let settled = false;
+    const advance = () => {
+      if (settled || seqToken !== audioPlaySeqId) return;
+      settled = true;
+      playClip();
+    };
+    audio.onended = advance;
+    audio.onerror = advance;
+    audio.play().then(() => { playedAny = true; }).catch(advance);
+  };
+  playClip();
+}
+
+function playAudioSequence(relPaths, fallbackTc, fallbackEn, fallbackSc = '') {
   stopAllAudio();
   const seqToken = audioPlaySeqId;
   const urls = Array.from(new Set(
@@ -461,17 +616,16 @@ function playAudioSequence(relPaths, fallbackTc, fallbackEn) {
   ));
 
   if (urls.length === 0) {
-    speakTtsFallback(fallbackTc, fallbackEn);
+    speakGoogleTts(fallbackTc, fallbackEn, fallbackSc, seqToken);
     return;
   }
 
   let playedAny = false;
   let idx = 0;
-
   const next = () => {
     if (seqToken !== audioPlaySeqId) return;
     if (idx >= urls.length) {
-      if (!playedAny) speakTtsFallback(fallbackTc, fallbackEn);
+      if (!playedAny) speakGoogleTts(fallbackTc, fallbackEn, fallbackSc, seqToken);
       return;
     }
     const url = urls[idx++];
@@ -486,9 +640,7 @@ function playAudioSequence(relPaths, fallbackTc, fallbackEn) {
     };
     audio.onended = advance;
     audio.onerror = advance;
-    audio.play().then(() => {
-      playedAny = true;
-    }).catch(advance);
+    audio.play().then(() => { playedAny = true; }).catch(advance);
   };
   next();
 }
@@ -501,19 +653,169 @@ function triggerStopAnnouncement(idx, force = false) {
   state.lastAnnouncedKey = key;
 
   const files = [];
-  if (st.stopAudioFile) files.push(st.stopAudioFile);
-  else if (st.stopId) {
-    const guess = `${String(st.stopId).replace(/^0+/, '')}_a`;
-    if (state.audioStemMap.has(guess)) files.push(state.audioStemMap.get(guess));
-  }
+  const mainAudio = getEffectiveStopAudio(st);
+  if (mainAudio) files.push(mainAudio);
   if (st.approachAudioFile) files.push(st.approachAudioFile);
 
-  const tc = `下一站，${getStopNameTc(st)}`;
-  const en = getStopNameEn(st) ? `Next stop, ${getStopNameEn(st)}` : '';
-  playAudioSequence(files, tc, en);
+  const tcName = getStopNameTc(st);
+  const enName = getStopNameEn(st);
+  const tc = `下一站，${tcName}`;
+  const en = enName ? `Next stop, ${enName}` : '';
+  const sc = `下一站，${tcName}`;
+  playAudioSequence(files, tc, en, sc);
 }
 
-// ============ GPS 自動追蹤引擎 ============
+// ============ 智駕全城 (Clever Driving) 引擎 ============
+function playAlertBeep(isDanger = false) {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = isDanger ? 960 : 720;
+    gain.gain.value = 0.14 * state.volume;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    setTimeout(() => {
+      osc.stop();
+      ctx.close().catch(() => {});
+    }, isDanger ? 260 : 160);
+  } catch (_) {}
+}
+
+function getCleverDriveGrade(score) {
+  if (score >= 85) return { face: '☺', label: '好', en: 'Good', bg: 'bg-emerald-500', text: 'text-black', ring: 'border-emerald-400' };
+  if (score >= 65) return { face: '😐', label: '一般', en: 'Fair', bg: 'bg-amber-400', text: 'text-black', ring: 'border-amber-400' };
+  return { face: '☹', label: '差', en: 'Poor', bg: 'bg-red-600', text: 'text-white', ring: 'border-red-500' };
+}
+
+function triggerCleverDriveEvent(kind) {
+  const cd = state.cleverDrive;
+  let msg = '';
+  let deduct = 4;
+  let danger = false;
+
+  if (kind === 'accel') {
+    cd.harshAccel++;
+    msg = '⚠ 智駕警示：偵測到急加速，請平穩起步';
+    deduct = 3;
+  } else if (kind === 'brake') {
+    cd.harshBrake++;
+    msg = '⚠ 智駕警示：偵測到急煞車，請保持安全車距';
+    deduct = 5;
+    danger = true;
+  } else if (kind === 'turn') {
+    cd.sharpTurn++;
+    msg = '⚠ 智駕警示：偵測到急轉彎，請減速慢駛';
+    deduct = 4;
+  } else if (kind === 'overspeed') {
+    cd.overspeed++;
+    msg = '🚨 智駕警示：車速超過 70 km/h，請立即減速';
+    deduct = 6;
+    danger = true;
+  }
+
+  cd.score = Math.max(0, cd.score - deduct);
+  cd.lastEvent = msg;
+  cd.warningText = msg;
+  cd.warningLevel = danger ? 'danger' : 'warn';
+  playAlertBeep(danger);
+  renderTopStatus();
+  renderCleverDriveModalContent();
+
+  clearTimeout(window._cdBannerTimer);
+  window._cdBannerTimer = setTimeout(() => {
+    cd.warningText = '';
+    cd.warningLevel = '';
+    renderTopStatus();
+  }, 4500);
+}
+
+function resetCleverDrive() {
+  state.cleverDrive = {
+    score: 100,
+    harshAccel: 0,
+    harshBrake: 0,
+    sharpTurn: 0,
+    overspeed: 0,
+    lastEvent: '駕駛表現優良',
+    warningText: '',
+    warningLevel: ''
+  };
+  renderTopStatus();
+  renderCleverDriveModalContent();
+  showToast('智駕全城評分已重設');
+}
+
+function renderCleverDriveModalContent() {
+  const body = document.getElementById('cdModalBody');
+  if (!body) return;
+  const cd = state.cleverDrive;
+  const g = getCleverDriveGrade(cd.score);
+
+  body.innerHTML = `
+    <div class="rounded-xl p-3.5 ${g.bg} ${g.text} flex items-center justify-between shadow">
+      <div>
+        <div class="text-xs font-extrabold opacity-80">目前智駕評級</div>
+        <div class="text-3xl font-black mt-0.5">${g.face} ${g.label}</div>
+      </div>
+      <div class="text-right">
+        <div class="text-3xl font-black font-mono leading-none">${cd.score}</div>
+        <div class="text-[11px] font-bold opacity-80 mt-0.5">實時車速 ${state.gpsSpeedKmh} km/h</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 text-center">
+      <div class="p-2.5 rounded-lg bg-zinc-800/90 border border-zinc-700">
+        <div class="text-[11px] text-zinc-400 font-bold">急加速</div>
+        <div class="text-xl font-black ${cd.harshAccel > 0 ? 'text-amber-400' : 'text-emerald-400'}">${cd.harshAccel}</div>
+      </div>
+      <div class="p-2.5 rounded-lg bg-zinc-800/90 border border-zinc-700">
+        <div class="text-[11px] text-zinc-400 font-bold">急煞車</div>
+        <div class="text-xl font-black ${cd.harshBrake > 0 ? 'text-red-400' : 'text-emerald-400'}">${cd.harshBrake}</div>
+      </div>
+      <div class="p-2.5 rounded-lg bg-zinc-800/90 border border-zinc-700">
+        <div class="text-[11px] text-zinc-400 font-bold">急轉彎</div>
+        <div class="text-xl font-black ${cd.sharpTurn > 0 ? 'text-amber-400' : 'text-emerald-400'}">${cd.sharpTurn}</div>
+      </div>
+      <div class="p-2.5 rounded-lg bg-zinc-800/90 border border-zinc-700">
+        <div class="text-[11px] text-zinc-400 font-bold">超速 (>70km/h)</div>
+        <div class="text-xl font-black ${cd.overspeed > 0 ? 'text-red-400' : 'text-emerald-400'}">${cd.overspeed}</div>
+      </div>
+    </div>
+
+    <div class="px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-xs text-zinc-300 font-semibold">
+      最新紀錄：${esc(cd.lastEvent)}
+    </div>
+
+    <div class="pt-1 border-t border-zinc-700">
+      <div class="text-[11px] font-bold text-zinc-400 mb-2">模擬測試智駕警示（電腦測試用）</div>
+      <div class="grid grid-cols-2 gap-1.5">
+        <button id="cdSimAccel" class="py-2 rounded-lg bg-amber-600/90 text-white text-xs font-black active:scale-95">模擬急加速</button>
+        <button id="cdSimBrake" class="py-2 rounded-lg bg-red-600/90 text-white text-xs font-black active:scale-95">模擬急煞車</button>
+        <button id="cdSimTurn" class="py-2 rounded-lg bg-amber-700/90 text-white text-xs font-black active:scale-95">模擬急轉彎</button>
+        <button id="cdSimSpeed" class="py-2 rounded-lg bg-red-700/90 text-white text-xs font-black active:scale-95">模擬超速</button>
+      </div>
+      <button id="cdResetBtn" class="mt-2 w-full py-2 rounded-lg bg-zinc-700 text-zinc-100 text-xs font-black active:scale-95">重設今日智駕評分</button>
+    </div>
+  `;
+
+  document.getElementById('cdSimAccel').onclick = () => triggerCleverDriveEvent('accel');
+  document.getElementById('cdSimBrake').onclick = () => triggerCleverDriveEvent('brake');
+  document.getElementById('cdSimTurn').onclick = () => triggerCleverDriveEvent('turn');
+  document.getElementById('cdSimSpeed').onclick = () => triggerCleverDriveEvent('overspeed');
+  document.getElementById('cdResetBtn').onclick = () => resetCleverDrive();
+}
+
+function openCleverDriveModal() {
+  renderCleverDriveModalContent();
+  document.getElementById('cleverDriveModal').classList.remove('hidden');
+}
+
+// ============ GPS 自動追蹤引擎（聯動智駕全城車速與加減速偵測） ============
 function calcDistanceMeters(lat1, lon1, lat2, lon2) {
   const R = 6371000;
   const toRad = d => (d * Math.PI) / 180;
@@ -542,8 +844,21 @@ function startGpsTracking() {
   state.gpsEnabled = true;
   state.gpsWatchId = navigator.geolocation.watchPosition(
     pos => {
+      const nowMs = Date.now();
       const { latitude, longitude, speed } = pos.coords;
       const kmh = typeof speed === 'number' && !Number.isNaN(speed) ? Math.round(speed * 3.6) : 0;
+
+      // 智駕全城實時速度與急加減速評估
+      if (state.lastGpsTimeMs > 0) {
+        const dtSec = Math.max(0.5, (nowMs - state.lastGpsTimeMs) / 1000);
+        const deltaKmh = kmh - state.lastGpsSpeedKmh;
+        if (dtSec <= 4 && deltaKmh <= -18) triggerCleverDriveEvent('brake');
+        else if (dtSec <= 4 && deltaKmh >= 18) triggerCleverDriveEvent('accel');
+      }
+      if (kmh > 70 && state.lastGpsSpeedKmh <= 70) triggerCleverDriveEvent('overspeed');
+
+      state.lastGpsSpeedKmh = kmh;
+      state.lastGpsTimeMs = nowMs;
       state.gpsSpeedKmh = kmh;
       state.isStopped3s = kmh < 3;
 
@@ -610,6 +925,13 @@ function toggleGpsMode() {
   renderAll();
 }
 
+function toggleTheme() {
+  state.theme = isNight() ? 'day' : 'night';
+  try { localStorage.setItem('ctb_lecip_theme', state.theme); } catch (_) {}
+  showToast(isNight() ? '已切換為夜間模式' : '已切換為日間模式');
+  renderAll();
+}
+
 // ============ 診斷載入畫面（機身內嵌） ============
 function renderInFrameDiagnostic(vp, statusText) {
   vp.className = 'flex-1 flex flex-col overflow-hidden bg-[#2b2b2b] text-white';
@@ -644,7 +966,7 @@ function renderInFrameDiagnostic(vp, statusText) {
   `;
 }
 
-// 按需載入 stops.json（點入路線班次先下載）
+// 按需載入 stops.json 並建立跨路線同站名音檔索引
 async function ensureStopsLoaded(trip) {
   if (!state.stopsLoaded) {
     const vp = document.getElementById('mainViewport');
@@ -653,6 +975,10 @@ async function ensureStopsLoaded(trip) {
     if (!res.ok) throw new Error('無法載入站點資料庫');
     const rawStops = await res.json();
     const arr = Array.isArray(rawStops) ? rawStops : [];
+
+    state.audioByStopName.clear();
+    state.audioByBaseName.clear();
+
     for (const s of arr) {
       const k1 = `${s.routeId || ''}|${String(s.bound || '').toUpperCase()}|${s.patternId || ''}`;
       if (!state.stopsByTrip.has(k1)) state.stopsByTrip.set(k1, []);
@@ -661,6 +987,14 @@ async function ensureStopsLoaded(trip) {
       const k2 = `${s.routeId || ''}|${String(s.bound || '').toUpperCase()}`;
       if (!state.stopsByRouteBound.has(k2)) state.stopsByRouteBound.set(k2, []);
       state.stopsByRouteBound.get(k2).push(s);
+
+      if (s.stopAudioFile) {
+        const tc = getStopNameTc(s);
+        const en = normStopName(tc);
+        const bn = normBaseName(tc);
+        if (en && !state.audioByStopName.has(en)) state.audioByStopName.set(en, s.stopAudioFile);
+        if (bn && bn.length >= 2 && !state.audioByBaseName.has(bn)) state.audioByBaseName.set(bn, s.stopAudioFile);
+      }
     }
     for (const list of state.stopsByTrip.values()) list.sort((a, b) => (a.seq ?? 0) - (b.seq ?? 0));
     state.stopsLoaded = true;
@@ -671,7 +1005,6 @@ async function ensureStopsLoaded(trip) {
   if (!stops || stops.length === 0) {
     const keyFallback = `${trip.routeId || ''}|${getBound(trip)}`;
     const allForBound = state.stopsByRouteBound.get(keyFallback) || [];
-    // 若同一方向有多個 pattern，取第一個 pattern 避免重複站
     if (allForBound.length > 0) {
       const firstPat = allForBound[0].patternId || '';
       stops = allForBound.filter(x => (x.patternId || '') === firstPat).sort((a, b) => (a.seq ?? 0) - (b.seq ?? 0));
@@ -704,19 +1037,47 @@ function renderTopStatus() {
     }
   }
 
-  const stopEl = document.getElementById('btnStopState');
-  if (stopEl) {
-    if (state.isStopped3s) {
-      stopEl.textContent = '☺ 好 · 已停 ≥3s';
-      stopEl.className = 'px-2.5 py-0.5 rounded bg-emerald-600 text-white text-[10px] font-extrabold leading-tight min-w-[92px] text-center active:scale-95';
-    } else {
-      stopEl.textContent = `行駛 ${state.gpsSpeedKmh || 32} km/h`;
-      stopEl.className = 'px-2.5 py-0.5 rounded bg-amber-600 text-white text-[10px] font-extrabold leading-tight min-w-[92px] text-center active:scale-95';
-    }
+  const themeEl = document.getElementById('btnThemeToggle');
+  if (themeEl) {
+    themeEl.textContent = isNight() ? '🌙 夜' : '☀ 日';
+    themeEl.className = isNight()
+      ? 'px-1.5 py-0.5 rounded bg-indigo-950 text-amber-300 text-[10px] font-black border border-indigo-700 active:scale-95'
+      : 'px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-black border border-amber-300 active:scale-95';
   }
 
   const langEl = document.getElementById('btnLangToggle');
   if (langEl) langEl.textContent = state.lang === 'tc' ? '繁' : 'EN';
+
+  // 智駕全城頂部條
+  const cd = state.cleverDrive;
+  const g = getCleverDriveGrade(cd.score);
+  const cdBar = document.getElementById('btnCleverDriveBar');
+  if (cdBar) {
+    cdBar.textContent = `${g.face} ${g.label} · ${cd.score}`;
+    cdBar.className = `px-2.5 py-0.5 rounded ${g.bg} ${g.text} text-[10px] font-black leading-tight min-w-[78px] text-center active:scale-95`;
+  }
+
+  const cdBanner = document.getElementById('cdWarningBanner');
+  if (cdBanner) {
+    if (cd.warningText) {
+      cdBanner.classList.remove('hidden');
+      cdBanner.className = `px-3 py-1.5 text-xs font-black flex items-center justify-between shrink-0 ${cd.warningLevel === 'danger' ? 'bg-red-600 text-white' : 'bg-amber-400 text-black'}`;
+      document.getElementById('cdWarningText').textContent = cd.warningText;
+    } else {
+      cdBanner.classList.add('hidden');
+    }
+  }
+
+  const stopEl = document.getElementById('btnStopState');
+  if (stopEl) {
+    if (state.isStopped3s) {
+      stopEl.textContent = '已停 ≥3s';
+      stopEl.className = 'px-2 py-0.5 rounded bg-zinc-700 text-zinc-100 text-[10px] font-extrabold leading-tight active:scale-95';
+    } else {
+      stopEl.textContent = `${state.gpsSpeedKmh || 32} km/h`;
+      stopEl.className = 'px-2 py-0.5 rounded bg-blue-600 text-white text-[10px] font-extrabold leading-tight active:scale-95';
+    }
+  }
 
   const unread = state.messages.filter(m => m.unread).length;
   const badge = document.getElementById('msgUnreadBadge');
@@ -731,6 +1092,14 @@ function renderTopStatus() {
 }
 
 function renderTabs() {
+  const dark = isNight();
+  const nav = document.getElementById('topNavBar');
+  if (nav) {
+    nav.className = dark
+      ? 'grid grid-cols-5 bg-[#151a24] text-zinc-300 border-b border-zinc-800 shrink-0'
+      : 'grid grid-cols-5 bg-[#1d2432] text-zinc-200 border-b border-zinc-300 shrink-0';
+  }
+
   const iconEl = document.getElementById('tabRouteIcon');
   const labelEl = document.getElementById('tabRouteLabel');
   if (iconEl && labelEl) {
@@ -748,10 +1117,9 @@ function renderTabs() {
 
   document.querySelectorAll('.tab-btn').forEach(btn => {
     const active = btn.dataset.tab === state.currentTab;
-    const isDarkActive = state.currentTab === 'route' && state.routeStage === 'stops';
     if (active) {
-      btn.className = isDarkActive
-        ? 'tab-btn relative flex flex-col items-center justify-center py-1.5 gap-0.5 bg-[#1e2636] text-white border-b-2 border-[#0068FF]'
+      btn.className = dark
+        ? 'tab-btn relative flex flex-col items-center justify-center py-1.5 gap-0.5 bg-[#20293b] text-white border-b-2 border-[#0068FF]'
         : 'tab-btn relative flex flex-col items-center justify-center py-1.5 gap-0.5 bg-white text-black rounded-t-md';
     } else {
       btn.className = 'tab-btn relative flex flex-col items-center justify-center py-1.5 gap-0.5 text-zinc-300 hover:text-white';
@@ -759,11 +1127,28 @@ function renderTabs() {
   });
 }
 
+// 共用日間 / 夜間色票
+function themeClasses() {
+  const dark = isNight();
+  return {
+    dark,
+    vp: dark ? 'flex-1 flex flex-col overflow-hidden bg-[#141923] text-white' : 'flex-1 flex flex-col overflow-hidden bg-white text-zinc-900',
+    subBar: dark ? 'bg-[#1b2230] border-b border-zinc-700 text-zinc-100' : 'bg-zinc-100 border-b border-zinc-300 text-zinc-900',
+    divider: dark ? 'divide-zinc-800' : 'divide-zinc-300',
+    row: dark ? 'bg-[#141923] active:bg-zinc-800 text-white' : 'bg-white active:bg-blue-50 text-zinc-900',
+    emptyRow: dark ? 'bg-[#10141c]' : 'bg-zinc-50',
+    muted: dark ? 'text-zinc-400' : 'text-zinc-500',
+    card: dark ? 'bg-[#1b2230] border-zinc-700 text-zinc-100' : 'bg-zinc-50 border-zinc-200 text-zinc-800',
+    botBar: dark ? 'grid grid-cols-4 gap-1.5 p-1.5 bg-[#0d1118] border-t border-zinc-800 shrink-0' : 'grid grid-cols-4 gap-1.5 p-1.5 bg-zinc-200 border-t border-zinc-300 shrink-0'
+  };
+}
+
 // ============ 各主畫面渲染 ============
 function renderMain() {
   const vp = document.getElementById('mainViewport');
   const bar = document.getElementById('bottomBar');
   if (!vp || !bar) return;
+  bar.className = themeClasses().botBar;
 
   if (state.currentTab === 'route') {
     if (state.routeStage === 'route') renderRouteList(vp, bar);
@@ -783,7 +1168,8 @@ function renderMain() {
 }
 
 function renderRouteList(vp, bar) {
-  vp.className = 'flex-1 flex flex-col overflow-hidden bg-white text-black';
+  const th = themeClasses();
+  vp.className = th.vp;
   const filtered = state.searchQuery
     ? state.uniqueRouteNos.filter(no => no.includes(state.searchQuery))
     : state.uniqueRouteNos;
@@ -794,26 +1180,26 @@ function renderRouteList(vp, bar) {
   const slice = filtered.slice(state.pageOffset * PAGE_SIZE, (state.pageOffset + 1) * PAGE_SIZE);
 
   vp.innerHTML = `
-    <div class="flex items-center justify-between px-3 py-2 bg-zinc-100 border-b border-zinc-300 shrink-0">
+    <div class="flex items-center justify-between px-3 py-2 ${th.subBar} shrink-0">
       <div class="flex items-center gap-2">
         <span class="font-black text-sm">${state.lang === 'en' ? 'Select Route' : '選擇路線'}</span>
-        ${state.searchQuery ? `<span class="px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-xs font-black">篩選: ${esc(state.searchQuery)}</span>` : ''}
+        ${state.searchQuery ? `<span class="px-2 py-0.5 rounded bg-blue-600/20 text-[#0068FF] text-xs font-black">篩選: ${esc(state.searchQuery)}</span>` : ''}
       </div>
-      <span class="text-xs font-bold text-zinc-500">${state.pageOffset + 1} / ${totalPages}</span>
+      <span class="text-xs font-bold ${th.muted}">${state.pageOffset + 1} / ${totalPages}</span>
     </div>
-    <div class="flex-1 flex flex-col divide-y divide-zinc-300">
+    <div class="flex-1 flex flex-col divide-y ${th.divider}">
       ${slice.length === 0 ? `
-        <div class="flex-1 flex flex-col items-center justify-center text-zinc-500 text-sm font-bold gap-2">
+        <div class="flex-1 flex flex-col items-center justify-center ${th.muted} text-sm font-bold gap-2">
           <div>找不到符合「${esc(state.searchQuery)}」的路線</div>
           <button id="btnResetSearch" class="px-3 py-1.5 rounded bg-[#0068FF] text-white text-xs font-black">清除搜尋</button>
         </div>
       ` : slice.map(no => `
-        <button data-route="${esc(no)}" class="pick-route-btn flex-1 px-4 flex items-center justify-between bg-white active:bg-blue-50 text-left">
-          <span class="text-2xl font-black tracking-tight text-zinc-900">${esc(no)}</span>
-          <span class="text-zinc-400 text-xl font-bold">›</span>
+        <button data-route="${esc(no)}" class="pick-route-btn flex-1 px-4 flex items-center justify-between ${th.row} text-left">
+          <span class="text-2xl font-black tracking-tight">${esc(no)}</span>
+          <span class="${th.muted} text-xl font-bold">›</span>
         </button>
       `).join('')}
-      ${slice.length > 0 && slice.length < PAGE_SIZE ? Array(PAGE_SIZE - slice.length).fill('<div class="flex-1 bg-zinc-50"></div>').join('') : ''}
+      ${slice.length > 0 && slice.length < PAGE_SIZE ? Array(PAGE_SIZE - slice.length).fill(`<div class="flex-1 ${th.emptyRow}"></div>`).join('') : ''}
     </div>
   `;
 
@@ -846,7 +1232,8 @@ function renderRouteList(vp, bar) {
 }
 
 function renderBoundList(vp, bar) {
-  vp.className = 'flex-1 flex flex-col overflow-hidden bg-white text-black';
+  const th = themeClasses();
+  vp.className = th.vp;
   const matches = state.routes.filter(r => getRouteNo(r) === state.selectedRouteNo);
   const byDest = new Map();
   for (const r of matches) {
@@ -857,23 +1244,23 @@ function renderBoundList(vp, bar) {
   const groups = Array.from(byDest.entries());
 
   vp.innerHTML = `
-    <div class="flex items-center justify-between px-3 py-2 bg-zinc-100 border-b border-zinc-300 shrink-0">
+    <div class="flex items-center justify-between px-3 py-2 ${th.subBar} shrink-0">
       <span class="font-black text-sm">路線 ${esc(state.selectedRouteNo)} · 選擇方向</span>
-      <span class="text-xs font-bold text-zinc-500">${groups.length} 個方向</span>
+      <span class="text-xs font-bold ${th.muted}">${groups.length} 個方向</span>
     </div>
-    <div class="flex-1 flex flex-col divide-y divide-zinc-300 overflow-y-auto no-scrollbar">
+    <div class="flex-1 flex flex-col divide-y ${th.divider} overflow-y-auto no-scrollbar">
       ${groups.map(([dKey, list]) => {
         const rep = list[0];
         const dest = state.lang === 'en' ? (getDestEn(rep) || getDestTc(rep) || dKey) : (getDestTc(rep) || getDestEn(rep) || dKey);
         const orig = state.lang === 'en' ? (getOrigEn(rep) || getOrigTc(rep)) : (getOrigTc(rep) || getOrigEn(rep));
         return `
-          <button data-destkey="${esc(dKey)}" class="pick-bound-btn px-4 py-4 flex items-center justify-between bg-white active:bg-blue-50 text-left">
+          <button data-destkey="${esc(dKey)}" class="pick-bound-btn px-4 py-4 flex items-center justify-between ${th.row} text-left">
             <div class="min-w-0 pr-2">
               <div class="text-xs font-black text-[#0068FF] mb-0.5">${list.length} 個班次</div>
-              <div class="text-xl font-black text-zinc-900 truncate">往 ${esc(dest)}</div>
-              ${orig ? `<div class="text-xs font-bold text-zinc-500 truncate mt-0.5">由 ${esc(orig)} 開出</div>` : ''}
+              <div class="text-xl font-black truncate">往 ${esc(dest)}</div>
+              ${orig ? `<div class="text-xs font-bold ${th.muted} truncate mt-0.5">由 ${esc(orig)} 開出</div>` : ''}
             </div>
-            <span class="text-zinc-400 text-xl font-bold">›</span>
+            <span class="${th.muted} text-xl font-bold">›</span>
           </button>
         `;
       }).join('')}
@@ -882,8 +1269,8 @@ function renderBoundList(vp, bar) {
 
   bar.innerHTML = `
     <button id="botBack" class="h-11 rounded-lg bg-[#d92b1c] text-white font-black text-xl flex items-center justify-center active:brightness-90">‹</button>
-    <button class="h-11 rounded-lg bg-zinc-700 text-zinc-400 font-black text-xl flex items-center justify-center">↑</button>
-    <button class="h-11 rounded-lg bg-zinc-700 text-zinc-400 font-black text-xl flex items-center justify-center">↓</button>
+    <button class="h-11 rounded-lg bg-zinc-600 text-zinc-300 font-black text-xl flex items-center justify-center">↑</button>
+    <button class="h-11 rounded-lg bg-zinc-600 text-zinc-300 font-black text-xl flex items-center justify-center">↓</button>
     <button id="botHome" class="h-11 rounded-lg bg-[#0068FF] text-white font-black text-xs flex items-center justify-center active:brightness-90">路線表</button>
   `;
 
@@ -900,37 +1287,34 @@ function renderBoundList(vp, bar) {
 }
 
 function renderTripList(vp, bar) {
-  vp.className = 'flex-1 flex flex-col overflow-hidden bg-white text-black';
+  const th = themeClasses();
+  vp.className = th.vp;
   const trips = state.routes.filter(r => getRouteNo(r) === state.selectedRouteNo && getDestGroupKey(r) === state.selectedBound);
   const totalPages = Math.max(1, Math.ceil(trips.length / PAGE_SIZE));
   if (state.pageOffset >= totalPages) state.pageOffset = totalPages - 1;
   const slice = trips.slice(state.pageOffset * PAGE_SIZE, (state.pageOffset + 1) * PAGE_SIZE);
 
   vp.innerHTML = `
-    <div class="flex items-center justify-between px-3 py-2 bg-zinc-100 border-b border-zinc-300 shrink-0">
+    <div class="flex items-center justify-between px-3 py-2 ${th.subBar} shrink-0">
       <span class="font-black text-sm truncate pr-2">${esc(state.selectedRouteNo)} 往 ${esc(state.selectedBound)} · 選擇班次</span>
-      <span class="text-xs font-bold text-zinc-500 shrink-0">${state.pageOffset + 1} / ${totalPages}</span>
+      <span class="text-xs font-bold ${th.muted} shrink-0">${state.pageOffset + 1} / ${totalPages}</span>
     </div>
-    <div class="flex-1 flex flex-col divide-y divide-zinc-300 overflow-y-auto no-scrollbar">
+    <div class="flex-1 flex flex-col divide-y ${th.divider} overflow-y-auto no-scrollbar">
       ${slice.map((t, idx) => {
         const globalIdx = state.pageOffset * PAGE_SIZE + idx;
         const dest = state.lang === 'en' ? (getDestEn(t) || getDestTc(t)) : (getDestTc(t) || getDestEn(t));
-        const desc = formatTripSubtitle(t, globalIdx + 1);
-        const fare = getTripFare(t);
+        const remark = getRealTripRemark(t);
         return `
-          <button data-tidx="${globalIdx}" class="pick-trip-btn flex-1 px-4 py-3 flex items-center justify-between bg-white active:bg-blue-50 text-left">
+          <button data-tidx="${globalIdx}" class="pick-trip-btn flex-1 px-4 py-3 flex items-center justify-between ${th.row} text-left">
             <div class="min-w-0 pr-2">
-              <div class="flex items-center gap-2">
-                <span class="text-lg font-black text-zinc-900 truncate">${esc(state.selectedRouteNo)}-${esc(dest || '班次')}-${globalIdx + 1}</span>
-                ${fare ? `<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[11px] font-black shrink-0">${esc(fare)}</span>` : ''}
-              </div>
-              <div class="text-xs font-bold text-zinc-500 truncate mt-0.5">${esc(desc)}</div>
+              <div class="text-lg font-black truncate">${esc(state.selectedRouteNo)}-${esc(dest || '班次')}-${globalIdx + 1}</div>
+              ${remark ? `<div class="text-xs font-bold ${th.muted} truncate mt-0.5">${esc(remark)}</div>` : ''}
             </div>
-            <span class="text-zinc-400 text-xl font-bold">›</span>
+            <span class="${th.muted} text-xl font-bold">›</span>
           </button>
         `;
       }).join('')}
-      ${slice.length < PAGE_SIZE ? Array(PAGE_SIZE - slice.length).fill('<div class="flex-1 bg-zinc-50"></div>').join('') : ''}
+      ${slice.length < PAGE_SIZE ? Array(PAGE_SIZE - slice.length).fill(`<div class="flex-1 ${th.emptyRow}"></div>`).join('') : ''}
     </div>
   `;
 
@@ -969,36 +1353,41 @@ function renderTripList(vp, bar) {
 }
 
 function renderStartStopList(vp, bar) {
-  vp.className = 'flex-1 flex flex-col overflow-hidden bg-white text-black';
+  const th = themeClasses();
+  vp.className = th.vp;
+  const sections = computeTripSections(state.tripStops, state.selectedTrip);
   const totalPages = Math.max(1, Math.ceil(state.tripStops.length / PAGE_SIZE));
   if (state.pageOffset >= totalPages) state.pageOffset = totalPages - 1;
   const slice = state.tripStops.slice(state.pageOffset * PAGE_SIZE, (state.pageOffset + 1) * PAGE_SIZE);
 
   vp.innerHTML = `
-    <div class="flex items-center justify-between px-3 py-2 bg-zinc-100 border-b border-zinc-300 shrink-0">
+    <div class="flex items-center justify-between px-3 py-2 ${th.subBar} shrink-0">
       <span class="font-black text-sm">${esc(state.selectedRouteNo)} · 選擇開始站位</span>
-      <span class="text-xs font-bold text-zinc-500">${state.pageOffset + 1} / ${totalPages} (共 ${state.tripStops.length} 站)</span>
+      <span class="text-xs font-bold ${th.muted}">${state.pageOffset + 1} / ${totalPages} (共 ${state.tripStops.length} 站)</span>
     </div>
-    <div class="flex-1 flex flex-col divide-y divide-zinc-300 overflow-y-auto no-scrollbar">
+    <div class="flex-1 flex flex-col divide-y ${th.divider} overflow-y-auto no-scrollbar">
       ${slice.length === 0 ? `
-        <div class="flex-1 flex items-center justify-center text-zinc-500 text-sm font-bold">此班次暫無站點資料</div>
+        <div class="flex-1 flex items-center justify-center ${th.muted} text-sm font-bold">此班次暫無站點資料</div>
       ` : slice.map((st, idx) => {
         const sIdx = state.pageOffset * PAGE_SIZE + idx;
-        const hasAudio = !!(st.stopAudioFile || st.approachAudioFile);
+        const hasAudio = !!getEffectiveStopAudio(st);
+        const sub = getStopSub(st);
+        const secInfo = sections[sIdx] || {};
         return `
-          <button data-sidx="${sIdx}" class="pick-start-btn flex-1 px-4 py-2.5 flex items-center justify-between bg-white active:bg-blue-50 text-left">
+          <button data-sidx="${sIdx}" class="pick-start-btn flex-1 px-4 py-2.5 flex items-center justify-between ${th.row} text-left">
             <div class="min-w-0 pr-2">
-              <div class="text-lg font-black text-zinc-900 truncate">${sIdx + 1}. ${esc(state.lang === 'en' ? (getStopNameEn(st) || getStopNameTc(st)) : getStopNameTc(st))}</div>
-              <div class="text-xs font-bold text-zinc-500 truncate">${esc(getStopSub(st))}</div>
+              <div class="text-lg font-black truncate">${sIdx + 1}. ${esc(state.lang === 'en' ? (getStopNameEn(st) || getStopNameTc(st)) : getStopNameTc(st))}</div>
+              ${sub ? `<div class="text-xs font-bold ${th.muted} truncate">${esc(sub)}</div>` : ''}
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
-              ${hasAudio ? '<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 text-[10px] font-black">MP3</span>' : ''}
-              <span class="text-zinc-400 text-xl font-bold">›</span>
+              ${secInfo.badgeFare != null ? `<span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black">${esc(fmtFare(secInfo.badgeFare))}</span>` : ''}
+              ${hasAudio ? `<span class="px-1.5 py-0.5 rounded ${th.dark ? 'bg-zinc-800 text-emerald-400 border border-zinc-600' : 'bg-emerald-100 text-emerald-700'} text-[10px] font-black">MP3</span>` : ''}
+              <span class="${th.muted} text-xl font-bold">›</span>
             </div>
           </button>
         `;
       }).join('')}
-      ${slice.length > 0 && slice.length < PAGE_SIZE ? Array(PAGE_SIZE - slice.length).fill('<div class="flex-1 bg-zinc-50"></div>').join('') : ''}
+      ${slice.length > 0 && slice.length < PAGE_SIZE ? Array(PAGE_SIZE - slice.length).fill(`<div class="flex-1 ${th.emptyRow}"></div>`).join('') : ''}
     </div>
   `;
 
@@ -1031,52 +1420,66 @@ function renderStartStopList(vp, bar) {
   document.getElementById('botQuickStart').onclick = () => { if (state.tripStops.length > 0) enterStops(0); };
 }
 
-// ============ 報站主畫面（深色實車風格：手動模式大掣 / GPS 自動模式） ============
+// ============ 報站主畫面（支援日間／夜間模式、分段車費位置、隱藏英文站名） ============
 function renderStopsView(vp, bar) {
-  vp.className = 'flex-1 flex flex-col overflow-hidden bg-[#141923] text-white';
+  const th = themeClasses();
+  vp.className = th.vp;
   const cur = state.tripStops[state.currentStopIdx];
   if (!cur) {
-    vp.innerHTML = '<div class="flex-1 flex items-center justify-center text-zinc-400 font-bold">無站點資料</div>';
+    vp.innerHTML = `<div class="flex-1 flex items-center justify-center ${th.muted} font-bold">無站點資料</div>`;
     return;
   }
 
+  const sections = computeTripSections(state.tripStops, state.selectedTrip);
+  const curSec = sections[state.currentStopIdx] || { sectionNo: 1, activeFare: null, badgeFare: null };
   const trip = state.selectedTrip || {};
   const dest = state.lang === 'en' ? (getDestEn(trip) || getDestTc(trip)) : (getDestTc(trip) || getDestEn(trip));
-  const desc = formatTripSubtitle(trip, state.selectedTripSeq);
-  const sectionLabel = cur.section || cur.fareStage || '1';
+  const remark = getRealTripRemark(trip);
   const upcoming = state.tripStops.slice(state.currentStopIdx + 1, state.currentStopIdx + 6);
   const curName = state.lang === 'en' ? (getStopNameEn(cur) || getStopNameTc(cur)) : getStopNameTc(cur);
+  const curSub = getStopSub(cur);
+  const hasAudio = !!getEffectiveStopAudio(cur);
+
+  const curPanelCls = th.dark ? 'bg-[#12161f] border-b border-zinc-700/80' : 'bg-white border-b border-zinc-300';
+  const secBoxCls = th.dark ? 'border-zinc-500/80 bg-[#141923] text-white' : 'border-zinc-400 bg-white text-zinc-900';
+  const gpsBtnCls = th.dark ? 'bg-zinc-800 border-zinc-600 text-zinc-200' : 'bg-zinc-100 border-zinc-300 text-zinc-800';
 
   vp.innerHTML = `
     <!-- 路線與分段標頭 -->
-    <div class="px-3.5 py-2.5 bg-[#1b2230] border-b border-zinc-700/80 flex items-center justify-between gap-2 shrink-0">
+    <div class="px-3.5 py-2.5 ${th.subBar} flex items-center justify-between gap-2 shrink-0">
       <div class="min-w-0">
-        <div class="text-xl font-black tracking-tight text-white truncate">${esc(state.selectedRouteNo)}-${esc(dest || '終點')}-${esc(state.selectedTripSeq || 1)}</div>
-        <div class="text-xs font-bold text-zinc-300 truncate mt-0.5">${esc(desc)}</div>
+        <div class="text-xl font-black tracking-tight truncate">${esc(state.selectedRouteNo)}-${esc(dest || '終點')}-${esc(state.selectedTripSeq || 1)}</div>
+        ${remark ? `<div class="text-xs font-bold ${th.muted} truncate mt-0.5">${esc(remark)}</div>` : ''}
       </div>
-      <div class="w-16 py-1 rounded border border-zinc-500/80 bg-[#141923] text-center shrink-0">
-        <div class="text-[10px] font-bold text-zinc-400 leading-none">分段</div>
-        <div class="text-xl font-black text-white leading-tight mt-0.5">${esc(sectionLabel)}</div>
+      <div class="min-w-[68px] px-2 py-1 rounded border ${secBoxCls} text-center shrink-0">
+        <div class="text-[10px] font-bold ${th.muted} leading-none">分段 ${esc(curSec.sectionNo)}</div>
+        ${curSec.activeFare != null
+          ? `<div class="mt-0.5 px-1.5 py-0.5 rounded bg-emerald-600 text-white text-xs font-black leading-none">${esc(fmtFare(curSec.activeFare))}</div>`
+          : `<div class="text-xl font-black leading-tight mt-0.5">${esc(curSec.sectionNo)}</div>`
+        }
       </div>
     </div>
 
     <!-- 當前車站卡片 + 手動模式大掣 / GPS 進度條 -->
-    <div class="px-3.5 py-3 bg-[#12161f] border-b border-zinc-700/80 shrink-0">
+    <div class="px-3.5 py-3 ${curPanelCls} shrink-0">
       <button id="btnReplayCurrent" class="w-full text-left active:opacity-80">
         <div class="flex items-start justify-between gap-2">
-          <div class="text-2xl font-black text-white leading-snug">${state.currentStopIdx + 1}. ${esc(curName)}</div>
-          <span class="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-600 text-[10px] font-black text-emerald-400 shrink-0 mt-1">
-            ${cur.stopAudioFile ? 'HKOWS' : 'TTS'}
-          </span>
+          <div class="text-2xl font-black leading-snug">${state.currentStopIdx + 1}. ${esc(curName)}</div>
+          <div class="flex items-center gap-1 shrink-0 mt-1">
+            ${curSec.badgeFare != null ? `<span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black">${esc(fmtFare(curSec.badgeFare))}</span>` : ''}
+            <span class="px-1.5 py-0.5 rounded ${th.dark ? 'bg-zinc-800 border border-zinc-600 text-emerald-400' : 'bg-zinc-100 border border-zinc-300 text-emerald-700'} text-[10px] font-black">
+              ${hasAudio ? 'HKOWS' : 'G-TTS'}
+            </span>
+          </div>
         </div>
-        <div class="text-xs font-bold text-zinc-400 mt-0.5 truncate">${esc(getStopSub(cur))}</div>
+        ${curSub ? `<div class="text-xs font-bold ${th.muted} mt-0.5 truncate">${esc(curSub)}</div>` : ''}
       </button>
 
       <div class="flex items-center justify-between mt-3 mb-2">
-        <span id="gpsLiveText" class="text-xs font-black ${state.gpsEnabled ? 'text-emerald-400' : 'text-zinc-300'}">
+        <span id="gpsLiveText" class="text-xs font-black ${state.gpsEnabled ? 'text-emerald-500' : th.muted}">
           ${state.gpsEnabled ? (state.gpsDistanceM != null ? `GPS 自動 · 距下站 ${state.gpsDistanceM}m` : 'GPS 自動報站中') : '手動模式'}
         </span>
-        <button id="btnToggleGpsInline" class="px-2.5 py-1 rounded bg-zinc-800 border border-zinc-600 text-[11px] font-black text-zinc-200 active:scale-95">
+        <button id="btnToggleGpsInline" class="px-2.5 py-1 rounded border ${gpsBtnCls} text-[11px] font-black active:scale-95">
           切換${state.gpsEnabled ? '手動 (M)' : 'GPS 自動'}
         </button>
       </div>
@@ -1092,10 +1495,10 @@ function renderStopsView(vp, bar) {
         </div>
       ` : `
         <div class="mt-1 space-y-2">
-          <div class="w-full h-4 bg-zinc-800 rounded overflow-hidden border border-zinc-600">
+          <div class="w-full h-4 ${th.dark ? 'bg-zinc-800 border-zinc-600' : 'bg-zinc-200 border-zinc-400'} rounded overflow-hidden border">
             <div id="stopProgressFill" class="h-full bg-[#0068FF] transition-all duration-300" style="width:${state.stopProgressPct}%"></div>
           </div>
-          <div class="flex justify-between text-[11px] font-bold text-zinc-400">
+          <div class="flex justify-between text-[11px] font-bold ${th.muted}">
             <span>自動偵測埋站 (≤45m)</span>
             <span>第 ${state.currentStopIdx + 1} / ${state.tripStops.length} 站</span>
           </div>
@@ -1103,17 +1506,21 @@ function renderStopsView(vp, bar) {
       `}
     </div>
 
-    <!-- 後續站位列表 -->
-    <div class="flex-1 overflow-y-auto no-scrollbar divide-y divide-zinc-800 bg-[#141923]">
+    <!-- 後續站位列表（指定車站分段位顯示綠色價錢標誌） -->
+    <div class="flex-1 overflow-y-auto no-scrollbar divide-y ${th.divider}">
       ${upcoming.length === 0 ? `
-        <div class="px-4 py-6 text-center text-sm font-bold text-amber-400">已到達本班次終點站</div>
+        <div class="px-4 py-6 text-center text-sm font-bold text-amber-500">已到達本班次終點站</div>
       ` : upcoming.map((st, offset) => {
         const targetIdx = state.currentStopIdx + 1 + offset;
         const nm = state.lang === 'en' ? (getStopNameEn(st) || getStopNameTc(st)) : getStopNameTc(st);
+        const sInfo = sections[targetIdx] || {};
         return `
-          <button data-jump="${targetIdx}" class="jump-stop-btn w-full px-4 py-3.5 text-left active:bg-zinc-800/80 flex items-center justify-between gap-2">
-            <span class="text-lg font-extrabold text-zinc-100 truncate">${targetIdx + 1}. ${esc(nm)}</span>
-            ${st.approachAudioFile ? '<span class="px-1.5 py-0.5 rounded bg-blue-900/60 text-blue-300 text-[10px] font-bold shrink-0">+提示</span>' : ''}
+          <button data-jump="${targetIdx}" class="jump-stop-btn w-full px-4 py-3.5 text-left ${th.row} flex items-center justify-between gap-2">
+            <span class="text-lg font-extrabold truncate">${targetIdx + 1}. ${esc(nm)}</span>
+            <div class="flex items-center gap-1.5 shrink-0">
+              ${sInfo.badgeFare != null ? `<span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black">${esc(fmtFare(sInfo.badgeFare))}</span>` : ''}
+              ${st.approachAudioFile ? '<span class="px-1.5 py-0.5 rounded bg-blue-600/20 text-[#0068FF] text-[10px] font-bold">+提示</span>' : ''}
+            </div>
           </button>
         `;
       }).join('')}
@@ -1192,31 +1599,32 @@ function renderStopsView(vp, bar) {
 
 // ============ 特別廣播分頁 ============
 function renderAnnounceView(vp, bar) {
-  vp.className = 'flex-1 flex flex-col overflow-hidden bg-white text-black';
+  const th = themeClasses();
+  vp.className = th.vp;
   const totalPages = Math.max(1, Math.ceil(state.announcements.length / PAGE_SIZE));
   if (state.announcePage >= totalPages) state.announcePage = totalPages - 1;
   const slice = state.announcements.slice(state.announcePage * PAGE_SIZE, (state.announcePage + 1) * PAGE_SIZE);
 
   vp.innerHTML = `
-    <div class="flex items-center justify-between px-3 py-2 bg-zinc-100 border-b border-zinc-300 shrink-0">
+    <div class="flex items-center justify-between px-3 py-2 ${th.subBar} shrink-0">
       <span class="font-black text-sm">特別車廂廣播</span>
-      <span class="text-xs font-bold text-zinc-500">${state.announcePage + 1} / ${totalPages}</span>
+      <span class="text-xs font-bold ${th.muted}">${state.announcePage + 1} / ${totalPages}</span>
     </div>
-    <div class="flex-1 flex flex-col divide-y divide-zinc-300">
+    <div class="flex-1 flex flex-col divide-y ${th.divider}">
       ${slice.map(item => {
         const code = item.code ?? '';
         const title = state.lang === 'en' ? (item.titleEn || item.titleTc) : (item.titleTc || item.titleEn);
         return `
-          <button data-acode="${esc(code)}" class="play-ann-btn flex-1 px-4 py-2 flex items-center justify-between bg-white active:bg-emerald-50 text-left">
+          <button data-acode="${esc(code)}" class="play-ann-btn flex-1 px-4 py-2 flex items-center justify-between ${th.row} text-left">
             <div class="min-w-0 pr-2">
-              <div class="text-sm font-black text-zinc-900 truncate">${esc(code)}. ${esc(title)}</div>
-              <div class="text-[11px] font-semibold text-zinc-500 truncate mt-0.5">${esc(item.ttsTc || item.ttsEn || '')}</div>
+              <div class="text-sm font-black truncate">${esc(code)}. ${esc(title)}</div>
+              <div class="text-[11px] font-semibold ${th.muted} truncate mt-0.5">${esc(item.ttsTc || item.ttsEn || '')}</div>
             </div>
             <span class="w-9 h-9 rounded-full bg-emerald-600 text-white font-black text-sm flex items-center justify-center shrink-0">▶</span>
           </button>
         `;
       }).join('')}
-      ${slice.length < PAGE_SIZE ? Array(PAGE_SIZE - slice.length).fill('<div class="flex-1 bg-zinc-50"></div>').join('') : ''}
+      ${slice.length < PAGE_SIZE ? Array(PAGE_SIZE - slice.length).fill(`<div class="flex-1 ${th.emptyRow}"></div>`).join('') : ''}
     </div>
   `;
 
@@ -1235,7 +1643,7 @@ function renderAnnounceView(vp, bar) {
       const item = state.announcements.find(a => String(a.code) === String(code));
       if (!item) return;
       const candidate = item.audioFile || `audio/announcements/${code}.mp3`;
-      playAudioSequence([candidate], item.ttsTc || item.titleTc, item.ttsEn || item.titleEn);
+      playAudioSequence([candidate], item.ttsTc || item.titleTc, item.ttsEn || item.titleEn, item.ttsSc || '');
       showToast(`播放廣播 #${code}`);
     };
   });
@@ -1247,21 +1655,22 @@ function renderAnnounceView(vp, bar) {
 
 // ============ 訊息分頁 ============
 function renderMessageView(vp, bar) {
-  vp.className = 'flex-1 flex flex-col overflow-hidden bg-white text-black';
+  const th = themeClasses();
+  vp.className = th.vp;
   vp.innerHTML = `
-    <div class="flex items-center justify-between px-3 py-2 bg-zinc-100 border-b border-zinc-300 shrink-0">
+    <div class="flex items-center justify-between px-3 py-2 ${th.subBar} shrink-0">
       <span class="font-black text-sm">車務控制中心訊息</span>
-      <span class="text-xs font-bold text-zinc-500">共 ${state.messages.length} 則</span>
+      <span class="text-xs font-bold ${th.muted}">共 ${state.messages.length} 則</span>
     </div>
-    <div class="flex-1 overflow-y-auto no-scrollbar divide-y divide-zinc-200">
+    <div class="flex-1 overflow-y-auto no-scrollbar divide-y ${th.divider}">
       ${state.messages.map(m => `
-        <div data-mid="${m.id}" class="msg-row p-3.5 ${m.unread ? 'bg-amber-50' : 'bg-white'} cursor-pointer">
+        <div data-mid="${m.id}" class="msg-row p-3.5 ${m.unread ? (th.dark ? 'bg-amber-950/40' : 'bg-amber-50') : ''} cursor-pointer">
           <div class="flex items-center justify-between mb-1">
             <span class="text-xs font-black text-[#0068FF]">${esc(m.sender)}</span>
-            <span class="text-[11px] font-mono text-zinc-500">${esc(m.time)} ${m.unread ? '● 未讀' : ''}</span>
+            <span class="text-[11px] font-mono ${th.muted}">${esc(m.time)} ${m.unread ? '● 未讀' : ''}</span>
           </div>
-          <div class="text-sm font-black text-zinc-900">${esc(m.title)}</div>
-          <div class="text-xs font-medium text-zinc-600 mt-1 leading-relaxed">${esc(m.body)}</div>
+          <div class="text-sm font-black">${esc(m.title)}</div>
+          <div class="text-xs font-medium ${th.muted} mt-1 leading-relaxed">${esc(m.body)}</div>
         </div>
       `).join('')}
     </div>
@@ -1286,21 +1695,22 @@ function renderMessageView(vp, bar) {
 
 // ============ 事故回報分頁 ============
 function renderIncidentView(vp, bar) {
-  vp.className = 'flex-1 flex flex-col overflow-hidden bg-white text-black';
+  const th = themeClasses();
+  vp.className = th.vp;
   const types = ['交通擠塞', '機件故障', '交通意外', '乘客不適', '臨時改道', '道路封閉'];
   vp.innerHTML = `
-    <div class="px-3 py-2 bg-zinc-100 border-b border-zinc-300 font-black text-sm shrink-0">事故回報</div>
+    <div class="px-3 py-2 ${th.subBar} font-black text-sm shrink-0">事故回報</div>
     <div class="p-3 grid grid-cols-2 gap-2 shrink-0">
       ${types.map(t => `
         <button data-itype="${esc(t)}" class="inc-btn py-3 rounded-lg bg-red-600 active:brightness-90 text-white font-black text-sm shadow-sm">${esc(t)}</button>
       `).join('')}
     </div>
-    <div class="px-3 py-1.5 bg-zinc-100 border-y border-zinc-200 text-xs font-black text-zinc-600 shrink-0">已提交記錄 (${state.incidents.length})</div>
-    <div class="flex-1 overflow-y-auto no-scrollbar divide-y divide-zinc-200 px-3">
-      ${state.incidents.length === 0 ? '<div class="py-6 text-center text-xs text-zinc-400 font-bold">暫無事故記錄</div>' : state.incidents.map(inc => `
+    <div class="px-3 py-1.5 ${th.subBar} text-xs font-black shrink-0">已提交記錄 (${state.incidents.length})</div>
+    <div class="flex-1 overflow-y-auto no-scrollbar divide-y ${th.divider} px-3">
+      ${state.incidents.length === 0 ? `<div class="py-6 text-center text-xs ${th.muted} font-bold">暫無事故記錄</div>` : state.incidents.map(inc => `
         <div class="py-2 flex items-center justify-between text-xs">
-          <span class="font-black text-red-700">${esc(inc.type)}</span>
-          <span class="font-mono text-zinc-500">${esc(inc.time)}</span>
+          <span class="font-black text-red-500">${esc(inc.type)}</span>
+          <span class="font-mono ${th.muted}">${esc(inc.time)}</span>
         </div>
       `).join('')}
     </div>
@@ -1311,8 +1721,7 @@ function renderIncidentView(vp, bar) {
   `;
   vp.querySelectorAll('.inc-btn').forEach(btn => {
     btn.onclick = () => {
-      const now = new Date();
-      const t = now.toTimeString().slice(0, 8);
+      const t = new Date().toTimeString().slice(0, 8);
       state.incidents.unshift({ type: btn.dataset.itype, time: t });
       showToast(`已回報：${btn.dataset.itype}`);
       renderAll();
@@ -1324,22 +1733,30 @@ function renderIncidentView(vp, bar) {
 
 // ============ 系統設定分頁 ============
 function renderSettingsView(vp, bar) {
-  vp.className = 'flex-1 flex flex-col overflow-hidden bg-white text-black';
+  const th = themeClasses();
+  vp.className = th.vp;
   vp.innerHTML = `
-    <div class="px-3 py-2 bg-zinc-100 border-b border-zinc-300 font-black text-sm shrink-0">系統設定與診斷</div>
+    <div class="px-3 py-2 ${th.subBar} font-black text-sm shrink-0">系統設定與診斷</div>
     <div class="flex-1 overflow-y-auto no-scrollbar p-3 space-y-2.5 text-sm">
-      <div class="p-3 rounded-lg border border-zinc-200 bg-zinc-50 space-y-1 text-xs">
-        <div class="font-black text-zinc-800">裝置與資料庫狀態</div>
+      <div class="p-3 rounded-lg border ${th.card} space-y-1 text-xs">
+        <div class="font-black">裝置與資料庫狀態</div>
         <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
         <div>站點庫狀態：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
         <div>HKOWS 音檔索引：<b>${state.audioManifest.length}</b> 個 MP3</div>
-        <div>音量：<b>${Math.round(state.volume * 100)}%</b> ｜ 亮度：<b>${Math.round(state.brightness * 100)}%</b></div>
+        <div>備用語音引擎：<b>Google TTS（粵／英／普）</b></div>
+        <div>顯示主題：<b>${isNight() ? '夜間模式' : '日間模式'}</b> ｜ 智駕評分：<b>${state.cleverDrive.score} 分</b></div>
       </div>
 
+      <button id="setToggleTheme" class="w-full py-2.5 rounded-lg bg-amber-600 text-white font-black">
+        顯示模式：${isNight() ? '🌙 夜間模式' : '☀ 日間模式'}（點擊切換）
+      </button>
+      <button id="setOpenCD" class="w-full py-2.5 rounded-lg bg-emerald-600 text-white font-black">
+        打開「智駕全城 Clever Driving」面板
+      </button>
       <button id="setToggleGps" class="w-full py-2.5 rounded-lg bg-[#0068FF] text-white font-black">
         報站模式：${state.gpsEnabled ? 'GPS 自動報站' : '手動模式 (M)'}（點擊切換）
       </button>
-      <button id="setReplayBoot" class="w-full py-2.5 rounded-lg bg-zinc-800 text-white font-black">
+      <button id="setReplayBoot" class="w-full py-2.5 rounded-lg bg-zinc-700 text-white font-black">
         重新播放開機與診斷畫面
       </button>
       <button id="setClearCache" class="w-full py-2.5 rounded-lg bg-red-600 text-white font-black">
@@ -1350,6 +1767,8 @@ function renderSettingsView(vp, bar) {
   bar.innerHTML = `
     <button id="botBackRoute" class="col-span-4 h-11 rounded-lg bg-[#0068FF] text-white font-black text-sm">返回路線</button>
   `;
+  document.getElementById('setToggleTheme').onclick = () => toggleTheme();
+  document.getElementById('setOpenCD').onclick = () => openCleverDriveModal();
   document.getElementById('setToggleGps').onclick = () => toggleGpsMode();
   document.getElementById('setReplayBoot').onclick = () => runBootSequence(true);
   document.getElementById('setClearCache').onclick = async () => {
@@ -1397,14 +1816,8 @@ function openKeypad() {
       }
     };
   });
-  document.getElementById('btnKeypadBack').onclick = () => {
-    draft = draft.slice(0, -1);
-    display.textContent = draft;
-  };
-  document.getElementById('btnKeypadClear').onclick = () => {
-    draft = '';
-    display.textContent = '';
-  };
+  document.getElementById('btnKeypadBack').onclick = () => { draft = draft.slice(0, -1); display.textContent = draft; };
+  document.getElementById('btnKeypadClear').onclick = () => { draft = ''; display.textContent = ''; };
   document.getElementById('btnKeypadConfirm').onclick = () => {
     state.searchQuery = draft;
     state.pageOffset = 0;
@@ -1416,8 +1829,6 @@ function openKeypad() {
 }
 
 // ============ 機身內嵌開機序列 + 輕量路線名載入 ============
-let routesReadyPromise = null;
-
 async function fetchInitialLightData() {
   const [rRes, aRes] = await Promise.all([
     fetch('./data/routes.json'),
@@ -1430,15 +1841,14 @@ async function fetchInitialLightData() {
   const set = new Set(state.routes.map(getRouteNo).filter(Boolean));
   state.uniqueRouteNos = Array.from(set).sort(compareRouteNo);
 
-  // 背景載入 HKOWS 音檔索引，不阻塞進入選擇路線畫面
-  fetch(`${AUDIO_CDN_BASE}/audio_manifest.json?v=37`)
+  fetch(`${AUDIO_CDN_BASE}/audio_manifest.json?v=40`)
     .then(r => (r.ok ? r.json() : []))
     .then(list => {
       if (!Array.isArray(list)) return;
       state.audioManifest = list.map(x => String(x).replace(/\\/g, '/'));
       state.audioStemMap.clear();
       for (const p of state.audioManifest) {
-        const stem = String(p).split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
+        const stem = p.split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
         if (stem && !state.audioStemMap.has(stem)) state.audioStemMap.set(stem, p);
       }
     })
@@ -1469,11 +1879,8 @@ function runBootSequence(isReplay = false) {
     setTimeout(() => overlay.classList.add('hidden'), 300);
   };
 
-  overlay.onclick = () => {
-    if (dataDone) tryClose();
-  };
+  overlay.onclick = () => { if (dataDone) tryClose(); };
 
-  // 階段一：Android（1.1秒） -> 階段二：診斷模式
   setTimeout(() => {
     if (closed) return;
     pAndroid.classList.add('hidden');
@@ -1491,7 +1898,7 @@ function runBootSequence(isReplay = false) {
     tryClose();
   }, 2400);
 
-  routesReadyPromise = fetchInitialLightData()
+  fetchInitialLightData()
     .then(() => {
       dataDone = true;
       if (diagStatus) diagStatus.textContent = `READY (${state.uniqueRouteNos.length} ROUTES)`;
@@ -1521,16 +1928,18 @@ function bindGlobalEvents() {
     state.octopusMode = (state.octopusMode + 1) % 3;
     renderTopStatus();
   };
+  document.getElementById('btnThemeToggle').onclick = () => toggleTheme();
+  document.getElementById('btnLangToggle').onclick = () => {
+    state.lang = state.lang === 'tc' ? 'en' : 'tc';
+    renderAll();
+  };
+  document.getElementById('btnCleverDriveBar').onclick = () => openCleverDriveModal();
+  document.getElementById('btnCloseCD').onclick = () => document.getElementById('cleverDriveModal').classList.add('hidden');
 
   document.getElementById('btnStopState').onclick = () => {
     state.isStopped3s = !state.isStopped3s;
     state.gpsSpeedKmh = state.isStopped3s ? 0 : 32;
     renderTopStatus();
-  };
-
-  document.getElementById('btnLangToggle').onclick = () => {
-    state.lang = state.lang === 'tc' ? 'en' : 'tc';
-    renderAll();
   };
 
   document.getElementById('btnDriverBadge').onclick = () => {
@@ -1551,17 +1960,12 @@ function bindGlobalEvents() {
     renderAll();
   };
 
-  // 更多選項彈窗按鈕
   const closeMore = () => document.getElementById('moreModal').classList.add('hidden');
   document.getElementById('btnCloseMore').onclick = closeMore;
-  document.getElementById('moreReplayAudio').onclick = () => {
-    closeMore();
-    triggerStopAnnouncement(state.currentStopIdx, true);
-  };
-  document.getElementById('moreToggleGps').onclick = () => {
-    closeMore();
-    toggleGpsMode();
-  };
+  document.getElementById('moreReplayAudio').onclick = () => { closeMore(); triggerStopAnnouncement(state.currentStopIdx, true); };
+  document.getElementById('moreToggleGps').onclick = () => { closeMore(); toggleGpsMode(); };
+  document.getElementById('moreToggleTheme').onclick = () => { closeMore(); toggleTheme(); };
+  document.getElementById('moreOpenCD').onclick = () => { closeMore(); openCleverDriveModal(); };
   document.getElementById('morePickStart').onclick = () => {
     closeMore();
     stopAllAudio();
@@ -1577,7 +1981,6 @@ function bindGlobalEvents() {
     renderAll();
   };
 
-  // 機身實體音量／亮度按鍵
   document.getElementById('hwVolDown').onclick = () => {
     state.volume = Math.max(0.1, Math.round((state.volume - 0.1) * 10) / 10);
     if (currentAudio) currentAudio.volume = state.volume;
