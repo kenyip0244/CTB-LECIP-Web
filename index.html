@@ -252,6 +252,7 @@ const state = {
   selectedRouteNo: '',
   selectedBound: '',
   selectedTrip: null,
+  selectedTripSeq: 1,
   tripStops: [],
   currentStopIdx: 0,
   lastAnnouncedKey: '',
@@ -306,22 +307,34 @@ function getBound(r) {
   return String(r?.bound || r?.dir || r?.direction || 'O').trim().toUpperCase();
 }
 function getOrigTc(r) {
-  return String(r?.origTc || r?.originTc || r?.fromTc || r?.orig_tc || '').trim();
+  return String(r?.origTc || r?.originTc || r?.fromTc || r?.orig_tc || r?.startTc || r?.orig || r?.origin || '').trim();
 }
 function getDestTc(r) {
-  return String(r?.destTc || r?.destinationTc || r?.toTc || r?.dest_tc || '').trim();
+  return String(r?.destTc || r?.destinationTc || r?.toTc || r?.dest_tc || r?.endTc || r?.dest || r?.destination || '').trim();
 }
 function getOrigEn(r) {
-  return String(r?.origEn || r?.originEn || r?.fromEn || r?.orig_en || '').trim();
+  return String(r?.origEn || r?.originEn || r?.fromEn || r?.orig_en || r?.startEn || '').trim();
 }
 function getDestEn(r) {
-  return String(r?.destEn || r?.destinationEn || r?.toEn || r?.dest_en || '').trim();
+  return String(r?.destEn || r?.destinationEn || r?.toEn || r?.dest_en || r?.endEn || '').trim();
+}
+function getDestGroupKey(r) {
+  return getDestTc(r) || getDestEn(r) || getBound(r);
 }
 function getTripDesc(r) {
   if (state.lang === 'en') {
-    return String(r?.descEn || r?.remarksEn || r?.patternDescEn || r?.serviceTypeNameEn || r?.viaEn || '').trim();
+    return String(r?.descEn || r?.remarksEn || r?.patternDescEn || r?.serviceTypeNameEn || r?.viaEn || r?.remarkEn || '').trim();
   }
-  return String(r?.descTc || r?.remarksTc || r?.patternDescTc || r?.serviceTypeNameTc || r?.viaTc || '').trim();
+  return String(r?.descTc || r?.remarksTc || r?.patternDescTc || r?.serviceTypeNameTc || r?.viaTc || r?.remarkTc || r?.remark || '').trim();
+}
+function formatTripSubtitle(r, fallbackSeq) {
+  const raw = getTripDesc(r);
+  if (raw) return raw;
+  const orig = state.lang === 'en' ? (getOrigEn(r) || getOrigTc(r)) : (getOrigTc(r) || getOrigEn(r));
+  const dest = state.lang === 'en' ? (getDestEn(r) || getDestTc(r)) : (getDestTc(r) || getDestEn(r));
+  if (orig && dest) return `${orig} → ${dest}`;
+  if (dest) return state.lang === 'en' ? `To ${dest}` : `往 ${dest}（班次 ${fallbackSeq || 1}）`;
+  return state.lang === 'en' ? 'Normal Service' : '正常班次';
 }
 function getTripFare(r) {
   const f = r?.fare ?? r?.fullFare ?? r?.price;
@@ -816,29 +829,29 @@ function renderRouteList(vp, bar) {
 function renderBoundList(vp, bar) {
   vp.className = 'flex-1 flex flex-col overflow-hidden bg-white text-black';
   const matches = state.routes.filter(r => getRouteNo(r) === state.selectedRouteNo);
-  const byBound = new Map();
+  const byDest = new Map();
   for (const r of matches) {
-    const b = getBound(r);
-    if (!byBound.has(b)) byBound.set(b, []);
-    byBound.get(b).push(r);
+    const dKey = getDestGroupKey(r);
+    if (!byDest.has(dKey)) byDest.set(dKey, []);
+    byDest.get(dKey).push(r);
   }
-  const bounds = Array.from(byBound.entries());
+  const groups = Array.from(byDest.entries());
 
   vp.innerHTML = `
     <div class="flex items-center justify-between px-3 py-2 bg-zinc-100 border-b border-zinc-300 shrink-0">
       <span class="font-black text-sm">路線 ${esc(state.selectedRouteNo)} · 選擇方向</span>
-      <span class="text-xs font-bold text-zinc-500">${bounds.length} 個方向</span>
+      <span class="text-xs font-bold text-zinc-500">${groups.length} 個方向</span>
     </div>
     <div class="flex-1 flex flex-col divide-y divide-zinc-300 overflow-y-auto no-scrollbar">
-      ${bounds.map(([b, list]) => {
+      ${groups.map(([dKey, list]) => {
         const rep = list[0];
-        const dest = state.lang === 'en' ? (getDestEn(rep) || getDestTc(rep)) : (getDestTc(rep) || getDestEn(rep));
+        const dest = state.lang === 'en' ? (getDestEn(rep) || getDestTc(rep) || dKey) : (getDestTc(rep) || getDestEn(rep) || dKey);
         const orig = state.lang === 'en' ? (getOrigEn(rep) || getOrigTc(rep)) : (getOrigTc(rep) || getOrigEn(rep));
         return `
-          <button data-bound="${esc(b)}" class="pick-bound-btn px-4 py-4 flex items-center justify-between bg-white active:bg-blue-50 text-left">
+          <button data-destkey="${esc(dKey)}" class="pick-bound-btn px-4 py-4 flex items-center justify-between bg-white active:bg-blue-50 text-left">
             <div class="min-w-0 pr-2">
-              <div class="text-xs font-black text-[#0068FF] mb-0.5">方向 ${esc(b)} (${list.length} 個班次)</div>
-              <div class="text-xl font-black text-zinc-900 truncate">往 ${esc(dest || '終點站')}</div>
+              <div class="text-xs font-black text-[#0068FF] mb-0.5">${list.length} 個班次</div>
+              <div class="text-xl font-black text-zinc-900 truncate">往 ${esc(dest)}</div>
               ${orig ? `<div class="text-xs font-bold text-zinc-500 truncate mt-0.5">由 ${esc(orig)} 開出</div>` : ''}
             </div>
             <span class="text-zinc-400 text-xl font-bold">›</span>
@@ -857,7 +870,7 @@ function renderBoundList(vp, bar) {
 
   vp.querySelectorAll('.pick-bound-btn').forEach(btn => {
     btn.onclick = () => {
-      state.selectedBound = btn.dataset.bound;
+      state.selectedBound = btn.dataset.destkey;
       state.routeStage = 'trip';
       state.pageOffset = 0;
       renderAll();
@@ -869,30 +882,30 @@ function renderBoundList(vp, bar) {
 
 function renderTripList(vp, bar) {
   vp.className = 'flex-1 flex flex-col overflow-hidden bg-white text-black';
-  const trips = state.routes.filter(r => getRouteNo(r) === state.selectedRouteNo && getBound(r) === state.selectedBound);
+  const trips = state.routes.filter(r => getRouteNo(r) === state.selectedRouteNo && getDestGroupKey(r) === state.selectedBound);
   const totalPages = Math.max(1, Math.ceil(trips.length / PAGE_SIZE));
   if (state.pageOffset >= totalPages) state.pageOffset = totalPages - 1;
   const slice = trips.slice(state.pageOffset * PAGE_SIZE, (state.pageOffset + 1) * PAGE_SIZE);
 
   vp.innerHTML = `
     <div class="flex items-center justify-between px-3 py-2 bg-zinc-100 border-b border-zinc-300 shrink-0">
-      <span class="font-black text-sm">${esc(state.selectedRouteNo)} (${esc(state.selectedBound)}) · 選擇班次</span>
-      <span class="text-xs font-bold text-zinc-500">${state.pageOffset + 1} / ${totalPages}</span>
+      <span class="font-black text-sm truncate pr-2">${esc(state.selectedRouteNo)} 往 ${esc(state.selectedBound)} · 選擇班次</span>
+      <span class="text-xs font-bold text-zinc-500 shrink-0">${state.pageOffset + 1} / ${totalPages}</span>
     </div>
     <div class="flex-1 flex flex-col divide-y divide-zinc-300 overflow-y-auto no-scrollbar">
       ${slice.map((t, idx) => {
         const globalIdx = state.pageOffset * PAGE_SIZE + idx;
         const dest = state.lang === 'en' ? (getDestEn(t) || getDestTc(t)) : (getDestTc(t) || getDestEn(t));
-        const desc = getTripDesc(t) || `${getOrigTc(t)} → ${getDestTc(t)}`;
+        const desc = formatTripSubtitle(t, globalIdx + 1);
         const fare = getTripFare(t);
         return `
           <button data-tidx="${globalIdx}" class="pick-trip-btn flex-1 px-4 py-3 flex items-center justify-between bg-white active:bg-blue-50 text-left">
             <div class="min-w-0 pr-2">
               <div class="flex items-center gap-2">
-                <span class="text-lg font-black text-zinc-900 truncate">${esc(state.selectedRouteNo)} - ${esc(dest || '班次 ' + (globalIdx + 1))}</span>
+                <span class="text-lg font-black text-zinc-900 truncate">${esc(state.selectedRouteNo)}-${esc(dest || '班次')}-${globalIdx + 1}</span>
                 ${fare ? `<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[11px] font-black shrink-0">${esc(fare)}</span>` : ''}
               </div>
-              <div class="text-xs font-bold text-zinc-500 truncate mt-0.5">${esc(desc || '正常班次')}</div>
+              <div class="text-xs font-bold text-zinc-500 truncate mt-0.5">${esc(desc)}</div>
             </div>
             <span class="text-zinc-400 text-xl font-bold">›</span>
           </button>
@@ -913,9 +926,11 @@ function renderTripList(vp, bar) {
 
   vp.querySelectorAll('.pick-trip-btn').forEach(btn => {
     btn.onclick = async () => {
-      const t = trips[Number(btn.dataset.tidx)];
+      const tidx = Number(btn.dataset.tidx);
+      const t = trips[tidx];
       if (!t) return;
       state.selectedTrip = t;
+      state.selectedTripSeq = tidx + 1;
       try {
         state.tripStops = await ensureStopsLoaded(t);
         state.currentStopIdx = 0;
@@ -933,7 +948,6 @@ function renderTripList(vp, bar) {
   document.getElementById('botPrev').onclick = () => { if (canPrev) { state.pageOffset--; renderAll(); } };
   document.getElementById('botNext').onclick = () => { if (canNext) { state.pageOffset++; renderAll(); } };
 }
-
 function renderStartStopList(vp, bar) {
   vp.className = 'flex-1 flex flex-col overflow-hidden bg-white text-black';
   const totalPages = Math.max(1, Math.ceil(state.tripStops.length / PAGE_SIZE));
@@ -1008,7 +1022,7 @@ function renderStopsView(vp, bar) {
 
   const trip = state.selectedTrip || {};
   const dest = state.lang === 'en' ? (getDestEn(trip) || getDestTc(trip)) : (getDestTc(trip) || getDestEn(trip));
-  const desc = getTripDesc(trip) || `${getOrigTc(trip)} → ${getDestTc(trip)}`;
+  const desc = formatTripSubtitle(trip, state.selectedTripSeq);
   const sectionLabel = cur.section || cur.fareStage || '1';
   const upcoming = state.tripStops.slice(state.currentStopIdx + 1, state.currentStopIdx + 6);
   const curName = state.lang === 'en' ? (getStopNameEn(cur) || getStopNameTc(cur)) : getStopNameTc(cur);
@@ -1017,7 +1031,7 @@ function renderStopsView(vp, bar) {
     <!-- 路線與分段標頭 -->
     <div class="px-3.5 py-2.5 bg-[#1b2230] border-b border-zinc-700/80 flex items-center justify-between gap-2 shrink-0">
       <div class="min-w-0">
-        <div class="text-xl font-black tracking-tight text-white truncate">${esc(state.selectedRouteNo)}-${esc(dest || '終點')}-${esc(state.selectedBound)}</div>
+        <div class="text-xl font-black tracking-tight text-white truncate">${esc(state.selectedRouteNo)}-${esc(dest || '終點')}-${esc(state.selectedTripSeq || 1)}</div>
         <div class="text-xs font-bold text-zinc-300 truncate mt-0.5">${esc(desc)}</div>
       </div>
       <div class="w-16 py-1 rounded border border-zinc-500/80 bg-[#141923] text-center shrink-0">
