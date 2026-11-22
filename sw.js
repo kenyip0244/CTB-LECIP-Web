@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'ctb-lecip-web-v6';
+﻿const CACHE_NAME = 'ctb-lecip-web-v7';
 const ASSETS = [
   './',
   './index.html',
@@ -8,7 +8,8 @@ const ASSETS = [
   './assets/lecip_button_invisible.png',
   './data/routes.json',
   './data/stops.json',
-  './data/announcements.json'
+  './data/announcements.json',
+  './data/location_codes.json'
 ];
 
 self.addEventListener('install', (e) => {
@@ -30,4 +31,3 @@ self.addEventListener('fetch', (e) => {
     caches.match(e.request).then((cached) => cached || fetch(e.request))
   );
 });
-
