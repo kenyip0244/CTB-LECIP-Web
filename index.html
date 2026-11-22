@@ -337,6 +337,10 @@ const state = {
   announcePage: 0,
   playingAnnCode: '',
   searchQuery: '',
+  routeKbOpen: false,
+  routeLetterKey: null,
+  annKbOpen: false,
+  annInputCode: '',
 
   routes: [],
   uniqueRouteNos: [],
@@ -1433,12 +1437,9 @@ function renderTopStatus() {
 }
 
 function renderTabs() {
-  const dark = isNight();
   const nav = document.getElementById('topNavBar');
   if (nav) {
-    nav.className = dark
-      ? 'grid grid-cols-5 bg-[#151a24] text-zinc-300 border-b border-zinc-800 shrink-0'
-      : 'grid grid-cols-5 bg-[#1d2432] text-zinc-200 border-b border-zinc-300 shrink-0';
+    nav.className = 'grid grid-cols-5 bg-black text-zinc-200 shrink-0';
   }
 
   const iconEl = document.getElementById('tabRouteIcon');
@@ -1459,11 +1460,9 @@ function renderTabs() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
     const active = btn.dataset.tab === state.currentTab;
     if (active) {
-      btn.className = dark
-        ? 'tab-btn relative flex flex-col items-center justify-center py-1.5 gap-0.5 bg-[#20293b] text-white border-b-2 border-[#0068FF]'
-        : 'tab-btn relative flex flex-col items-center justify-center py-1.5 gap-0.5 bg-white text-black rounded-t-md';
+      btn.className = 'tab-btn relative flex flex-col items-center justify-center py-1.5 gap-0.5 bg-[#d4dcff] text-black rounded-t-lg font-black';
     } else {
-      btn.className = 'tab-btn relative flex flex-col items-center justify-center py-1.5 gap-0.5 text-zinc-300 hover:text-white';
+      btn.className = 'tab-btn relative flex flex-col items-center justify-center py-1.5 gap-0.5 text-white hover:text-zinc-200';
     }
   });
 }
@@ -1683,68 +1682,302 @@ function renderMain() {
   }
 }
 
+const LECIP_KEYPAD_SPEC = [
+  { digit: '1', letters: ['A', 'B', 'C'] },
+  { digit: '2', letters: ['D', 'E', 'F'] },
+  { digit: '3', letters: ['G', 'H', 'I'] },
+  { digit: '4', letters: ['J', 'K', 'L'] },
+  { digit: '5', letters: ['M', 'N', 'O'] },
+  { digit: '6', letters: ['P', 'Q', 'R'] },
+  { digit: '7', letters: ['S', 'T', 'U'] },
+  { digit: '8', letters: ['V', 'W', 'X'] },
+  { digit: '9', letters: ['Y', 'Z'] },
+  { digit: '0', letters: ['.'] }
+];
+
+function renderLecipInlineKeypadHtml(activeDigit = null) {
+  return `
+    <div class="grid grid-cols-5 bg-[#0057d8] gap-[1px] border-t border-[#0044aa] shrink-0 select-none">
+      ${LECIP_KEYPAD_SPEC.map(k => {
+        const isHeld = activeDigit === k.digit;
+        const sub = k.letters.join('');
+        return `
+          <button data-kdigit="${k.digit}"
+                  class="lecip-kb-key h-[52px] flex flex-col items-center justify-center leading-none transition-colors ${isHeld ? 'bg-[#3b3a36] text-[#0070ff]' : 'bg-[#0074f0] active:bg-[#0058bd] text-white'}">
+            <span class="text-[24px] font-black leading-none">${k.digit}</span>
+            <span class="text-[11px] font-black tracking-wider mt-0.5">${sub}</span>
+          </button>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function bindLecipInlineKeypad(container, onDigit, onLongPressDigit) {
+  container.querySelectorAll('.lecip-kb-key').forEach(btn => {
+    const digit = btn.dataset.kdigit;
+    let holdTimer = null;
+    let heldFired = false;
+
+    const startHold = e => {
+      if (e.type === 'mousedown' && e.button !== 0) return;
+      heldFired = false;
+      clearTimeout(holdTimer);
+      if (onLongPressDigit) {
+        holdTimer = setTimeout(() => {
+          heldFired = true;
+          onLongPressDigit(digit);
+        }, 380);
+      }
+    };
+    const cancelHold = () => {
+      clearTimeout(holdTimer);
+    };
+
+    btn.addEventListener('mousedown', startHold);
+    btn.addEventListener('touchstart', startHold, { passive: true });
+    btn.addEventListener('mouseup', cancelHold);
+    btn.addEventListener('mouseleave', cancelHold);
+    btn.addEventListener('touchend', cancelHold);
+    btn.addEventListener('touchcancel', cancelHold);
+
+    btn.addEventListener('contextmenu', e => {
+      if (!onLongPressDigit) return;
+      e.preventDefault();
+      clearTimeout(holdTimer);
+      onLongPressDigit(digit);
+    });
+
+    btn.addEventListener('click', () => {
+      if (heldFired) {
+        heldFired = false;
+        return;
+      }
+      onDigit(digit);
+    });
+  });
+}
+
 function renderRouteList(vp, bar) {
   const th = themeClasses();
-  vp.className = th.vp;
+  vp.className = th.dark ? 'flex-1 flex flex-col overflow-hidden bg-[#3b3a36] text-white' : 'flex-1 flex flex-col overflow-hidden bg-white text-black';
+
   const filtered = state.searchQuery
-    ? state.uniqueRouteNos.filter(no => no.includes(state.searchQuery))
+    ? state.uniqueRouteNos.filter(no => no.startsWith(state.searchQuery) || no.includes(state.searchQuery))
+        .sort((a, b) => {
+          const as = a.startsWith(state.searchQuery) ? 0 : 1;
+          const bs = b.startsWith(state.searchQuery) ? 0 : 1;
+          return as !== bs ? as - bs : compareRouteNo(a, b);
+        })
     : state.uniqueRouteNos;
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
+  const hasLetterBar = state.routeKbOpen && !!state.routeLetterKey;
+  const visibleRows = state.routeKbOpen ? (hasLetterBar ? 2 : 3) : PAGE_SIZE;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / visibleRows));
   if (state.pageOffset >= totalPages) state.pageOffset = totalPages - 1;
   if (state.pageOffset < 0) state.pageOffset = 0;
 
-  const slice = filtered.slice(state.pageOffset * PAGE_SIZE, (state.pageOffset + 1) * PAGE_SIZE);
+  const slice = filtered.slice(state.pageOffset * visibleRows, (state.pageOffset + 1) * visibleRows);
+  const activeSpec = hasLetterBar ? LECIP_KEYPAD_SPEC.find(x => x.digit === state.routeLetterKey) : null;
+
+  const rowBg = th.dark ? 'bg-[#3b3a36] active:bg-[#4b4944] text-white border-[#52504a]' : 'bg-white active:bg-blue-50 text-zinc-900 border-zinc-400';
+  const emptyBg = th.dark ? 'bg-[#3b3a36] border-[#52504a]' : 'bg-white border-zinc-400';
+  const inputBg = th.dark ? 'bg-[#3b3a36] text-white border-zinc-400' : 'bg-white text-black border-zinc-500';
+  const letterBg = th.dark ? 'bg-[#3b3a36] border-[#52504a]' : 'bg-white border-zinc-400';
 
   vp.innerHTML = `
-    <div class="flex items-center justify-between px-3 py-2 ${th.subBar} shrink-0">
-      <div class="flex items-center gap-2">
-        <span class="font-black text-sm">${state.lang === 'en' ? 'Select Route' : '選擇路線'}</span>
-        ${state.searchQuery ? `<span class="px-2 py-0.5 rounded bg-blue-600/20 text-[#0068FF] text-xs font-black">篩選: ${esc(state.searchQuery)}</span>` : ''}
-      </div>
-      <span class="text-xs font-bold ${th.muted}">${state.pageOffset + 1} / ${totalPages}</span>
+    <!-- 淺紫藍「輸入路線」實機輸入列 -->
+    <div class="px-2.5 py-1.5 bg-[#d4dcff] text-black border-b border-zinc-500 flex items-center gap-2 shrink-0">
+      <div class="font-black text-[15px] leading-tight shrink-0 min-w-[66px]">${state.lang === 'en' ? 'Route' : '輸入路線'}</div>
+      <button id="routeInputField" class="flex-1 h-10 rounded-xl border ${inputBg} px-3 flex items-center justify-between text-left active:opacity-90">
+        <span class="text-2xl font-black tracking-wider leading-none">${esc(state.searchQuery)}${state.routeKbOpen ? '<span class="inline-block w-[2px] h-6 bg-current align-middle ml-0.5 animate-pulse"></span>' : ''}</span>
+        ${!state.routeKbOpen ? `<span class="text-[11px] font-bold opacity-60">${state.pageOffset + 1}/${totalPages}</span>` : ''}
+      </button>
+      <button id="btnRouteBackspace" title="退格（長按全部清除）" class="w-12 h-10 rounded-xl bg-[#0074f0] active:brightness-90 text-white flex items-center justify-center shrink-0 shadow-sm">
+        <svg class="w-7 h-7" viewBox="0 0 28 22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9.5 3.5h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-14L2.5 11l7-7.5z"/>
+          <line x1="14" y1="8.2" x2="20" y2="14.2"/>
+          <line x1="20" y1="8.2" x2="14" y2="14.2"/>
+        </svg>
+      </button>
     </div>
-    <div class="flex-1 flex flex-col divide-y ${th.divider}">
+
+    <!-- 路線列表（收合鍵盤 5 行／展開鍵盤 3 行／展開字母列 2 行） -->
+    <div class="flex-1 flex flex-col overflow-hidden">
       ${slice.length === 0 ? `
-        <div class="flex-1 flex flex-col items-center justify-center ${th.muted} text-sm font-bold gap-2">
+        <div class="flex-1 flex flex-col items-center justify-center ${th.muted} text-sm font-bold gap-2 px-4 text-center">
           <div>找不到符合「${esc(state.searchQuery)}」的路線</div>
-          <button id="btnResetSearch" class="px-3 py-1.5 rounded bg-[#0068FF] text-white text-xs font-black">清除搜尋</button>
+          <button id="btnResetSearch" class="px-3 py-1.5 rounded-lg bg-[#0074f0] text-white text-xs font-black">清除輸入</button>
         </div>
       ` : slice.map(no => `
-        <button data-route="${esc(no)}" class="pick-route-btn flex-1 px-4 flex items-center justify-between ${th.row} text-left">
+        <button data-route="${esc(no)}" class="pick-route-btn flex-1 px-4 flex items-center justify-between border-b ${rowBg} text-left">
           <span class="text-2xl font-black tracking-tight">${esc(no)}</span>
-          <span class="${th.muted} text-xl font-bold">›</span>
+          <span class="text-zinc-400 text-2xl font-black">›</span>
         </button>
       `).join('')}
-      ${slice.length > 0 && slice.length < PAGE_SIZE ? Array(PAGE_SIZE - slice.length).fill(`<div class="flex-1 ${th.emptyRow}"></div>`).join('') : ''}
+      ${slice.length > 0 && slice.length < visibleRows ? Array(visibleRows - slice.length).fill(`
+        <div class="flex-1 px-4 flex items-center justify-end border-b ${emptyBg}">
+          <span class="text-zinc-500/40 text-2xl font-black">›</span>
+        </div>
+      `).join('') : ''}
     </div>
+
+    <!-- 長按數字鍵展開嘅 5 格字母選擇列（例如 [ ][A][B][C][›]） -->
+    ${activeSpec ? `
+      <div class="grid grid-cols-5 h-[56px] border-t border-zinc-500 shrink-0 ${letterBg} divide-x ${th.dark ? 'divide-[#52504a]' : 'divide-zinc-400'}">
+        <button id="btnLetterCancel" class="flex items-center justify-center text-xs font-bold ${th.muted} active:opacity-70"></button>
+        ${[0, 1, 2].map(i => {
+          const ch = activeSpec.letters[i] || '';
+          return ch
+            ? `<button data-lchar="${esc(ch)}" class="pick-letter-btn flex items-center justify-center text-3xl font-black text-[#0070ff] active:bg-[#0074f0] active:text-white">${esc(ch)}</button>`
+            : `<div class="flex items-center justify-center"></div>`;
+        }).join('')}
+        <button id="btnLetterClose" class="flex items-center justify-center text-zinc-400 text-3xl font-black active:opacity-70">›</button>
+      </div>
+    ` : ''}
+
+    <!-- 實機內嵌 2×5 藍色鍵盤 -->
+    ${state.routeKbOpen ? renderLecipInlineKeypadHtml(state.routeLetterKey) : ''}
   `;
 
   const canPrev = state.pageOffset > 0;
   const canNext = state.pageOffset < totalPages - 1;
+  bar.className = 'grid grid-cols-10 gap-1 p-1 bg-black border-t border-zinc-800 shrink-0';
   bar.innerHTML = `
-    <button id="botKeyA" class="h-11 rounded-lg bg-[#0068FF] text-white font-black text-base flex items-center justify-center active:brightness-90">
-      <span class="w-7 h-7 rounded-full bg-white text-black font-black text-sm flex items-center justify-center">A</span>
+    <!-- 實機 Auto-A 機械人按鈕 -->
+    <button id="botAutoA" title="長按數字鍵 1-9 可輸入英文字母" class="col-span-2 h-11 rounded-lg bg-[#0074f0] active:brightness-90 flex items-center justify-center">
+      <svg class="w-9 h-9" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="18" fill="white"/>
+        <line x1="15" y1="7" x2="18.5" y2="12" stroke="black" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="25" y1="7" x2="21.5" y2="12" stroke="black" stroke-width="2.2" stroke-linecap="round"/>
+        <rect x="11" y="12" width="18" height="17" rx="3" stroke="black" stroke-width="2.8" fill="white"/>
+        <path d="M8.5 16v8M31.5 16v8M16 29v4M24 29v4" stroke="black" stroke-width="2.5" stroke-linecap="round"/>
+        <text x="20" y="25" text-anchor="middle" fill="black" font-size="13.5" font-weight="900" font-family="sans-serif">A</text>
+      </svg>
     </button>
-    <button id="botPrev" class="h-11 rounded-lg ${canPrev ? 'bg-[#0068FF] text-white' : 'bg-zinc-600 text-zinc-300'} font-black text-xl flex items-center justify-center active:brightness-90">↑</button>
-    <button id="botNext" class="h-11 rounded-lg ${canNext ? 'bg-[#0068FF] text-white' : 'bg-zinc-600 text-zinc-300'} font-black text-xl flex items-center justify-center active:brightness-90">↓</button>
-    <button id="botSearch" class="h-11 rounded-lg bg-[#0068FF] text-white font-black text-lg flex items-center justify-center active:brightness-90">🔍</button>
+    <button id="botPrev" class="col-span-3 h-11 rounded-lg ${canPrev ? 'bg-[#0074f0] text-white' : 'bg-[#6b6b6b] text-white/90'} font-black text-2xl flex items-center justify-center active:brightness-90">↑</button>
+    <button id="botNext" class="col-span-3 h-11 rounded-lg ${canNext ? 'bg-[#0074f0] text-white' : 'bg-[#6b6b6b] text-white/90'} font-black text-2xl flex items-center justify-center active:brightness-90">↓</button>
+    <button id="botSearch" title="開啟／關閉鍵盤" class="col-span-2 h-11 rounded-lg ${state.routeKbOpen ? 'bg-white text-[#0074f0]' : 'bg-[#0074f0] text-white'} flex items-center justify-center active:brightness-90">
+      <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="6.5"/>
+        <line x1="16" y1="16" x2="21" y2="21"/>
+      </svg>
+    </button>
   `;
 
+  // 綁定路線點選
   vp.querySelectorAll('.pick-route-btn').forEach(btn => {
     btn.onclick = () => {
       state.selectedRouteNo = btn.dataset.route;
       state.routeStage = 'bound';
+      state.routeKbOpen = false;
+      state.routeLetterKey = null;
       state.pageOffset = 0;
       renderAll();
     };
   });
-  const resetBtn = document.getElementById('btnResetSearch');
-  if (resetBtn) resetBtn.onclick = () => { state.searchQuery = ''; state.pageOffset = 0; renderAll(); };
 
-  document.getElementById('botKeyA').onclick = () => openKeypad();
-  document.getElementById('botSearch').onclick = () => openKeypad();
-  document.getElementById('botPrev').onclick = () => { if (canPrev) { state.pageOffset--; renderAll(); } };
-  document.getElementById('botNext').onclick = () => { if (canNext) { state.pageOffset++; renderAll(); } };
+  // 綁定輸入框（點擊即開啟鍵盤）
+  document.getElementById('routeInputField').onclick = () => {
+    if (!state.routeKbOpen) {
+      state.routeKbOpen = true;
+      state.routeLetterKey = null;
+      renderMain();
+    }
+  };
+
+  // 退格掣（短按刪一字，長按全部清除）
+  const bsBtn = document.getElementById('btnRouteBackspace');
+  let bsTimer = null;
+  let bsHeld = false;
+  const startBs = () => {
+    bsHeld = false;
+    clearTimeout(bsTimer);
+    bsTimer = setTimeout(() => {
+      bsHeld = true;
+      state.searchQuery = '';
+      state.routeLetterKey = null;
+      state.pageOffset = 0;
+      renderMain();
+    }, 450);
+  };
+  const stopBs = () => clearTimeout(bsTimer);
+  bsBtn.addEventListener('mousedown', startBs);
+  bsBtn.addEventListener('touchstart', startBs, { passive: true });
+  bsBtn.addEventListener('mouseup', stopBs);
+  bsBtn.addEventListener('mouseleave', stopBs);
+  bsBtn.addEventListener('touchend', stopBs);
+  bsBtn.onclick = () => {
+    if (bsHeld) { bsHeld = false; return; }
+    if (state.routeLetterKey) {
+      state.routeLetterKey = null;
+      renderMain();
+      return;
+    }
+    if (state.searchQuery.length > 0) {
+      state.searchQuery = state.searchQuery.slice(0, -1);
+      state.pageOffset = 0;
+      renderMain();
+    }
+  };
+
+  const resetBtn = document.getElementById('btnResetSearch');
+  if (resetBtn) resetBtn.onclick = () => { state.searchQuery = ''; state.routeLetterKey = null; state.pageOffset = 0; renderMain(); };
+
+  // 綁定展開字母列
+  vp.querySelectorAll('.pick-letter-btn').forEach(btn => {
+    btn.onclick = () => {
+      if (state.searchQuery.length < 6) {
+        state.searchQuery += btn.dataset.lchar;
+        state.pageOffset = 0;
+      }
+      state.routeLetterKey = null;
+      renderMain();
+    };
+  });
+  const lc1 = document.getElementById('btnLetterCancel');
+  if (lc1) lc1.onclick = () => { state.routeLetterKey = null; renderMain(); };
+  const lc2 = document.getElementById('btnLetterClose');
+  if (lc2) lc2.onclick = () => { state.routeLetterKey = null; renderMain(); };
+
+  // 綁定內嵌 2×5 鍵盤
+  if (state.routeKbOpen) {
+    bindLecipInlineKeypad(
+      vp,
+      digit => {
+        if (state.searchQuery.length < 6) {
+          state.searchQuery += digit;
+          state.pageOffset = 0;
+        }
+        state.routeLetterKey = null;
+        renderMain();
+      },
+      digit => {
+        if (digit === '0') {
+          state.routeLetterKey = null;
+          renderMain();
+          return;
+        }
+        state.routeLetterKey = (state.routeLetterKey === digit) ? null : digit;
+        renderMain();
+      }
+    );
+  }
+
+  document.getElementById('botAutoA').onclick = () => {
+    state.routeKbOpen = true;
+    state.routeLetterKey = state.routeLetterKey ? null : '1';
+    showToast('長按數字鍵 1–9（或右鍵）可展開對應英文字母');
+    renderMain();
+  };
+  document.getElementById('botSearch').onclick = () => {
+    state.routeKbOpen = !state.routeKbOpen;
+    state.routeLetterKey = null;
+    state.pageOffset = 0;
+    renderMain();
+  };
+  document.getElementById('botPrev').onclick = () => { if (canPrev) { state.pageOffset--; renderMain(); } };
+  document.getElementById('botNext').onclick = () => { if (canNext) { state.pageOffset++; renderMain(); } };
 }
 
 function renderBoundList(vp, bar) {
@@ -2134,53 +2367,115 @@ function renderStopsView(vp, bar) {
   document.getElementById('botMore').onclick = () => document.getElementById('moreModal').classList.remove('hidden');
 }
 
-// ============ 特別廣播分頁（支援數字鍵盤 3 秒自動播＋播畢跳回路線） ============
+// ============ 特別廣播分頁（實機螢光綠 ▶ / 紅 ■ ＋ 內嵌 2×5 鍵盤 3 秒自動播） ============
+function scheduleInlineAnnAutoPlay() {
+  clearAnnAutoPlayTimers();
+  const val = state.annInputCode;
+  const badgeEl = document.getElementById('annCountdownText');
+  if (!val) {
+    if (badgeEl) badgeEl.textContent = '';
+    return;
+  }
+  const numVal = String(Number(val));
+  const item = state.announcements.find(a => String(a.code) === val || String(Number(a.code)) === numVal);
+  if (!item) {
+    if (badgeEl) badgeEl.textContent = `#${val} (無此編號)`;
+    return;
+  }
+  let remain = 3;
+  if (badgeEl) badgeEl.textContent = `#${item.code} (${remain}s 自動播)`;
+  annCountdownInterval = setInterval(() => {
+    remain--;
+    const b = document.getElementById('annCountdownText');
+    if (b && remain > 0) b.textContent = `#${item.code} (${remain}s 自動播)`;
+  }, 1000);
+  annAutoPlayTimer = setTimeout(() => {
+    clearAnnAutoPlayTimers();
+    state.annInputCode = '';
+    state.annKbOpen = false;
+    playSpecialAnnouncementByItem(item);
+  }, 3000);
+}
+
 function renderAnnounceView(vp, bar) {
   const th = themeClasses();
-  vp.className = th.vp;
-  const totalPages = Math.max(1, Math.ceil(state.announcements.length / PAGE_SIZE));
+  vp.className = th.dark ? 'flex-1 flex flex-col overflow-hidden bg-[#3b3a36] text-white' : 'flex-1 flex flex-col overflow-hidden bg-white text-black';
+
+  const filtered = state.annInputCode
+    ? state.announcements.filter(a => {
+        const c = String(a.code ?? '');
+        return c === state.annInputCode || c.startsWith(state.annInputCode) || String(Number(c)) === String(Number(state.annInputCode));
+      })
+    : state.announcements;
+
+  const visibleRows = state.annKbOpen ? 3 : PAGE_SIZE;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / visibleRows));
   if (state.announcePage >= totalPages) state.announcePage = totalPages - 1;
-  const slice = state.announcements.slice(state.announcePage * PAGE_SIZE, (state.announcePage + 1) * PAGE_SIZE);
+  if (state.announcePage < 0) state.announcePage = 0;
+
+  const slice = filtered.slice(state.announcePage * visibleRows, (state.announcePage + 1) * visibleRows);
+  const rowBg = th.dark ? 'bg-[#3b3a36] text-white border-[#52504a]' : 'bg-white text-zinc-900 border-zinc-400';
 
   vp.innerHTML = `
-    <div class="flex items-center justify-between px-3 py-2 ${th.subBar} shrink-0">
-      <span class="font-black text-sm">特別訊息（播畢自動返回路線）</span>
-      <span class="text-xs font-bold ${th.muted}">${state.announcePage + 1} / ${totalPages}</span>
+    <!-- 淺紫藍「播放特別訊息」實機標題列 -->
+    <div class="px-3 py-2 bg-[#d4dcff] text-black border-b border-zinc-500 flex items-center justify-between gap-2 shrink-0">
+      <span class="font-black text-[15px]">${state.lang === 'en' ? 'Special Announcements' : '播放特別訊息'}</span>
+      <div class="flex items-center gap-1.5">
+        <span id="annCountdownText" class="text-xs font-black text-[#0057d8]">${state.annInputCode ? '#' + esc(state.annInputCode) : ''}</span>
+        ${state.annInputCode ? `<button id="btnAnnClearCode" class="px-2 py-0.5 rounded bg-[#0074f0] text-white text-[11px] font-black">⌫</button>` : `<span class="text-xs font-bold text-zinc-600">${state.announcePage + 1} / ${totalPages}</span>`}
+      </div>
     </div>
-    <div class="flex-1 flex flex-col divide-y ${th.divider}">
-      ${slice.map(item => {
+
+    <!-- 特別訊息列表（無鍵盤 5 行／展開鍵盤 3 行） -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      ${slice.length === 0 ? `
+        <div class="flex-1 flex flex-col items-center justify-center ${th.muted} text-sm font-bold gap-2">
+          <div>找不到編號「${esc(state.annInputCode)}」的特別訊息</div>
+          <button id="btnAnnResetEmpty" class="px-3 py-1.5 rounded-lg bg-[#0074f0] text-white text-xs font-black">清除編號</button>
+        </div>
+      ` : slice.map(item => {
         const code = String(item.code ?? '');
         const title = state.lang === 'en' ? (item.titleEn || item.titleTc) : (item.titleTc || item.titleEn);
         const isPlaying = state.playingAnnCode === code;
         return `
-          <button data-acode="${esc(code)}" class="play-ann-btn flex-1 px-4 py-2 flex items-center justify-between ${th.row} text-left">
-            <div class="min-w-0 pr-2">
-              <div class="text-sm font-black truncate">${esc(code)}. ${esc(title)}</div>
-              <div class="text-[11px] font-semibold ${th.muted} truncate mt-0.5">${esc(item.ttsTc || item.ttsEn || '')}</div>
+          <div class="flex-1 flex items-stretch border-b ${rowBg}">
+            <div class="flex-1 px-4 flex items-center gap-3 min-w-0">
+              <span class="text-xl font-black shrink-0 w-9">${esc(code)}.</span>
+              <span class="text-lg font-extrabold truncate">${esc(title)}</span>
             </div>
-            <span class="w-9 h-9 rounded-full ${isPlaying ? 'bg-red-600' : 'bg-emerald-600'} text-white font-black text-sm flex items-center justify-center shrink-0">
-              ${isPlaying ? '■' : '▶'}
-            </span>
-          </button>
+            <button data-acode="${esc(code)}" class="play-ann-btn w-[72px] shrink-0 flex items-center justify-center ${isPlaying ? 'bg-[#e51c23]' : 'bg-[#00e600]'} active:brightness-90">
+              ${isPlaying
+                ? '<span class="w-7 h-7 rounded-[3px] bg-black block"></span>'
+                : '<svg class="w-8 h-8 text-black" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>'
+              }
+            </button>
+          </div>
         `;
       }).join('')}
-      ${slice.length < PAGE_SIZE ? Array(PAGE_SIZE - slice.length).fill(`<div class="flex-1 ${th.emptyRow}"></div>`).join('') : ''}
+      ${slice.length > 0 && slice.length < visibleRows ? Array(visibleRows - slice.length).fill(`<div class="flex-1 border-b ${rowBg}"></div>`).join('') : ''}
     </div>
+
+    <!-- 實機內嵌 2×5 藍色鍵盤 -->
+    ${state.annKbOpen ? renderLecipInlineKeypadHtml(null) : ''}
   `;
 
   const canPrev = state.announcePage > 0;
   const canNext = state.announcePage < totalPages - 1;
+  bar.className = 'grid grid-cols-5 gap-1 p-1 bg-black border-t border-zinc-800 shrink-0';
   bar.innerHTML = `
-    <button id="botAnnStop" class="h-11 rounded-lg bg-[#d92b1c] text-white font-black text-xs flex items-center justify-center active:brightness-90">停止</button>
-    <button id="botPrev" class="h-11 rounded-lg ${canPrev ? 'bg-[#0068FF] text-white' : 'bg-zinc-600 text-zinc-300'} font-black text-xl flex items-center justify-center">↑</button>
-    <button id="botNext" class="h-11 rounded-lg ${canNext ? 'bg-[#0068FF] text-white' : 'bg-zinc-600 text-zinc-300'} font-black text-xl flex items-center justify-center">↓</button>
-    <button id="botAnnKeypad" class="h-11 rounded-lg bg-[#0068FF] text-white font-black text-xs flex items-center justify-center gap-1 active:brightness-90">
-      <span>🔢</span><span>鍵盤</span>
+    <button id="botPrev" class="col-span-2 h-11 rounded-lg ${canPrev ? 'bg-[#0074f0] text-white' : 'bg-[#2b2a27] text-white/80'} font-black text-2xl flex items-center justify-center active:brightness-90">↑</button>
+    <button id="botNext" class="col-span-2 h-11 rounded-lg ${canNext ? 'bg-[#0074f0] text-white' : 'bg-[#2b2a27] text-white/80'} font-black text-2xl flex items-center justify-center active:brightness-90">↓</button>
+    <button id="botAnnKeypad" title="開啟／關閉數字鍵盤" class="col-span-1 h-11 rounded-lg ${state.annKbOpen ? 'bg-white text-[#0074f0]' : 'bg-[#0074f0] text-white'} flex items-center justify-center active:brightness-90">
+      <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="6.5"/>
+        <line x1="16" y1="16" x2="21" y2="21"/>
+      </svg>
     </button>
   `;
 
   vp.querySelectorAll('.play-ann-btn').forEach(btn => {
     btn.onclick = () => {
+      clearAnnAutoPlayTimers();
       const code = btn.dataset.acode;
       if (state.playingAnnCode === code) {
         stopAllAudio();
@@ -2189,13 +2484,53 @@ function renderAnnounceView(vp, bar) {
         return;
       }
       const item = state.announcements.find(a => String(a.code) === code);
-      if (item) playSpecialAnnouncementByItem(item);
+      if (item) {
+        state.annInputCode = '';
+        playSpecialAnnouncementByItem(item);
+      }
     };
   });
-  document.getElementById('botAnnStop').onclick = () => { stopAllAudio(); renderMain(); showToast('已停止廣播'); };
-  document.getElementById('botPrev').onclick = () => { if (canPrev) { state.announcePage--; renderAll(); } };
-  document.getElementById('botNext').onclick = () => { if (canNext) { state.announcePage++; renderAll(); } };
-  document.getElementById('botAnnKeypad').onclick = () => openAnnounceKeypadModal();
+
+  const clrBtn = document.getElementById('btnAnnClearCode');
+  if (clrBtn) clrBtn.onclick = () => {
+    clearAnnAutoPlayTimers();
+    state.annInputCode = state.annInputCode.slice(0, -1);
+    state.announcePage = 0;
+    renderMain();
+    scheduleInlineAnnAutoPlay();
+  };
+  const rstBtn = document.getElementById('btnAnnResetEmpty');
+  if (rstBtn) rstBtn.onclick = () => {
+    clearAnnAutoPlayTimers();
+    state.annInputCode = '';
+    state.announcePage = 0;
+    renderMain();
+  };
+
+  if (state.annKbOpen) {
+    bindLecipInlineKeypad(
+      vp,
+      digit => {
+        if (state.annInputCode.length < 3) {
+          state.annInputCode += digit;
+          state.announcePage = 0;
+          renderMain();
+          scheduleInlineAnnAutoPlay();
+        }
+      },
+      null
+    );
+  }
+
+  document.getElementById('botPrev').onclick = () => { if (canPrev) { state.announcePage--; renderMain(); } };
+  document.getElementById('botNext').onclick = () => { if (canNext) { state.announcePage++; renderMain(); } };
+  document.getElementById('botAnnKeypad').onclick = () => {
+    clearAnnAutoPlayTimers();
+    state.annKbOpen = !state.annKbOpen;
+    if (!state.annKbOpen) state.annInputCode = '';
+    state.announcePage = 0;
+    renderMain();
+  };
 }
 
 // ============ 訊息收件匣（停車 ≥3s 安全鎖＋聲音訊息綠色播放掣＋行車自動彈回） ============
@@ -2521,7 +2856,7 @@ function renderSettingsView(vp, bar) {
       <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">診斷模式</div>
       <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5 text-xs">
         <div class="p-3 rounded-xl border ${th.card} space-y-1.5">
-          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v45)</div>
+          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v46)</div>
           <div>App Version：<b>23.06.25</b> ｜ Config：<b>ctb_prod_v10</b></div>
           <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
           <div>站點資料庫：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
@@ -2986,6 +3321,47 @@ function bindGlobalEvents() {
     state.brightness = Math.min(1.2, Math.round((state.brightness + 0.1) * 10) / 10);
     applyBrightness();
   };
+  // 電腦實體鍵盤直接輸入支援（路線／廣播內嵌鍵盤開啟時）
+  window.addEventListener('keydown', e => {
+    if (e.target && ['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+    if (!document.getElementById('numModal').classList.contains('hidden')) return;
+    if (state.currentTab === 'route' && state.routeStage === 'route' && state.routeKbOpen) {
+      if (/^[0-9a-zA-Z]$/.test(e.key) && state.searchQuery.length < 6) {
+        state.searchQuery += e.key.toUpperCase();
+        state.routeLetterKey = null;
+        state.pageOffset = 0;
+        renderMain();
+      } else if (e.key === 'Backspace') {
+        state.searchQuery = state.searchQuery.slice(0, -1);
+        state.routeLetterKey = null;
+        state.pageOffset = 0;
+        renderMain();
+      } else if (e.key === 'Escape') {
+        state.routeKbOpen = false;
+        state.routeLetterKey = null;
+        renderMain();
+      }
+    } else if (state.currentTab === 'announce' && state.annKbOpen) {
+      if (/^[0-9]$/.test(e.key) && state.annInputCode.length < 3) {
+        state.annInputCode += e.key;
+        state.announcePage = 0;
+        renderMain();
+        scheduleInlineAnnAutoPlay();
+      } else if (e.key === 'Backspace') {
+        clearAnnAutoPlayTimers();
+        state.annInputCode = state.annInputCode.slice(0, -1);
+        state.announcePage = 0;
+        renderMain();
+        scheduleInlineAnnAutoPlay();
+      } else if (e.key === 'Escape') {
+        clearAnnAutoPlayTimers();
+        state.annKbOpen = false;
+        state.annInputCode = '';
+        renderMain();
+      }
+    }
+  });
+
 }
 
 // ============ 啟動應用 ============
