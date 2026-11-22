@@ -161,7 +161,7 @@ const state = {
   currentTab: 'route',
   routeStage: 'route',
   routeQuery: '',
-  selectedRouteNo: null,
+  selectedRouteId: null,
   selectedTrip: null,
   tripStops: [],
   currentStopIdx: 0,
@@ -181,6 +181,25 @@ const state = {
   lastAnnouncedKey: '',
   cleverScore: 100
 };
+
+function fmtRouteNo(rOrId) {
+  if (rOrId && typeof rOrId === 'object') {
+    const d = rOrId.displayTc || rOrId.externalRouteNo || rOrId.routeId || '';
+    return String(d).replace(/^CTB-/i, '').trim();
+  }
+  return String(rOrId || '').replace(/^CTB-/i, '').trim();
+}
+
+function getStopFare(trip, stopObj) {
+  if (!trip) return '';
+  if (stopObj && stopObj.fare != null && stopObj.fare !== '') return Number(stopObj.fare).toFixed(1);
+  const seq = stopObj ? Number(stopObj.seq || 1) : 1;
+  const segs = Array.isArray(trip.fareSegments) ? trip.fareSegments : [];
+  const hit = segs.find(seg => seq >= Number(seg.fromStopSeq || 1) && seq <= Number(seg.toStopSeq || 999));
+  if (hit && hit.fare != null) return Number(hit.fare).toFixed(1);
+  if (trip.fullFare != null) return Number(trip.fullFare).toFixed(1);
+  return '';
+}
 
 function showToast(msg) {
   const el = document.getElementById('toastBox');
@@ -226,7 +245,7 @@ async function initData() {
     const anns = await aRes.json();
     applyPackData(routes, stops, anns);
   } catch (err) {
-    document.getElementById('loadingText').textContent = '載入資料失敗，請確認 data/*.json 已上傳：' + err.message;
+    document.getElementById('loadingText').textContent = '載入資料失敗：' + err.message;
   }
 }
 
@@ -289,7 +308,7 @@ function startGpsWatcher() {
 function triggerStopAnnouncement(idx) {
   const st = state.tripStops[idx];
   if (!st) return;
-  const zh = st.nameZh || st.name || '';
+  const zh = st.nameTc || st.nameZh || st.name || '';
   const en = st.nameEn || '';
   showToast(`報站：${zh}`);
   speakAnnouncement(`下一站，${zh}`, en ? `Next stop, ${en}` : '');
@@ -323,22 +342,27 @@ function renderMain() {
 
   if (state.currentTab === 'route') {
     if (state.routeStage === 'route') {
-      const uniqueNos = [...new Set(state.routes.map(r => r.routeId))].filter(no =>
-        !state.routeQuery || no.toUpperCase().includes(state.routeQuery.toUpperCase())
+      const routeMap = new Map();
+      for (const r of state.routes) {
+        const disp = fmtRouteNo(r);
+        if (!routeMap.has(disp)) routeMap.set(disp, r.routeId);
+      }
+      const filtered = [...routeMap.entries()].filter(([disp]) =>
+        !state.routeQuery || disp.toUpperCase().includes(state.routeQuery.toUpperCase())
       );
       vp.innerHTML = `
         <div class="${bgBanner} px-3 py-2 font-bold text-sm flex items-center justify-between shrink-0">
-          <span>輸入路線 (${uniqueNos.length} 條)</span>
+          <span>輸入路線 (${filtered.length} 條)</span>
           ${state.routeQuery ? `<button id="clearRouteQ" class="text-xs bg-black/20 px-2 py-0.5 rounded">清除</button>` : ''}
         </div>
         <div class="p-2 shrink-0">
-          <input id="routeSearchInput" type="text" value="${state.routeQuery}" placeholder="輸入路線號例如 971 / 788 / A11..."
+          <input id="routeSearchInput" type="text" value="${state.routeQuery}" placeholder="輸入路線號例如 1 / 788 / 971..."
             class="w-full px-3 py-2 rounded border border-slate-400 text-black font-bold text-base focus:outline-none focus:ring-2 focus:ring-blue-600" />
         </div>
         <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar px-2 pb-2 grid grid-cols-3 gap-1.5 content-start">
-          ${uniqueNos.slice(0, 180).map(no => `
-            <button data-rno="${no}" class="pick-route-btn py-3 rounded border font-black text-lg ${rowBg} active:bg-blue-600 active:text-white shadow-sm">
-              ${no}
+          ${filtered.slice(0, 200).map(([disp, rawId]) => `
+            <button data-rid="${rawId}" class="pick-route-btn py-3 rounded border font-black text-lg ${rowBg} active:bg-blue-600 active:text-white shadow-sm">
+              ${disp}
             </button>
           `).join('')}
         </div>
@@ -350,27 +374,35 @@ function renderMain() {
       }
       document.querySelectorAll('.pick-route-btn').forEach(b => {
         b.onclick = () => {
-          state.selectedRouteNo = b.dataset.rno;
+          state.selectedRouteId = b.dataset.rid;
           state.routeStage = 'pattern';
           renderMain();
         };
       });
     } else if (state.routeStage === 'pattern') {
-      const trips = state.routes.filter(r => r.routeId === state.selectedRouteNo);
+      const trips = state.routes.filter(r => r.routeId === state.selectedRouteId);
+      const dispNo = fmtRouteNo(state.selectedRouteId);
       vp.innerHTML = `
         <div class="${bgBanner} px-3 py-2 font-bold text-sm shrink-0">
-          路線 ${state.selectedRouteNo} — 選擇方向／特別班次
+          路線 ${dispNo} — 選擇方向／特別班次
         </div>
         <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar divide-y divide-slate-300">
-          ${trips.map((t, idx) => `
-            <button data-tidx="${idx}" class="pick-trip-btn w-full text-left px-3 py-3 ${rowBg} active:bg-blue-600 active:text-white flex items-center justify-between">
-              <div>
-                <div class="font-bold text-base">${t.destZh || t.destination || '往總站'}</div>
-                <div class="text-xs opacity-75">${t.patternName || (t.patternId ? '特別班次 ' + t.patternId : '正常班次')} · 往 ${t.destEn || ''}</div>
-              </div>
-              <span class="font-black text-lg">›</span>
-            </button>
-          `).join('')}
+          ${trips.map((t, idx) => {
+            const dest = t.destTc || t.endStopNameTc || t.destZh || '往總站';
+            const start = t.startStopNameTc ? `${t.startStopNameTc} → ` : '';
+            const pat = t.patternNameTc || (t.patternId ? `特別班次 (${t.patternId})` : '正常班次');
+            const fare = t.fullFare != null ? `$${Number(t.fullFare).toFixed(1)}` : '';
+            return `
+              <button data-tidx="${idx}" class="pick-trip-btn w-full text-left px-3 py-3 ${rowBg} active:bg-blue-600 active:text-white flex items-center justify-between">
+                <div class="pr-2">
+                  <div class="font-bold text-base">往 ${dest}</div>
+                  <div class="text-xs opacity-80 mt-0.5">${start}${dest}</div>
+                  <div class="text-[11px] text-blue-600 dark:text-blue-400 font-semibold mt-0.5">${pat} ${fare ? '· 全程 ' + fare : ''}</div>
+                </div>
+                <span class="font-black text-lg shrink-0">›</span>
+              </button>
+            `;
+          }).join('')}
         </div>
       `;
       document.querySelectorAll('.pick-trip-btn').forEach(b => {
@@ -386,18 +418,23 @@ function renderMain() {
       });
     } else if (state.routeStage === 'start_stop') {
       const t = state.selectedTrip;
+      const dispNo = fmtRouteNo(t);
+      const dest = t.destTc || t.endStopNameTc || '';
       vp.innerHTML = `
         <div class="${bgBanner} px-3 py-1.5 shrink-0">
-          <div class="text-xs font-bold opacity-80">${t.routeId}-${t.destZh || ''}-${t.bound}</div>
+          <div class="text-xs font-bold opacity-80">${dispNo}-${dest}-${t.bound}</div>
           <div class="font-black text-base">選擇開始站位</div>
         </div>
         <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar divide-y divide-slate-300">
-          ${state.tripStops.map((s, idx) => `
-            <button data-sidx="${idx}" class="pick-start-btn w-full text-left px-3 py-2.5 flex items-center justify-between ${idx === 0 ? 'bg-[#f4f728] text-black font-bold' : rowBg}">
-              <span class="text-base truncate">${idx + 1}. ${s.nameZh || s.name}</span>
-              <span class="font-bold text-lg ml-2">›</span>
-            </button>
-          `).join('')}
+          ${state.tripStops.map((s, idx) => {
+            const name = s.nameTc || s.nameZh || s.name || `第 ${idx+1} 站`;
+            return `
+              <button data-sidx="${idx}" class="pick-start-btn w-full text-left px-3 py-2.5 flex items-center justify-between ${idx === 0 ? 'bg-[#f4f728] text-black font-bold' : rowBg}">
+                <span class="text-base truncate">${idx + 1}. ${name}</span>
+                <span class="font-bold text-lg ml-2">›</span>
+              </button>
+            `;
+          }).join('')}
         </div>
       `;
       document.querySelectorAll('.pick-start-btn').forEach(b => {
@@ -411,13 +448,17 @@ function renderMain() {
       });
     } else if (state.routeStage === 'stops') {
       const t = state.selectedTrip;
+      const dispNo = fmtRouteNo(t);
+      const dest = t.destTc || t.endStopNameTc || '';
       const cur = state.tripStops[state.currentStopIdx] || {};
-      const nextStops = state.tripStops.slice(state.currentStopIdx + 1, state.currentStopIdx + 5);
+      const curName = cur.nameTc || cur.nameZh || cur.name || '總站';
+      const curFare = getStopFare(t, cur);
+      const nextStops = state.tripStops.slice(state.currentStopIdx + 1, state.currentStopIdx + 6);
       vp.innerHTML = `
         <div class="${bgBanner} px-3 py-1.5 flex items-center justify-between shrink-0">
           <div>
-            <div class="text-xs font-bold">${t.routeId} 往 ${t.destZh || ''}</div>
-            <div class="text-[11px] opacity-80">第 ${state.currentStopIdx + 1} / ${state.tripStops.length} 站 · 車費 $${cur.fare || t.fullFare || '--'}</div>
+            <div class="text-xs font-bold">${dispNo} 往 ${dest}</div>
+            <div class="text-[11px] opacity-80">第 ${state.currentStopIdx + 1} / ${state.tripStops.length} 站 ${curFare ? '· 車費 $' + curFare : ''}</div>
           </div>
           <button id="toggleModeBtn" class="px-2.5 py-1 rounded bg-blue-700 text-white text-xs font-bold">
             ${state.stopMode === 'auto' ? '自動報站' : '手動報站'}
@@ -429,17 +470,19 @@ function renderMain() {
             <span class="text-xs font-extrabold uppercase tracking-wider bg-black text-[#f4f728] px-1.5 py-0.5 rounded">目前 / 下一站 (點擊重播)</span>
             <span class="text-xs font-bold">🔊</span>
           </div>
-          <div class="text-xl font-black mt-1 leading-tight">${state.currentStopIdx + 1}. ${cur.nameZh || cur.name || '總站'}</div>
+          <div class="text-xl font-black mt-1 leading-tight">${state.currentStopIdx + 1}. ${curName}</div>
           <div class="text-xs font-semibold text-zinc-800 mt-0.5">${cur.nameEn || ''}</div>
         </button>
 
         <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar divide-y divide-slate-300">
           ${nextStops.map((s, offset) => {
             const realIdx = state.currentStopIdx + 1 + offset;
+            const sName = s.nameTc || s.nameZh || s.name || '';
+            const sFare = getStopFare(t, s);
             return `
               <button data-jump="${realIdx}" class="jump-stop-btn w-full text-left px-3 py-2.5 ${rowBg} flex items-center justify-between">
-                <span class="text-base font-medium truncate">${realIdx + 1}. ${s.nameZh || s.name}</span>
-                <span class="text-xs opacity-60">$${s.fare || ''}</span>
+                <span class="text-base font-medium truncate">${realIdx + 1}. ${sName}</span>
+                <span class="text-xs opacity-60 ml-2 shrink-0">${sFare ? '$' + sFare : ''}</span>
               </button>
             `;
           }).join('') || `<div class="p-4 text-center text-sm opacity-70">已到達終點站</div>`}
@@ -463,7 +506,7 @@ function renderMain() {
     const list = state.announcements.filter(a => {
       if (!state.broadcastQuery) return true;
       const q = state.broadcastQuery.toLowerCase();
-      return String(a.code || a.id || '').toLowerCase().includes(q) || String(a.titleZh || a.label || '').toLowerCase().includes(q);
+      return String(a.code || '').toLowerCase().includes(q) || String(a.titleTc || a.ttsTc || '').toLowerCase().includes(q);
     });
     vp.innerHTML = `
       <div class="${bgBanner} px-3 py-2 font-bold text-sm shrink-0">特別訊息廣播 (${list.length})</div>
@@ -472,9 +515,9 @@ function renderMain() {
           class="w-full px-3 py-1.5 rounded border border-slate-400 text-black text-sm font-bold" />
       </div>
       <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar divide-y divide-slate-300">
-        ${list.slice(0, 100).map((a, i) => {
-          const title = a.titleZh || a.label || a.name || `廣播 ${i+1}`;
-          const code = a.code || a.id || (i + 1);
+        ${list.map((a, i) => {
+          const title = a.titleTc || a.titleZh || `特別訊息 ${i+1}`;
+          const code = a.code != null ? a.code : (i + 1);
           return `
             <button data-aidx="${i}" class="play-ann-btn w-full text-left px-3 py-2.5 ${rowBg} active:bg-blue-600 active:text-white flex items-center justify-between">
               <span class="font-bold text-sm truncate">${code}. ${title}</span>
@@ -488,9 +531,9 @@ function renderMain() {
     document.querySelectorAll('.play-ann-btn').forEach(b => {
       b.onclick = () => {
         const item = list[Number(b.dataset.aidx)];
-        const zh = item.titleZh || item.label || '';
-        const en = item.titleEn || '';
-        showToast(`播放廣播：${zh}`);
+        const zh = item.ttsTc || item.titleTc || '';
+        const en = item.ttsEn || item.titleEn || '';
+        showToast(`播放廣播：${item.titleTc || zh}`);
         speakAnnouncement(zh, en);
       };
     });

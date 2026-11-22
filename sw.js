@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'ctb-lecip-web-v1';
+﻿const CACHE_NAME = 'ctb-lecip-web-v3';
 const ASSETS = [
   './',
   './index.html',
