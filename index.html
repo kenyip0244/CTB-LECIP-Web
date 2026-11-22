@@ -1406,9 +1406,13 @@ function toggleGpsMode() {
   if (state.gpsEnabled) {
     state.gpsEnabled = false;
     stopGpsTracking();
+    state.gpsLat = null;
+    state.gpsLng = null;
     state.gpsDistanceM = null;
     state.gpsArrivedCur = false;
     state.gpsMinDistToCur = Infinity;
+    state.etaMap = {};
+    state.etaLastFetchKey = '';
     showToast('已切換為手動模式 (M)');
   } else {
     state.gpsEnabled = true;
@@ -2381,6 +2385,7 @@ function estimateFallbackEtas(curIdx) {
 }
 
 function updateEtaDomInPlace() {
+  if (!state.gpsEnabled) return;
   const curIdx = state.currentStopIdx;
   const curEta = state.etaMap[curIdx];
   const minEl = document.getElementById('etaCurMins');
@@ -2402,7 +2407,7 @@ function updateEtaDomInPlace() {
 }
 
 async function refreshRouteEtas(force = false) {
-  if (state.routeStage !== 'stops' || !state.tripStops.length) return;
+  if (!state.gpsEnabled || state.routeStage !== 'stops' || !state.tripStops.length) return;
   const curIdx = state.currentStopIdx;
   estimateFallbackEtas(curIdx);
   updateEtaDomInPlace();
@@ -2465,7 +2470,7 @@ async function refreshRouteEtas(force = false) {
     if (!Array.isArray(legs) || legs.length === 0) return;
 
     // 確認回覆時仍停留在同一個班次與站位
-    if (state.routeStage !== 'stops' || state.currentStopIdx !== curIdx) return;
+    if (!state.gpsEnabled || state.routeStage !== 'stops' || state.currentStopIdx !== curIdx) return;
 
     let cumSec = 0;
     if (startIsCurStop) {
@@ -2510,7 +2515,7 @@ function renderStopsView(vp, bar) {
     return;
   }
 
-  estimateFallbackEtas(state.currentStopIdx);
+  if (state.gpsEnabled) estimateFallbackEtas(state.currentStopIdx);
   const curEta = state.etaMap[state.currentStopIdx] || { mins: 1, distM: state.gpsDistanceM ?? 0 };
   const sections = computeTripSections(state.tripStops, state.selectedTrip);
   const curSec = sections[state.currentStopIdx] || { sectionNo: 1, activeFare: null, badgeFare: null };
@@ -2605,10 +2610,12 @@ function renderStopsView(vp, bar) {
               <span class="text-[20px] font-bold truncate">${targetIdx + 1}. ${esc(nm)}</span>
               ${sInfo.badgeFare != null ? `<span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black shrink-0">${esc(fmtFare(sInfo.badgeFare))}</span>` : ''}
             </div>
+            ${state.gpsEnabled ? `
             <div class="shrink-0 text-center leading-tight min-w-[38px]">
               <div data-eta-idx="${targetIdx}" class="text-[19px] font-black leading-none">${uEta.mins}</div>
               <div class="text-[11px] font-bold opacity-80 mt-0.5">${state.lang === 'en' ? 'min' : '分鐘'}</div>
             </div>
+            ` : ''}
           </button>
         `;
       }).join('')}
@@ -2698,8 +2705,8 @@ function renderStopsView(vp, bar) {
   document.getElementById('botNext').onclick = advanceStop;
   document.getElementById('botMore').onclick = () => document.getElementById('moreModal').classList.remove('hidden');
 
-  // 非同步向 OSRM 地圖 API 查詢實際道路距離與預計分鐘
-  refreshRouteEtas(true);
+  // 僅於 GPS 自動模式向 OSRM 地圖 API 查詢實際道路距離與預計分鐘
+  if (state.gpsEnabled) refreshRouteEtas(true);
 }
 
 // ============ 特別廣播分頁（實機螢光綠 ▶ / 紅 ■ ＋ 內嵌 2×5 鍵盤 3 秒自動播） ============
@@ -3245,7 +3252,7 @@ function renderSettingsView(vp, bar) {
       <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">診斷模式</div>
       <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5 text-xs">
         <div class="p-3 rounded-xl border ${th.card} space-y-1.5">
-          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v50)</div>
+          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v51)</div>
           <div>App Version：<b>23.06.25</b> ｜ Config：<b>ctb_prod_v10</b></div>
           <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
           <div>站點資料庫：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
