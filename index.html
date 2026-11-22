@@ -268,6 +268,8 @@ const state = {
   lastGpsSpeedKmh: 0,
   lastGpsTimeMs: 0,
   gpsDistanceM: null,
+  gpsArrivedCur: false,
+  gpsMinDistToCur: Infinity,
   stopProgressPct: 25,
   volume: 1.0,
   brightness: 1.0,
@@ -911,6 +913,11 @@ function startGpsTracking() {
   }
   stopGpsTracking();
   state.gpsEnabled = true;
+
+  const ARRIVE_RADIUS_M = 45;   // 進入本站 45m 視為已到達 A 站
+  const LEAVE_RADIUS_M = 55;    // 到站後駛離超過 55m 視為已離開 A 站 -> 立即播 B 站
+  const OFFSET_PASS_DELTA = 45; // 站牌/總站月台座標偏移補救（120m 內駛離超過 45m）
+
   state.gpsWatchId = navigator.geolocation.watchPosition(
     pos => {
       const nowMs = Date.now();
@@ -932,38 +939,82 @@ function startGpsTracking() {
       state.isStopped3s = kmh < 3;
 
       if (state.routeStage === 'stops' && state.tripStops.length > 0) {
-        const nextIdx = Math.min(state.tripStops.length - 1, state.currentStopIdx + 1);
-        const curSt = state.tripStops[state.currentStopIdx];
-        const nextSt = state.tripStops[nextIdx];
-        const nLat = getStopLat(nextSt);
-        const nLng = getStopLng(nextSt);
+        const curIdx = state.currentStopIdx;
+        const hasNext = curIdx < state.tripStops.length - 1;
+        const curSt = state.tripStops[curIdx];
+        const prevSt = curIdx > 0 ? state.tripStops[curIdx - 1] : null;
+        const nextSt = hasNext ? state.tripStops[curIdx + 1] : null;
+
         const cLat = getStopLat(curSt);
         const cLng = getStopLng(curSt);
 
-        if (Number.isFinite(nLat) && Number.isFinite(nLng) && nextIdx !== state.currentStopIdx) {
-          const dist = Math.round(calcDistanceMeters(latitude, longitude, nLat, nLng));
-          state.gpsDistanceM = dist;
-          let leg = 450;
-          if (Number.isFinite(cLat) && Number.isFinite(cLng)) {
-            leg = Math.max(80, Math.round(calcDistanceMeters(cLat, cLng, nLat, nLng)));
-          }
-          const ratio = Math.max(0, Math.min(1, 1 - dist / leg));
-          state.stopProgressPct = Math.round(15 + ratio * 80);
+        if (Number.isFinite(cLat) && Number.isFinite(cLng)) {
+          const distCur = Math.round(calcDistanceMeters(latitude, longitude, cLat, cLng));
+          state.gpsDistanceM = distCur;
+          if (distCur < state.gpsMinDistToCur) state.gpsMinDistToCur = distCur;
 
-          if (dist <= 45) {
-            state.currentStopIdx = nextIdx;
-            state.stopProgressPct = 20;
-            state.gpsDistanceM = null;
-            renderAll();
-            triggerStopAnnouncement(state.currentStopIdx);
-            return;
+          // 判斷已抵達目前站 (A 站)
+          if (distCur <= ARRIVE_RADIUS_M) {
+            state.gpsArrivedCur = true;
+          }
+
+          // 更新行駛進度條（由上一站往目前站）
+          if (state.gpsArrivedCur) {
+            state.stopProgressPct = 100;
+          } else if (prevSt) {
+            const pLat = getStopLat(prevSt);
+            const pLng = getStopLng(prevSt);
+            let leg = 450;
+            if (Number.isFinite(pLat) && Number.isFinite(pLng)) {
+              leg = Math.max(80, Math.round(calcDistanceMeters(pLat, pLng, cLat, cLng)));
+            }
+            const ratio = Math.max(0, Math.min(1, 1 - distCur / leg));
+            state.stopProgressPct = Math.round(15 + ratio * 80);
+          } else {
+            state.stopProgressPct = 15;
+          }
+
+          // 離開 A 站 -> 立即跳去 B 站並播報 B 站
+          if (hasNext && nextSt) {
+            const nLat = getStopLat(nextSt);
+            const nLng = getStopLng(nextSt);
+            const hasNextCoord = Number.isFinite(nLat) && Number.isFinite(nLng);
+            const distNext = hasNextCoord ? Math.round(calcDistanceMeters(latitude, longitude, nLat, nLng)) : Infinity;
+            const legToNext = hasNextCoord ? Math.max(80, Math.round(calcDistanceMeters(cLat, cLng, nLat, nLng))) : 450;
+
+            const standardLeave = state.gpsArrivedCur && distCur >= LEAVE_RADIUS_M;
+            const offsetLeave = !state.gpsArrivedCur &&
+                                state.gpsMinDistToCur <= 120 &&
+                                distCur >= state.gpsMinDistToCur + OFFSET_PASS_DELTA &&
+                                distCur >= 65 &&
+                                (!hasNextCoord || distNext < legToNext);
+            const alreadyAtNext = hasNextCoord && distNext <= ARRIVE_RADIUS_M && distCur > ARRIVE_RADIUS_M;
+
+            if (standardLeave || offsetLeave || alreadyAtNext) {
+              state.currentStopIdx = curIdx + 1;
+              state.gpsArrivedCur = alreadyAtNext;
+              state.gpsMinDistToCur = alreadyAtNext ? distNext : Infinity;
+              state.gpsDistanceM = hasNextCoord ? distNext : null;
+              state.stopProgressPct = alreadyAtNext ? 100 : 15;
+              renderAll();
+              triggerStopAnnouncement(state.currentStopIdx);
+              return;
+            }
           }
         }
       }
+
       renderTopStatus();
       const gpsLabel = document.getElementById('gpsLiveText');
       if (gpsLabel && state.gpsEnabled) {
-        gpsLabel.textContent = state.gpsDistanceM != null ? `GPS 自動 · 距下站 ${state.gpsDistanceM}m` : 'GPS 定位中...';
+        const isLast = state.currentStopIdx >= state.tripStops.length - 1;
+        if (state.gpsArrivedCur) {
+          gpsLabel.textContent = isLast ? 'GPS 自動 · 已到達終點站' : 'GPS 自動 · 已到站（離站後播下站）';
+        } else if (state.gpsDistanceM != null) {
+          gpsLabel.textContent = `GPS 自動 · 距本站 ${state.gpsDistanceM}m`;
+        } else {
+          gpsLabel.textContent = 'GPS 定位中...';
+        }
       }
       const bar = document.getElementById('stopProgressFill');
       if (bar) bar.style.width = `${state.stopProgressPct}%`;
@@ -984,7 +1035,7 @@ function toggleGpsMode() {
   if (state.gpsEnabled) {
     state.gpsEnabled = false;
     stopGpsTracking();
-    state.gpsDistanceM = null;
+    state.gpsDistanceM = null; state.gpsArrivedCur = false; state.gpsMinDistToCur = Infinity;
     showToast('已切換為手動模式 (M)');
   } else {
     state.gpsEnabled = true;
@@ -1473,7 +1524,7 @@ function renderStartStopList(vp, bar) {
   const enterStops = startIdx => {
     state.currentStopIdx = startIdx;
     state.stopProgressPct = 20;
-    state.gpsDistanceM = null;
+    state.gpsDistanceM = null; state.gpsArrivedCur = false; state.gpsMinDistToCur = Infinity;
     state.lastAnnouncedKey = '';
     state.routeStage = 'stops';
     if (state.gpsEnabled) startGpsTracking();
@@ -1547,7 +1598,7 @@ function renderStopsView(vp, bar) {
 
       <div class="flex items-center justify-between mt-3 mb-2">
         <span id="gpsLiveText" class="text-xs font-black ${state.gpsEnabled ? 'text-emerald-500' : th.muted}">
-          ${state.gpsEnabled ? (state.gpsDistanceM != null ? `GPS 自動 · 距下站 ${state.gpsDistanceM}m` : 'GPS 自動報站中') : '手動模式'}
+          ${state.gpsEnabled ? (state.gpsArrivedCur ? (state.currentStopIdx >= state.tripStops.length - 1 ? 'GPS 自動 · 已到達終點站' : 'GPS 自動 · 已到站（離站後播下站）') : (state.gpsDistanceM != null ? `GPS 自動 · 距本站 ${state.gpsDistanceM}m` : 'GPS 自動報站中')) : '手動模式'}
         </span>
         <button id="btnToggleGpsInline" class="px-2.5 py-1 rounded border ${gpsBtnCls} text-[11px] font-black active:scale-95">
           切換${state.gpsEnabled ? '手動 (M)' : 'GPS 自動'}
@@ -1569,7 +1620,7 @@ function renderStopsView(vp, bar) {
             <div id="stopProgressFill" class="h-full bg-[#0068FF] transition-all duration-300" style="width:${state.stopProgressPct}%"></div>
           </div>
           <div class="flex justify-between text-[11px] font-bold ${th.muted}">
-            <span>自動偵測埋站 (≤45m)</span>
+            <span>離開本站後 (>55m) 自動播下站</span>
             <span>第 ${state.currentStopIdx + 1} / ${state.tripStops.length} 站</span>
           </div>
         </div>
@@ -1610,7 +1661,7 @@ function renderStopsView(vp, bar) {
     if (state.currentStopIdx < state.tripStops.length - 1) {
       state.currentStopIdx++;
       state.stopProgressPct = 20;
-      state.gpsDistanceM = null;
+      state.gpsDistanceM = null; state.gpsArrivedCur = false; state.gpsMinDistToCur = Infinity;
       renderAll();
       triggerStopAnnouncement(state.currentStopIdx, true);
     } else {
@@ -1621,7 +1672,7 @@ function renderStopsView(vp, bar) {
     if (state.currentStopIdx > 0) {
       state.currentStopIdx--;
       state.stopProgressPct = 20;
-      state.gpsDistanceM = null;
+      state.gpsDistanceM = null; state.gpsArrivedCur = false; state.gpsMinDistToCur = Infinity;
       renderAll();
       triggerStopAnnouncement(state.currentStopIdx, true);
     }
@@ -1655,7 +1706,7 @@ function renderStopsView(vp, bar) {
     btn.onclick = () => {
       state.currentStopIdx = Number(btn.dataset.jump);
       state.stopProgressPct = 20;
-      state.gpsDistanceM = null;
+      state.gpsDistanceM = null; state.gpsArrivedCur = false; state.gpsMinDistToCur = Infinity;
       renderAll();
       triggerStopAnnouncement(state.currentStopIdx, true);
     };
