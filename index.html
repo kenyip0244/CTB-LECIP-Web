@@ -76,7 +76,7 @@
         </div>
         <div class="flex items-center gap-1 shrink-0">
           <span id="octopusBadge" class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-zinc-700 text-zinc-200">八達通未連</span>
-          <button id="simStopToggle" title="點擊切換停車3秒/模擬行車測試" class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-700 text-white">已停 ≥3s</button>
+          <button id="simStopToggle" title="點擊切換停車3秒/模擬行車測試" class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-700 text-white">${state.isStopped3s ? '已停 ≥3s' : ('行駛 ' + state.gpsSpeedKmh + 'km/h')}</button>
           <svg id="destSignIcon" class="w-4 h-4 text-zinc-300" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8M12 3a14.5 14.5 0 010 18M12 3a14.5 14.5 0 000 18"/></svg>
         </div>
       </div>
@@ -183,6 +183,11 @@ const state = {
   tripStops: [],
   currentStopIdx: 0,
   stopProgressPct: 35,
+  gpsEnabled: true,
+  gpsWatchId: null,
+  gpsDistanceM: null,
+  gpsSpeedKmh: 0,
+  isStopped3s: true,
   stopMode: 'auto',
   volume: 1.0,
   brightnessDim: 0.0,
@@ -303,6 +308,101 @@ function speakTtsFallback(zhText, enText) {
 
 function speakAnnouncement(zhText, enText, audioFiles = []) {
   playAudioSequence(audioFiles, zhText, enText);
+}
+
+function calcDistanceMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const toRad = d => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function startGpsTracking() {
+  if (!('geolocation' in navigator)) {
+    showToast('此瀏覽器不支援 GPS 定位');
+    return;
+  }
+  stopGpsTracking();
+  state.gpsEnabled = true;
+  state.gpsWatchId = navigator.geolocation.watchPosition(
+    pos => {
+      const { latitude, longitude, speed } = pos.coords;
+      const kmh = typeof speed === 'number' && !Number.isNaN(speed) ? Math.round(speed * 3.6) : 0;
+      state.gpsSpeedKmh = kmh;
+      state.isStopped3s = kmh < 3;
+
+      if (state.routeStage === 'stops' && state.tripStops.length > 0) {
+        const nextIdx = Math.min(state.tripStops.length - 1, state.currentStopIdx + 1);
+        const curSt = state.tripStops[state.currentStopIdx];
+        const nextSt = state.tripStops[nextIdx];
+        const nLat = Number(nextSt?.lat ?? nextSt?.latitude);
+        const nLng = Number(nextSt?.lng ?? nextSt?.longitude);
+        const cLat = Number(curSt?.lat ?? curSt?.latitude);
+        const cLng = Number(curSt?.lng ?? curSt?.longitude);
+
+        if (Number.isFinite(nLat) && Number.isFinite(nLng) && nextIdx !== state.currentStopIdx) {
+          const dist = Math.round(calcDistanceMeters(latitude, longitude, nLat, nLng));
+          state.gpsDistanceM = dist;
+
+          // 根據與上一站及下一站距離計算動態進度條 (15% ~ 95%)
+          let legTotal = 450;
+          if (Number.isFinite(cLat) && Number.isFinite(cLng)) {
+            legTotal = Math.max(80, Math.round(calcDistanceMeters(cLat, cLng, nLat, nLng)));
+          }
+          const ratio = Math.max(0, Math.min(1, 1 - dist / legTotal));
+          state.stopProgressPct = Math.round(15 + ratio * 80);
+
+          // 進入下一站 45 米範圍自動推進報站
+          if (dist <= 45) {
+            state.currentStopIdx = nextIdx;
+            state.stopProgressPct = 20;
+            state.gpsDistanceM = null;
+            renderAll();
+            triggerStopAnnouncement(state.currentStopIdx);
+            return;
+          }
+        }
+      }
+      renderTopStatus();
+      if (state.currentTab === 'route' && state.routeStage === 'stops') {
+        const gpsBadge = document.getElementById('gpsLiveBadge');
+        if (gpsBadge) {
+          gpsBadge.textContent = state.gpsDistanceM != null
+            ? `GPS 自動 · 距下站 ${state.gpsDistanceM}m`
+            : 'GPS 定位中';
+        }
+        const barFill = document.getElementById('stopProgressFill');
+        if (barFill) barFill.style.width = `${state.stopProgressPct}%`;
+      }
+    },
+    err => {
+      if (err.code === 1) showToast('請允許瀏覽器存取 GPS 位置權限');
+    },
+    { enableHighAccuracy: true, maximumAge: 1500, timeout: 10000 }
+  );
+}
+
+function stopGpsTracking() {
+  if (state.gpsWatchId != null && 'geolocation' in navigator) {
+    navigator.geolocation.clearWatch(state.gpsWatchId);
+    state.gpsWatchId = null;
+  }
+}
+
+function toggleGpsMode() {
+  state.gpsEnabled = !state.gpsEnabled;
+  if (state.gpsEnabled) {
+    startGpsTracking();
+    showToast('已開啟 GPS 自動報站');
+  } else {
+    stopGpsTracking();
+    state.gpsDistanceM = null;
+    showToast('已切換為手動報站模式');
+  }
+  renderAll();
 }
 
 function showToast(msg) {
@@ -467,7 +567,7 @@ function renderTopStatus() {
   // 停車3秒安全鎖狀態切換按鈕
   const stopBtn = document.getElementById('simStopToggle');
   if (state.isStopped3s) {
-    stopBtn.textContent = '已停 ≥3s';
+    stopBtn.textContent = '${state.isStopped3s ? '已停 ≥3s' : ('行駛 ' + state.gpsSpeedKmh + 'km/h')}';
     stopBtn.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-700 text-white';
   } else {
     stopBtn.textContent = `${state.gpsSpeedKmh || 32} km/h`;
@@ -823,8 +923,10 @@ function renderMain() {
         b.onclick = () => {
           state.currentStopIdx = Number(b.dataset.sidx);
           state.routeStage = 'stops';
-          state.stopProgressPct = 35;
+          state.stopProgressPct = 20;
+          state.gpsDistanceM = null;
           state.lastAnnouncedKey = '';
+          if (state.gpsEnabled) startGpsTracking();
           renderAll();
           triggerStopAnnouncement(state.currentStopIdx);
         };
@@ -1549,6 +1651,7 @@ startGpsWatcher();
 </script>
 </body>
 </html>
+
 
 
 
