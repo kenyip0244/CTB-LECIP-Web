@@ -178,6 +178,8 @@ const state = {
   routeListOffset: 0,
   activeLetterKey: null,
   selectedRouteId: null,
+  selectedDestTc: null,
+  stagePageOffset: 0,
   selectedTrip: null,
   tripStops: [],
   currentStopIdx: 0,
@@ -478,21 +480,21 @@ function renderMain() {
       const filtered = getFilteredRouteList();
 
       if (!state.showRouteInput) {
-        const pageRows = 7;
+        const pageRows = 5;
         const maxOff = Math.max(0, filtered.length - pageRows);
         state.routeListOffset = Math.min(state.routeListOffset, maxOff);
         const visibleRows = filtered.slice(state.routeListOffset, state.routeListOffset + pageRows);
 
         vp.innerHTML = `
-          <div class="${bgBanner} px-3 py-2 border-b border-zinc-500 flex items-center justify-between shrink-0">
-            <span class="font-black text-base">選擇路線</span>
-            ${state.scheduledDuty ? `<span class="text-[11px] font-black bg-emerald-600 text-white px-2 py-0.5 rounded">已編配 ${state.scheduledDuty.routeNo} (${state.scheduledDuty.departTime})</span>` : ''}
+          <div class="${bgBanner} px-3 py-2.5 border-b border-zinc-500 flex items-center justify-between shrink-0">
+            <span class="font-black text-lg">選擇路線</span>
+            ${state.scheduledDuty ? `<span class="text-[11px] font-black bg-emerald-600 text-white px-2 py-0.5 rounded">已編配 ${state.scheduledDuty.routeNo} (${state.scheduledDuty.departTime})</span>` : `<span class="text-xs font-extrabold opacity-70">${Math.floor(state.routeListOffset / pageRows) + 1} / ${Math.max(1, Math.ceil(filtered.length / pageRows))}</span>`}
           </div>
           <div class="flex-1 flex flex-col divide-y divide-zinc-400 overflow-hidden">
             ${Array.from({ length: pageRows }).map((_, slot) => {
               const item = visibleRows[slot];
               if (!item) {
-                return `<div class="flex-1 ${rowBg} px-4 flex items-center justify-end"><span class="text-zinc-300 font-black text-xl">›</span></div>`;
+                return `<div class="flex-1 ${rowBg} px-4 flex items-center justify-end"><span class="text-zinc-300 font-black text-2xl">›</span></div>`;
               }
               const [disp, rObj] = item;
               return `
@@ -507,8 +509,9 @@ function renderMain() {
         document.querySelectorAll('.pick-route-row').forEach(btn => {
           btn.onclick = () => {
             state.selectedRouteId = btn.dataset.rid;
-            state.routeStage = 'pattern';
-            renderMain();
+            state.routeStage = 'direction';
+            state.stagePageOffset = 0;
+            renderAll();
           };
         });
 
@@ -589,7 +592,8 @@ function renderMain() {
         document.querySelectorAll('.pick-route-row').forEach(btn => {
           btn.onclick = () => {
             state.selectedRouteId = btn.dataset.rid;
-            state.routeStage = 'pattern';
+            state.routeStage = 'direction';
+            state.stagePageOffset = 0;
             state.activeLetterKey = null;
             renderAll();
           };
@@ -636,25 +640,77 @@ function renderMain() {
         });
       }
 
-    } else if (state.routeStage === 'pattern') {
+    } else if (state.routeStage === 'direction') {
       const trips = state.routes.filter(r => r.routeId === state.selectedRouteId);
       const dispNo = fmtRouteNo(state.selectedRouteId);
+      const destList = [...new Set(trips.map(t => t.destTc || t.endStopNameTc || '總站'))];
+      const pageRows = 5;
+      const maxOff = Math.max(0, destList.length - pageRows);
+      state.stagePageOffset = Math.min(state.stagePageOffset, maxOff);
+      const visible = destList.slice(state.stagePageOffset, state.stagePageOffset + pageRows);
+
       vp.innerHTML = `
-        <div class="${bgBanner} px-3 py-2 font-black text-base border-b border-zinc-500 shrink-0">
-          路線 ${dispNo} — 選擇方向／特別班次
+        <div class="${bgBanner} px-3 py-2 border-b border-zinc-500 flex items-center justify-between shrink-0">
+          <div>
+            <div class="text-xs font-bold opacity-80">路線 ${dispNo}</div>
+            <div class="font-black text-lg">選擇目的地</div>
+          </div>
+          <span class="text-xs font-extrabold opacity-70">${Math.floor(state.stagePageOffset / pageRows) + 1} / ${Math.max(1, Math.ceil(destList.length / pageRows))}</span>
         </div>
-        <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar divide-y divide-zinc-400">
-          ${trips.map((t, idx) => {
-            const dest = t.destTc || t.endStopNameTc || '往總站';
-            const start = t.startStopNameTc ? `${t.startStopNameTc} → ` : '';
+        <div class="flex-1 flex flex-col divide-y divide-zinc-400 overflow-hidden">
+          ${Array.from({ length: pageRows }).map((_, slot) => {
+            const dest = visible[slot];
+            if (!dest) return `<div class="flex-1 ${rowBg} px-4 flex items-center justify-end"><span class="text-zinc-300 font-black text-2xl">›</span></div>`;
+            return `
+              <button data-dest="${dest}" class="pick-dest-btn flex-1 w-full text-left px-4 ${rowBg} active:bg-blue-100 flex items-center justify-between">
+                <span class="font-black text-xl truncate">${dest}</span>
+                <span class="text-zinc-500 font-black text-2xl ml-2 shrink-0">›</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      `;
+      document.querySelectorAll('.pick-dest-btn').forEach(b => {
+        b.onclick = () => {
+          state.selectedDestTc = b.dataset.dest;
+          state.routeStage = 'pattern';
+          state.stagePageOffset = 0;
+          renderAll();
+        };
+      });
+
+    } else if (state.routeStage === 'pattern') {
+      const trips = state.routes.filter(r =>
+        r.routeId === state.selectedRouteId &&
+        (r.destTc || r.endStopNameTc || '總站') === state.selectedDestTc
+      );
+      const dispNo = fmtRouteNo(state.selectedRouteId);
+      const pageRows = 5;
+      const maxOff = Math.max(0, trips.length - pageRows);
+      state.stagePageOffset = Math.min(state.stagePageOffset, maxOff);
+      const visible = trips.slice(state.stagePageOffset, state.stagePageOffset + pageRows);
+
+      vp.innerHTML = `
+        <div class="${bgBanner} px-3 py-2 border-b border-zinc-500 flex items-center justify-between shrink-0">
+          <div class="truncate pr-2">
+            <div class="text-xs font-bold opacity-80">${dispNo} 往 ${state.selectedDestTc}</div>
+            <div class="font-black text-lg">選擇行車路線</div>
+          </div>
+          <span class="text-xs font-extrabold opacity-70 shrink-0">${Math.floor(state.stagePageOffset / pageRows) + 1} / ${Math.max(1, Math.ceil(trips.length / pageRows))}</span>
+        </div>
+        <div class="flex-1 flex flex-col divide-y divide-zinc-400 overflow-hidden">
+          ${Array.from({ length: pageRows }).map((_, slot) => {
+            const t = visible[slot];
+            if (!t) return `<div class="flex-1 ${rowBg} px-4 flex items-center justify-end"><span class="text-zinc-300 font-black text-2xl">›</span></div>`;
+            const realIdx = state.stagePageOffset + slot;
             const pat = t.patternNameTc || (t.patternId ? `特別班次 (${t.patternId})` : '正常班次');
+            const start = t.startStopNameTc ? `${t.startStopNameTc}開出` : '';
             const fare = t.fullFare != null ? `$${Number(t.fullFare).toFixed(1)}` : '';
             return `
-              <button data-tidx="${idx}" class="pick-trip-btn w-full text-left px-3 py-2.5 ${rowBg} active:bg-blue-100 flex items-center justify-between">
-                <div class="pr-2">
-                  <div class="font-black text-base">往 ${dest}</div>
-                  <div class="text-xs font-bold opacity-75 mt-0.5">${start}${dest}</div>
-                  <div class="text-xs text-[#0068FF] font-extrabold mt-0.5">${pat} ${fare ? '· 全程 ' + fare : ''}</div>
+              <button data-tidx="${realIdx}" class="pick-trip-btn flex-1 w-full text-left px-4 ${rowBg} active:bg-blue-100 flex items-center justify-between">
+                <div class="truncate pr-2">
+                  <div class="font-black text-lg truncate">${pat}</div>
+                  <div class="text-xs font-bold opacity-75 truncate">${start} ${fare ? '· ' + fare : ''}</div>
                 </div>
                 <span class="text-zinc-500 font-black text-2xl shrink-0">›</span>
               </button>
@@ -669,8 +725,9 @@ function renderMain() {
           const key = `${t.routeId}|${t.bound}|${t.patternId || ''}`;
           state.tripStops = state.stopsByTrip.get(key) || [];
           state.currentStopIdx = 0;
+          state.stagePageOffset = 0;
           state.routeStage = 'start_stop';
-          renderMain();
+          renderAll();
         };
       });
 
@@ -678,18 +735,29 @@ function renderMain() {
       const t = state.selectedTrip;
       const dispNo = fmtRouteNo(t);
       const dest = t.destTc || t.endStopNameTc || '';
+      const pageRows = 5;
+      const maxOff = Math.max(0, state.tripStops.length - pageRows);
+      state.stagePageOffset = Math.min(state.stagePageOffset, maxOff);
+      const visible = state.tripStops.slice(state.stagePageOffset, state.stagePageOffset + pageRows);
+
       vp.innerHTML = `
-        <div class="${bgBanner} px-3 py-1.5 border-b border-zinc-500 shrink-0">
-          <div class="text-xs font-bold opacity-80">${dispNo}-${dest}-${t.bound}</div>
-          <div class="font-black text-base">選擇開始站位</div>
+        <div class="${bgBanner} px-3 py-1.5 border-b border-zinc-500 flex items-center justify-between shrink-0">
+          <div class="truncate pr-2">
+            <div class="text-xs font-bold opacity-80">${dispNo}-${dest}-${t.bound}</div>
+            <div class="font-black text-lg">選擇開始站位</div>
+          </div>
+          <span class="text-xs font-extrabold opacity-70 shrink-0">${Math.floor(state.stagePageOffset / pageRows) + 1} / ${Math.max(1, Math.ceil(state.tripStops.length / pageRows))}</span>
         </div>
-        <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar divide-y divide-zinc-400">
-          ${state.tripStops.map((s, idx) => {
-            const name = s.nameTc || s.nameZh || s.name || `第 ${idx+1} 站`;
+        <div class="flex-1 flex flex-col divide-y divide-zinc-400 overflow-hidden">
+          ${Array.from({ length: pageRows }).map((_, slot) => {
+            const s = visible[slot];
+            if (!s) return `<div class="flex-1 ${rowBg} px-4 flex items-center justify-end"><span class="text-zinc-300 font-black text-2xl">›</span></div>`;
+            const realIdx = state.stagePageOffset + slot;
+            const name = s.nameTc || s.nameZh || s.name || `第 ${realIdx+1} 站`;
             return `
-              <button data-sidx="${idx}" class="pick-start-btn w-full text-left px-3 py-2.5 flex items-center justify-between ${idx === 0 ? 'bg-[#f4f728] text-black font-black' : rowBg}">
-                <span class="text-base font-bold truncate">${idx + 1}. ${name}</span>
-                <span class="text-zinc-500 font-black text-xl ml-2">›</span>
+              <button data-sidx="${realIdx}" class="pick-start-btn flex-1 w-full text-left px-4 flex items-center justify-between ${realIdx === 0 ? 'bg-[#f4f728] text-black font-black' : rowBg}">
+                <span class="text-lg font-bold truncate">${realIdx + 1}. ${name}</span>
+                <span class="text-zinc-500 font-black text-2xl ml-2 shrink-0">›</span>
               </button>
             `;
           }).join('')}
@@ -1152,7 +1220,7 @@ function renderBottomBar() {
   }
 
   if (state.currentTab === 'route' && state.routeStage === 'route') {
-    const step = state.showRouteInput ? 3 : 7;
+    const step = state.showRouteInput ? 3 : 5;
     bar.style.gridTemplateColumns = '0.85fr 1.3fr 1.3fr 0.85fr';
     bar.innerHTML = `
       <button id="rBot" class="h-12 rounded-lg bg-[#0068FF] active:brightness-90 flex items-center justify-center">
@@ -1226,10 +1294,11 @@ function renderBottomBar() {
     return;
   }
 
+  const isRouteSubStage = (state.currentTab === 'route' && ['direction', 'pattern', 'start_stop'].includes(state.routeStage));
   bar.style.gridTemplateColumns = '0.85fr 1.3fr 1.3fr 0.85fr';
   bar.innerHTML = `
-    <button id="gBack" class="h-12 rounded-lg bg-[#2a313d] active:bg-blue-700 text-white flex items-center justify-center">
-      <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+    <button id="gBack" class="h-12 rounded-lg ${isRouteSubStage ? 'bg-[#ef1a1a]' : 'bg-[#2a313d]'} active:brightness-90 text-white flex items-center justify-center">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="3.2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
     </button>
     <button id="gUp" class="h-12 rounded-lg bg-[#6b7280] active:brightness-90 text-white flex items-center justify-center">
       <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
@@ -1237,22 +1306,40 @@ function renderBottomBar() {
     <button id="gDown" class="h-12 rounded-lg bg-[#0068FF] active:brightness-90 text-white flex items-center justify-center">
       <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
     </button>
-    <button id="gHome" class="h-12 rounded-lg bg-[#2a313d] active:bg-blue-700 text-white flex items-center justify-center font-bold text-xs">
+    <button id="gHome" class="h-12 rounded-lg bg-[#0068FF] active:brightness-90 text-white flex items-center justify-center font-black text-xs">
       路線
     </button>
   `;
   document.getElementById('gBack').onclick = () => {
     if (state.currentTab === 'route') {
+      state.stagePageOffset = 0;
       if (state.routeStage === 'start_stop') state.routeStage = 'pattern';
-      else if (state.routeStage === 'pattern') state.routeStage = 'route';
+      else if (state.routeStage === 'pattern') state.routeStage = 'direction';
+      else if (state.routeStage === 'direction') state.routeStage = 'route';
       renderAll();
     } else {
       state.currentTab = 'route';
       renderAll();
     }
   };
-  document.getElementById('gUp').onclick = () => { const sc = document.getElementById('scrollList'); if (sc) sc.scrollBy({ top: -150, behavior: 'smooth' }); };
-  document.getElementById('gDown').onclick = () => { const sc = document.getElementById('scrollList'); if (sc) sc.scrollBy({ top: 150, behavior: 'smooth' }); };
+  document.getElementById('gUp').onclick = () => {
+    if (isRouteSubStage) {
+      state.stagePageOffset = Math.max(0, state.stagePageOffset - 5);
+      renderMain();
+    } else {
+      const sc = document.getElementById('scrollList');
+      if (sc) sc.scrollBy({ top: -150, behavior: 'smooth' });
+    }
+  };
+  document.getElementById('gDown').onclick = () => {
+    if (isRouteSubStage) {
+      state.stagePageOffset += 5;
+      renderMain();
+    } else {
+      const sc = document.getElementById('scrollList');
+      if (sc) sc.scrollBy({ top: 150, behavior: 'smooth' });
+    }
+  };
   document.getElementById('gHome').onclick = () => { state.currentTab = 'route'; renderAll(); };
 }
 
@@ -1368,3 +1455,4 @@ startGpsWatcher();
 </script>
 </body>
 </html>
+
