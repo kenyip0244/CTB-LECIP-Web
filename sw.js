@@ -1,7 +1,8 @@
-﻿const CACHE_NAME = 'ctb-lecip-web-v22';
+﻿const CACHE_NAME = 'ctb-lecip-web-v23';
 const ASSETS = [
   './',
   './index.html',
+  './assets/android_boot.gif',
   './manifest.json',
   './assets/lecip_faytech_controller.png',
   './assets/lecip_faytech_controller_lm.png',
@@ -31,6 +32,7 @@ self.addEventListener('fetch', (e) => {
     caches.match(e.request).then((cached) => cached || fetch(e.request))
   );
 });
+
 
 
 
