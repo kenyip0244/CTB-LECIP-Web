@@ -59,41 +59,7 @@
     .tab-active-dark { background: #263142; color: #ffffff; border-top-left-radius: 10px; border-top-right-radius: 10px; }
   </style>
 </head>
-<!-- 開機序列：1. android 開機畫面 -> 2. 診斷初始化畫面 -->
-<div id="lecipBootOverlay" class="fixed inset-0 z-50 bg-black text-white flex flex-col justify-between select-none transition-opacity duration-300">
-  <!-- 階段一：Android 字樣 -->
-  <div id="bootPhaseAndroid" class="flex-1 flex items-center justify-center px-6">
-    <img src="./assets/android_boot.gif" alt="android" onerror="this.style.display='none';document.getElementById('bootAndroidFallback').classList.remove('hidden');" class="max-h-[65vh] w-auto object-contain" />
-    <div id="bootAndroidFallback" class="hidden text-6xl font-bold tracking-tight text-white">android</div>
-  </div>
-
-  <!-- 階段二：診斷畫面 (INITIALIZING...) -->
-  <div id="bootPhaseDiag" class="hidden flex-1 flex flex-col justify-between bg-[#2b2b2b] p-5 font-sans">
-    <div>
-      <div class="flex items-center gap-3 mb-5">
-        <div class="w-10 h-10 rounded-full bg-[#3b82f6] flex items-center justify-center font-black text-xs tracking-tight text-white shrink-0">
-          LIT
-        </div>
-        <span class="text-2xl font-light tracking-widest text-zinc-400">TRANSIT</span>
-      </div>
-
-      <div class="text-sm text-zinc-200 leading-relaxed space-y-0.5 mb-8">
-        <div>App version: 23.06.25</div>
-        <div>Kernel version: 22.03.01</div>
-        <div>Config version: ctb_prod_v10</div>
-      </div>
-
-      <div class="text-center text-lg font-extrabold tracking-wider text-white mb-6">
-        INITIALIZING...
-      </div>
-
-      <div class="text-xs text-zinc-200 leading-relaxed space-y-0.5">
-        <div>DeviceID: 358709052246844</div>
-        <div>Boot info: SDCARD|PRIMARY BOOT</div>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-end gap-2 pt-4">
+<div class="flex items-center justify-end gap-2 pt-4">
       <div class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center font-black text-sm">C</div>
       <div class="leading-tight text-left">
         <div class="text-sm font-bold text-white">Citybus</div>
@@ -307,7 +273,7 @@ function playAudioSequence(urls, fallbackZh, fallbackEn) {
 
   const validUrls = (urls || []).filter(Boolean).map(u => {
     const clean = String(u).replace(/^\/+/, '').replace(/\.wav$/i, '.mp3');
-    return ${AUDIO_CDN_BASE}/;
+    return `${AUDIO_CDN_BASE}/${clean}`;
   });
 
   if (validUrls.length === 0) {
