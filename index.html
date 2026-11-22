@@ -232,7 +232,7 @@
       </div>
 
       <!-- 智駕全城下方紅／黃警告卡片（實機位置：螢幕底部） -->
-      <div id="cdBottomWarning" class="hidden absolute left-1.5 right-1.5 bottom-[58px] z-[45] cursor-pointer select-none"></div>
+      <div id="cdBottomWarning" class="hidden absolute inset-x-0 bottom-0 z-[55] p-1.5 cursor-pointer select-none"></div>
 
       <!-- Toast -->
       <div id="toastBox" class="hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-50 px-3.5 py-2 rounded-lg bg-black/90 border border-zinc-600 text-white text-xs font-bold whitespace-nowrap shadow-lg pointer-events-none"></div>
@@ -1074,12 +1074,13 @@ function renderCleverDriveBottomWarning() {
   const label = cd.warningType === 'overspeed'
     ? (state.lang === 'en' ? 'SPEED' : '超速')
     : (state.lang === 'en' ? 'CAUTION' : '注意');
+  const backdropCls = isNight() ? 'bg-[#0d1118] border-t border-zinc-700' : 'bg-white border-t border-zinc-400';
 
-  el.classList.remove('hidden');
+  el.className = `absolute inset-x-0 bottom-0 z-[55] p-1.5 cursor-pointer select-none ${backdropCls}`;
   el.innerHTML = `
-    <div class="w-full rounded-2xl bg-white shadow-2xl px-4 py-5 flex items-center justify-around gap-3" style="border: 7px solid ${accent};">
+    <div class="w-full min-h-[168px] rounded-2xl bg-white shadow-2xl px-4 py-6 flex items-center justify-around gap-3" style="border: 7px solid ${accent};">
       ${getCleverDriveWarningIconSvg(cd.warningType, accent)}
-      <div class="font-black leading-none tracking-wider text-center" style="color: ${accent}; font-size: ${label.length > 3 ? '36px' : '54px'};">
+      <div class="font-black leading-none tracking-wider text-center" style="color: ${accent}; font-size: ${label.length > 3 ? '36px' : '56px'};">
         ${esc(label)}
       </div>
     </div>
@@ -2151,7 +2152,6 @@ function renderBoundList(vp, bar) {
   vp.innerHTML = `
     <div class="flex items-center justify-between px-3 py-2 ${th.subBar} shrink-0">
       <span class="font-black text-sm">路線 ${esc(state.selectedRouteNo)} · 選擇目的地</span>
-      <span class="text-xs font-bold ${th.muted}">${groups.length} 個方向</span>
     </div>
     <div class="flex-1 flex flex-col divide-y ${th.divider} overflow-y-auto no-scrollbar">
       ${groups.map(([dKey, list]) => {
@@ -2161,7 +2161,6 @@ function renderBoundList(vp, bar) {
         return `
           <button data-destkey="${esc(dKey)}" class="pick-bound-btn px-4 py-4 flex items-center justify-between ${th.row} text-left">
             <div class="min-w-0 pr-2">
-              <div class="text-xs font-black text-[#0068FF] mb-0.5">${list.length} 個班次</div>
               <div class="text-xl font-black truncate">往 ${esc(dest)}</div>
               ${orig ? `<div class="text-xs font-bold ${th.muted} truncate mt-0.5">由 ${esc(orig)} 開出</div>` : ''}
             </div>
@@ -2174,9 +2173,9 @@ function renderBoundList(vp, bar) {
 
   bar.innerHTML = `
     <button id="botBack" class="h-11 rounded-lg bg-[#d92b1c] text-white font-black text-xl flex items-center justify-center active:brightness-90">‹</button>
-    <button class="h-11 rounded-lg bg-zinc-600 text-zinc-300 font-black text-xl flex items-center justify-center">↑</button>
-    <button class="h-11 rounded-lg bg-zinc-600 text-zinc-300 font-black text-xl flex items-center justify-center">↓</button>
-    <button id="botHome" class="h-11 rounded-lg bg-[#0068FF] text-white font-black text-xs flex items-center justify-center active:brightness-90">路線表</button>
+    <button class="h-11 rounded-lg bg-zinc-600 text-zinc-300 font-black text-xl flex items-center justify-center" disabled>↑</button>
+    <button class="h-11 rounded-lg bg-zinc-600 text-zinc-300 font-black text-xl flex items-center justify-center" disabled>↓</button>
+    <button class="h-11 rounded-lg bg-zinc-600 text-zinc-300 font-black text-xl flex items-center justify-center" disabled>•••</button>
   `;
 
   vp.querySelectorAll('.pick-bound-btn').forEach(btn => {
@@ -2188,7 +2187,6 @@ function renderBoundList(vp, bar) {
     };
   });
   document.getElementById('botBack').onclick = () => { state.routeStage = 'route'; state.pageOffset = 0; renderAll(); };
-  document.getElementById('botHome').onclick = () => { state.routeStage = 'route'; state.pageOffset = 0; renderAll(); };
 }
 
 function renderTripList(vp, bar) {
@@ -2229,7 +2227,7 @@ function renderTripList(vp, bar) {
     <button id="botBack" class="h-11 rounded-lg bg-[#d92b1c] text-white font-black text-xl flex items-center justify-center active:brightness-90">‹</button>
     <button id="botPrev" class="h-11 rounded-lg ${canPrev ? 'bg-[#0068FF] text-white' : 'bg-zinc-600 text-zinc-300'} font-black text-xl flex items-center justify-center">↑</button>
     <button id="botNext" class="h-11 rounded-lg ${canNext ? 'bg-[#0068FF] text-white' : 'bg-zinc-600 text-zinc-300'} font-black text-xl flex items-center justify-center">↓</button>
-    <button id="botHome" class="h-11 rounded-lg bg-[#0068FF] text-white font-black text-xs flex items-center justify-center">路線表</button>
+    <button class="h-11 rounded-lg bg-zinc-600 text-zinc-300 font-black text-xl flex items-center justify-center" disabled>•••</button>
   `;
 
   vp.querySelectorAll('.pick-trip-btn').forEach(btn => {
@@ -2252,7 +2250,7 @@ function renderTripList(vp, bar) {
     };
   });
   document.getElementById('botBack').onclick = () => { state.routeStage = 'bound'; state.pageOffset = 0; renderAll(); };
-  document.getElementById('botHome').onclick = () => { state.routeStage = 'route'; state.pageOffset = 0; renderAll(); };
+  const _botHome = document.getElementById('botHome'); if (_botHome) _botHome.onclick = () => { state.routeStage = 'route'; state.pageOffset = 0; renderAll(); };
   document.getElementById('botPrev').onclick = () => { if (canPrev) { state.pageOffset--; renderAll(); } };
   document.getElementById('botNext').onclick = () => { if (canNext) { state.pageOffset++; renderAll(); } };
 }
@@ -3247,7 +3245,7 @@ function renderSettingsView(vp, bar) {
       <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">診斷模式</div>
       <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5 text-xs">
         <div class="p-3 rounded-xl border ${th.card} space-y-1.5">
-          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v49)</div>
+          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v50)</div>
           <div>App Version：<b>23.06.25</b> ｜ Config：<b>ctb_prod_v10</b></div>
           <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
           <div>站點資料庫：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
