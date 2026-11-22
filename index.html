@@ -89,36 +89,48 @@
       </div>
 
       <!-- 頂部狀態列（含智駕全城狀態條、八達通、日夜間切換、語言） -->
-      <header class="bg-[#0d1118] text-white px-2.5 py-1.5 border-b border-zinc-800 shrink-0">
-        <div class="flex items-center justify-between gap-1.5">
-          <div class="min-w-0">
-            <div id="topClock" class="text-base font-black font-mono tracking-wider leading-none">00:00:00</div>
-            <button id="btnDriverBadge" class="mt-0.5 text-[11px] font-bold text-zinc-300 hover:text-white truncate block text-left">
+      <!-- 頂部狀態列（還原實機 LECIP 佈局與向量圖示） -->
+      <header class="bg-black text-white px-3 py-2 border-b border-zinc-800 shrink-0">
+        <div class="flex items-start justify-between gap-2">
+          <!-- 左側：時間與車長編號 -->
+          <div class="min-w-0 pt-0.5">
+            <div id="topClock" class="text-[19px] font-black font-mono tracking-wide leading-none">00:00:00</div>
+            <button id="btnDriverBadge" class="mt-1 text-[13px] font-extrabold text-zinc-100 hover:text-amber-300 truncate block text-left leading-tight">
               0001 KEN YIP
             </button>
           </div>
-          <div class="flex flex-col items-end gap-1 shrink-0">
-            <div class="flex items-center gap-1">
-              <button id="btnOctopus" class="px-2 py-0.5 rounded bg-yellow-400 text-black text-[10px] font-black leading-tight active:scale-95">
-                八達通正常
+
+          <!-- 右側：上排設備圖示 + 下排智駕狀態條 -->
+          <div class="flex flex-col items-end gap-1.5 shrink-0">
+            <div class="flex items-center gap-1.5">
+              <!-- 八達通 ∞ 圖示 -->
+              <button id="btnOctopus" title="切換八達通狀態" class="h-[20px] px-2.5 rounded-[4px] bg-[#9ca3af] text-[#1f2937] flex items-center justify-center active:scale-95">
+                <svg class="w-6 h-3.5" viewBox="0 0 34 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 12.2c-2.9 0-5-1.9-5-4.2S7.1 3.8 10 3.8c3.6 0 6.2 8.4 13.8 8.4 2.9 0 5-1.9 5-4.2s-2.1-4.2-5-4.2c-3.6 0-6.2 8.4-13.8 8.4z" transform="rotate(-10 17 8)"/>
+                </svg>
               </button>
-              <button id="btnThemeToggle" title="切換日間／夜間模式" class="px-1.5 py-0.5 rounded bg-zinc-800 text-amber-300 text-[10px] font-black border border-zinc-700 active:scale-95">
-                🌙
+              <!-- 電牌 [123] 圖示 -->
+              <button id="btnDisplayBox" title="電牌狀態／點擊模擬停車或行駛" class="h-[20px] px-2 rounded-[4px] bg-[#9ca3af] text-[#1f2937] flex items-center justify-center active:scale-95">
+                <svg class="w-8 h-3.5" viewBox="0 0 38 16" fill="none">
+                  <rect x="1.2" y="1.2" width="35.6" height="13.6" rx="1.8" stroke="currentColor" stroke-width="1.6"/>
+                  <text id="displayBoxText" x="19" y="11.4" text-anchor="middle" fill="currentColor" font-size="9.5" font-weight="900" font-family="monospace">123</text>
+                </svg>
               </button>
-              <button id="btnLangToggle" class="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 text-[10px] font-bold border border-zinc-700 active:scale-95">
-                繁
+              <!-- 地球／語言切換圖示 -->
+              <button id="btnGlobe" title="切換繁體／英文" class="w-5 h-5 text-zinc-300 hover:text-white flex items-center justify-center active:scale-95">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="12" cy="12" r="9"/>
+                  <ellipse cx="12" cy="12" rx="4.2" ry="9"/>
+                  <path d="M3.5 9h17M3.5 15h17"/>
+                </svg>
               </button>
             </div>
-            <div class="flex items-center gap-1">
-              <!-- 智駕全城 (Clever Driving) 狀態條 -->
-              <button id="btnCleverDriveBar" class="px-2.5 py-0.5 rounded bg-emerald-500 text-black text-[10px] font-black leading-tight min-w-[78px] text-center active:scale-95">
-                ☺ 好 · 100
-              </button>
-              <!-- 停車/車速狀態 -->
-              <button id="btnStopState" class="px-2 py-0.5 rounded bg-zinc-700 text-zinc-100 text-[10px] font-extrabold leading-tight active:scale-95">
-                已停
-              </button>
-            </div>
+
+            <!-- 智駕全城狀態條（純圖示＋好/留意/需改善，不顯示分數） -->
+            <button id="btnCleverDriveBar" class="w-[154px] h-[22px] rounded-[5px] bg-[#64e800] text-[#111] px-3 flex items-center justify-center gap-4 text-[13px] font-black leading-none active:scale-95 shadow-sm">
+              <span id="cdBarIcon" class="flex items-center justify-center"></span>
+              <span id="cdBarLabel">好</span>
+            </button>
           </div>
         </div>
       </header>
@@ -206,7 +218,7 @@
           </div>
           <button id="moreReplayAudio" class="w-full py-2.5 rounded-lg bg-emerald-600 font-black text-sm">重播當前站報站</button>
           <button id="moreToggleGps" class="w-full py-2.5 rounded-lg bg-[#0068FF] font-black text-sm">切換 手動模式 / GPS 自動</button>
-          <button id="moreToggleTheme" class="w-full py-2.5 rounded-lg bg-amber-600 font-black text-sm">切換 日間 / 夜間模式</button>
+          <button id="moreToggleTheme" class="w-full py-2.5 rounded-lg bg-amber-600 font-black text-sm">車長喜好設定（日夜模式）</button>
           <button id="moreOpenCD" class="w-full py-2.5 rounded-lg bg-teal-600 font-black text-sm">查看 智駕全城 評分</button>
           <button id="morePickStart" class="w-full py-2.5 rounded-lg bg-zinc-700 font-black text-sm">重新選擇開始站位</button>
           <button id="moreBackRoutes" class="w-full py-2.5 rounded-lg bg-red-700 font-black text-sm">結束班次返回選擇路線</button>
@@ -287,6 +299,8 @@ const state = {
   },
 
   currentTab: 'route',
+  settingsPage: 'menu',
+  scheduleTab: 'driver',
   routeStage: 'route',
   pageOffset: 0,
   announcePage: 0,
@@ -757,10 +771,20 @@ function playAlertBeep(isDanger = false) {
   } catch (_) {}
 }
 
+function getCleverDriveFaceSvg(score, sizeClass = 'w-4 h-4') {
+  if (score >= 85) {
+    return `<svg class="${sizeClass} shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9.5"/><circle cx="9" cy="10" r="1.25" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.25" fill="currentColor" stroke="none"/><path d="M8 14.2c1 1.9 2.4 2.8 4 2.8s3-.9 4-2.8" stroke-linecap="round"/></svg>`;
+  }
+  if (score >= 65) {
+    return `<svg class="${sizeClass} shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9.5"/><circle cx="9" cy="10" r="1.25" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.25" fill="currentColor" stroke="none"/><line x1="8.2" y1="15.2" x2="15.8" y2="15.2" stroke-linecap="round"/></svg>`;
+  }
+  return `<svg class="${sizeClass} shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9.5"/><circle cx="9" cy="10" r="1.25" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.25" fill="currentColor" stroke="none"/><path d="M8 16.6c1-1.9 2.4-2.8 4-2.8s3 .9 4 2.8" stroke-linecap="round"/></svg>`;
+}
+
 function getCleverDriveGrade(score) {
-  if (score >= 85) return { face: '☺', label: '好', en: 'Good', bg: 'bg-emerald-500', text: 'text-black', ring: 'border-emerald-400' };
-  if (score >= 65) return { face: '😐', label: '留意', en: 'Attention', bg: 'bg-amber-400', text: 'text-black', ring: 'border-amber-400' };
-  return { face: '☹', label: '需改善', en: 'Need Improvement', bg: 'bg-red-600', text: 'text-white', ring: 'border-red-500' };
+  if (score >= 85) return { label: '好', en: 'Good', bg: 'bg-[#64e800]', text: 'text-[#111]', ring: 'border-[#64e800]' };
+  if (score >= 65) return { label: '留意', en: 'Attention', bg: 'bg-[#facc15]', text: 'text-[#111]', ring: 'border-[#facc15]' };
+  return { label: '需改善', en: 'Need Improvement', bg: 'bg-[#ef4444]', text: 'text-white', ring: 'border-[#ef4444]' };
 }
 
 function triggerCleverDriveEvent(kind) {
@@ -829,13 +853,16 @@ function renderCleverDriveModalContent() {
 
   body.innerHTML = `
     <div class="rounded-xl p-3.5 ${g.bg} ${g.text} flex items-center justify-between shadow">
-      <div>
-        <div class="text-xs font-extrabold opacity-80">目前智駕評級</div>
-        <div class="text-3xl font-black mt-0.5">${g.face} ${g.label}</div>
+      <div class="flex items-center gap-3">
+        ${getCleverDriveFaceSvg(cd.score, 'w-10 h-10')}
+        <div>
+          <div class="text-[11px] font-extrabold opacity-80">目前智駕狀態</div>
+          <div class="text-2xl font-black leading-tight">${g.label}</div>
+        </div>
       </div>
       <div class="text-right">
-        <div class="text-3xl font-black font-mono leading-none">${cd.score}</div>
-        <div class="text-[11px] font-bold opacity-80 mt-0.5">實時車速 ${state.gpsSpeedKmh} km/h</div>
+        <div class="text-xs font-extrabold opacity-80">實時車速</div>
+        <div class="text-lg font-black font-mono leading-tight">${state.gpsSpeedKmh} km/h</div>
       </div>
     </div>
 
@@ -1147,36 +1174,47 @@ function renderTopStatus() {
   const octEl = document.getElementById('btnOctopus');
   if (octEl) {
     if (state.octopusMode === 0) {
-      octEl.textContent = '八達通正常';
-      octEl.className = 'px-2 py-0.5 rounded bg-yellow-400 text-black text-[10px] font-black leading-tight active:scale-95';
+      octEl.className = 'h-[20px] px-2.5 rounded-[4px] bg-[#9ca3af] text-[#111827] flex items-center justify-center active:scale-95';
+      octEl.title = '八達通正常（點擊切換）';
     } else if (state.octopusMode === 1) {
-      octEl.textContent = '暫停收費';
-      octEl.className = 'px-2 py-0.5 rounded bg-amber-600 text-white text-[10px] font-black leading-tight active:scale-95';
+      octEl.className = 'h-[20px] px-2.5 rounded-[4px] bg-amber-400 text-[#111827] flex items-center justify-center active:scale-95';
+      octEl.title = '八達通暫停收費（點擊切換）';
     } else {
-      octEl.textContent = '八達通未連';
-      octEl.className = 'px-2 py-0.5 rounded bg-zinc-700 text-zinc-200 text-[10px] font-black leading-tight active:scale-95';
+      octEl.className = 'h-[20px] px-2.5 rounded-[4px] bg-zinc-800 text-zinc-500 border border-zinc-700 flex items-center justify-center active:scale-95';
+      octEl.title = '八達通未連（點擊切換）';
     }
   }
 
-  const themeEl = document.getElementById('btnThemeToggle');
-  if (themeEl) {
-    themeEl.textContent = isNight() ? '🌙 夜' : '☀ 日';
-    themeEl.className = isNight()
-      ? 'px-1.5 py-0.5 rounded bg-indigo-950 text-amber-300 text-[10px] font-black border border-indigo-700 active:scale-95'
-      : 'px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-black border border-amber-300 active:scale-95';
+  const dispBox = document.getElementById('btnDisplayBox');
+  const dispTxt = document.getElementById('displayBoxText');
+  if (dispTxt) {
+    const label = (state.routeStage === 'stops' && state.selectedRouteNo) ? state.selectedRouteNo.slice(0, 4) : '123';
+    dispTxt.textContent = label;
+  }
+  if (dispBox) {
+    dispBox.className = state.isStopped3s
+      ? 'h-[20px] px-2 rounded-[4px] bg-[#9ca3af] text-[#111827] flex items-center justify-center active:scale-95'
+      : 'h-[20px] px-2 rounded-[4px] bg-sky-300 text-[#111827] flex items-center justify-center active:scale-95';
   }
 
-  const langEl = document.getElementById('btnLangToggle');
-  if (langEl) langEl.textContent = state.lang === 'tc' ? '繁' : 'EN';
+  const globeEl = document.getElementById('btnGlobe');
+  if (globeEl) {
+    globeEl.className = state.lang === 'en'
+      ? 'w-5 h-5 text-sky-400 flex items-center justify-center active:scale-95'
+      : 'w-5 h-5 text-zinc-300 hover:text-white flex items-center justify-center active:scale-95';
+  }
 
-  // 智駕全城頂部條
+  // 智駕全城頂部條（只顯示臉部圖示與 好 / 留意 / 需改善，不顯示分數）
   const cd = state.cleverDrive;
   const g = getCleverDriveGrade(cd.score);
   const cdBar = document.getElementById('btnCleverDriveBar');
+  const cdIcon = document.getElementById('cdBarIcon');
+  const cdLabel = document.getElementById('cdBarLabel');
   if (cdBar) {
-    cdBar.textContent = `${g.face} ${g.label} · ${cd.score}`;
-    cdBar.className = `px-2.5 py-0.5 rounded ${g.bg} ${g.text} text-[10px] font-black leading-tight min-w-[78px] text-center active:scale-95`;
+    cdBar.className = `w-[154px] h-[22px] rounded-[5px] ${g.bg} ${g.text} px-3 flex items-center justify-center gap-4 text-[13px] font-black leading-none active:scale-95 shadow-sm`;
   }
+  if (cdIcon) cdIcon.innerHTML = getCleverDriveFaceSvg(cd.score, 'w-4 h-4');
+  if (cdLabel) cdLabel.textContent = g.label;
 
   const cdBanner = document.getElementById('cdWarningBanner');
   if (cdBanner) {
@@ -1186,17 +1224,6 @@ function renderTopStatus() {
       document.getElementById('cdWarningText').textContent = cd.warningText;
     } else {
       cdBanner.classList.add('hidden');
-    }
-  }
-
-  const stopEl = document.getElementById('btnStopState');
-  if (stopEl) {
-    if (state.isStopped3s) {
-      stopEl.textContent = '已停 ≥3s';
-      stopEl.className = 'px-2 py-0.5 rounded bg-zinc-700 text-zinc-100 text-[10px] font-extrabold leading-tight active:scale-95';
-    } else {
-      stopEl.textContent = `${state.gpsSpeedKmh || 32} km/h`;
-      stopEl.className = 'px-2 py-0.5 rounded bg-blue-600 text-white text-[10px] font-extrabold leading-tight active:scale-95';
     }
   }
 
@@ -1857,59 +1884,332 @@ function renderIncidentView(vp, bar) {
   document.getElementById('botBackRoute').onclick = () => { state.currentTab = 'route'; renderAll(); };
 }
 
-// ============ 系統設定分頁 ============
+// ============ 系統設定分頁（還原實機「選項」六宮格與「車長喜好設定」） ============
 function renderSettingsView(vp, bar) {
   const th = themeClasses();
   vp.className = th.vp;
-  vp.innerHTML = `
-    <div class="px-3 py-2 ${th.subBar} font-black text-sm shrink-0">系統設定與診斷</div>
-    <div class="flex-1 overflow-y-auto no-scrollbar p-3 space-y-2.5 text-sm">
-      <div class="p-3 rounded-lg border ${th.card} space-y-1 text-xs">
-        <div class="font-black">裝置與資料庫狀態</div>
-        <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
-        <div>站點庫狀態：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
-        <div>HKOWS 音檔索引：<b>${state.audioManifest.length}</b> 個 MP3</div>
-        <div>備用語音引擎：<b>Google TTS（粵／英／普）</b></div>
-        <div>顯示主題：<b>${isNight() ? '夜間模式' : '日間模式'}</b> ｜ 智駕評分：<b>${state.cleverDrive.score} 分</b></div>
-      </div>
 
-      <button id="setToggleTheme" class="w-full py-2.5 rounded-lg bg-amber-600 text-white font-black">
-        顯示模式：${isNight() ? '🌙 夜間模式' : '☀ 日間模式'}（點擊切換）
+  // 子頁 1：車長喜好設定（日間／夜間模式、語言、報站模式）
+  if (state.settingsPage === 'prefs') {
+    vp.innerHTML = `
+      <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">車長喜好設定</div>
+      <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-4">
+        <div class="p-3 rounded-xl border ${th.card} space-y-2.5">
+          <div class="text-xs font-black">顯示模式（日夜模式）</div>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="prefDayBtn" class="py-3 rounded-lg font-black text-sm flex items-center justify-center gap-1.5 border ${!isNight() ? 'bg-[#007AFF] text-white border-[#007AFF] shadow' : (th.dark ? 'bg-zinc-800 text-zinc-200 border-zinc-700' : 'bg-white text-zinc-700 border-zinc-300')}">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+              日間模式
+            </button>
+            <button id="prefNightBtn" class="py-3 rounded-lg font-black text-sm flex items-center justify-center gap-1.5 border ${isNight() ? 'bg-[#007AFF] text-white border-[#007AFF] shadow' : (th.dark ? 'bg-zinc-800 text-zinc-200 border-zinc-700' : 'bg-white text-zinc-700 border-zinc-300')}">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              夜間模式
+            </button>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl border ${th.card} space-y-2.5">
+          <div class="text-xs font-black">介面語言</div>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="prefLangTc" class="py-2.5 rounded-lg font-black text-sm border ${state.lang === 'tc' ? 'bg-[#007AFF] text-white border-[#007AFF]' : (th.dark ? 'bg-zinc-800 text-zinc-200 border-zinc-700' : 'bg-white text-zinc-700 border-zinc-300')}">繁體中文</button>
+            <button id="prefLangEn" class="py-2.5 rounded-lg font-black text-sm border ${state.lang === 'en' ? 'bg-[#007AFF] text-white border-[#007AFF]' : (th.dark ? 'bg-zinc-800 text-zinc-200 border-zinc-700' : 'bg-white text-zinc-700 border-zinc-300')}">English</button>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl border ${th.card} space-y-2.5">
+          <div class="text-xs font-black">報站運作模式</div>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="prefModeManual" class="py-2.5 rounded-lg font-black text-sm border ${!state.gpsEnabled ? 'bg-[#007AFF] text-white border-[#007AFF]' : (th.dark ? 'bg-zinc-800 text-zinc-200 border-zinc-700' : 'bg-white text-zinc-700 border-zinc-300')}">手動模式 (M)</button>
+            <button id="prefModeGps" class="py-2.5 rounded-lg font-black text-sm border ${state.gpsEnabled ? 'bg-[#007AFF] text-white border-[#007AFF]' : (th.dark ? 'bg-zinc-800 text-zinc-200 border-zinc-700' : 'bg-white text-zinc-700 border-zinc-300')}">GPS 自動報站</button>
+          </div>
+        </div>
+      </div>
+    `;
+    bar.innerHTML = `
+      <button id="botSetBack" class="h-11 rounded-lg bg-[#007AFF] text-white font-black text-2xl flex items-center justify-center active:brightness-90">‹</button>
+      <button class="h-11 rounded-lg bg-zinc-600/80 text-zinc-300 font-black text-xl flex items-center justify-center">↑</button>
+      <button class="h-11 rounded-lg bg-zinc-600/80 text-zinc-300 font-black text-xl flex items-center justify-center">↓</button>
+      <button id="botBackRoute" class="h-11 rounded-lg bg-[#007AFF] text-white font-black text-xs flex items-center justify-center">返回路線</button>
+    `;
+    document.getElementById('prefDayBtn').onclick = () => {
+      state.theme = 'day';
+      try { localStorage.setItem('ctb_lecip_theme', 'day'); } catch (_) {}
+      showToast('已切換為日間模式');
+      renderAll();
+    };
+    document.getElementById('prefNightBtn').onclick = () => {
+      state.theme = 'night';
+      try { localStorage.setItem('ctb_lecip_theme', 'night'); } catch (_) {}
+      showToast('已切換為夜間模式');
+      renderAll();
+    };
+    document.getElementById('prefLangTc').onclick = () => { state.lang = 'tc'; renderAll(); };
+    document.getElementById('prefLangEn').onclick = () => { state.lang = 'en'; renderAll(); };
+    document.getElementById('prefModeManual').onclick = () => { if (state.gpsEnabled) toggleGpsMode(); };
+    document.getElementById('prefModeGps').onclick = () => { if (!state.gpsEnabled) toggleGpsMode(); };
+    document.getElementById('botSetBack').onclick = () => { state.settingsPage = 'menu'; renderAll(); };
+    document.getElementById('botBackRoute').onclick = () => { state.settingsPage = 'menu'; state.currentTab = 'route'; renderAll(); };
+    return;
+  }
+
+  // 子頁 2：診斷模式
+  if (state.settingsPage === 'diag') {
+    vp.innerHTML = `
+      <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">診斷模式</div>
+      <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5 text-xs">
+        <div class="p-3 rounded-xl border ${th.card} space-y-1.5">
+          <div class="font-black text-sm mb-1">系統與資料庫狀態</div>
+          <div>App Version：<b>23.06.25</b> ｜ Config：<b>ctb_prod_v10</b></div>
+          <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
+          <div>站點資料庫：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
+          <div>HKOWS 音檔索引：<b>${state.audioManifest.length}</b> 個 MP3</div>
+          <div>備用語音引擎：<b>Google TTS（粵／英／普）</b></div>
+          <div>車輛狀態：<b>${state.isStopped3s ? '已停 ≥3s' : '行駛中 ' + (state.gpsSpeedKmh || 32) + ' km/h'}</b></div>
+        </div>
+        <button id="diagToggleStop" class="w-full py-2.5 rounded-lg bg-[#007AFF] text-white font-black text-sm">
+          切換停車／行駛狀態（目前：${state.isStopped3s ? '已停 ≥3s' : '行駛中'}）
+        </button>
+        <button id="diagReplayBoot" class="w-full py-2.5 rounded-lg bg-zinc-700 text-white font-black text-sm">
+          重新播放開機與診斷初始化畫面
+        </button>
+      </div>
+    `;
+    bar.innerHTML = `
+      <button id="botSetBack" class="h-11 rounded-lg bg-[#007AFF] text-white font-black text-2xl flex items-center justify-center">‹</button>
+      <button class="h-11 rounded-lg bg-zinc-600/80 text-zinc-300 font-black text-xl flex items-center justify-center">↑</button>
+      <button class="h-11 rounded-lg bg-zinc-600/80 text-zinc-300 font-black text-xl flex items-center justify-center">↓</button>
+      <button id="botBackRoute" class="h-11 rounded-lg bg-[#007AFF] text-white font-black text-xs flex items-center justify-center">返回路線</button>
+    `;
+    document.getElementById('diagToggleStop').onclick = () => {
+      state.isStopped3s = !state.isStopped3s;
+      state.gpsSpeedKmh = state.isStopped3s ? 0 : 32;
+      renderAll();
+    };
+    document.getElementById('diagReplayBoot').onclick = () => runBootSequence(true);
+    document.getElementById('botSetBack').onclick = () => { state.settingsPage = 'menu'; renderAll(); };
+    document.getElementById('botBackRoute').onclick = () => { state.settingsPage = 'menu'; state.currentTab = 'route'; renderAll(); };
+    return;
+  }
+
+  // 子頁 3：維修模式
+  if (state.settingsPage === 'maint') {
+    vp.innerHTML = `
+      <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">維修模式</div>
+      <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5">
+        <div class="p-3 rounded-xl border ${th.card} text-xs space-y-1">
+          <div class="font-black text-sm">維護與快取管理</div>
+          <div>音量：<b>${Math.round(state.volume * 100)}%</b> ｜ 螢幕亮度：<b>${Math.round(state.brightness * 100)}%</b></div>
+        </div>
+        <button id="maintResetCD" class="w-full py-2.5 rounded-lg bg-emerald-600 text-white font-black text-sm">重設智駕全城狀態</button>
+        <button id="maintClearCache" class="w-full py-2.5 rounded-lg bg-red-600 text-white font-black text-sm">清除離線快取並重新載入</button>
+      </div>
+    `;
+    bar.innerHTML = `
+      <button id="botSetBack" class="h-11 rounded-lg bg-[#007AFF] text-white font-black text-2xl flex items-center justify-center">‹</button>
+      <button class="h-11 rounded-lg bg-zinc-600/80 text-zinc-300 font-black text-xl flex items-center justify-center">↑</button>
+      <button class="h-11 rounded-lg bg-zinc-600/80 text-zinc-300 font-black text-xl flex items-center justify-center">↓</button>
+      <button id="botBackRoute" class="h-11 rounded-lg bg-[#007AFF] text-white font-black text-xs flex items-center justify-center">返回路線</button>
+    `;
+    document.getElementById('maintResetCD').onclick = () => resetCleverDrive();
+    document.getElementById('maintClearCache').onclick = async () => {
+      try {
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(r => r.unregister()));
+        }
+      } catch (_) {}
+      location.reload();
+    };
+    document.getElementById('botSetBack').onclick = () => { state.settingsPage = 'menu'; renderAll(); };
+    document.getElementById('botBackRoute').onclick = () => { state.settingsPage = 'menu'; state.currentTab = 'route'; renderAll(); };
+    return;
+  }
+
+  // 子頁 4：訓練模式（智駕警示模擬）
+  if (state.settingsPage === 'train') {
+    const cd = state.cleverDrive;
+    const g = getCleverDriveGrade(cd.score);
+    vp.innerHTML = `
+      <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">訓練模式 · 智駕模擬</div>
+      <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-3">
+        <div class="rounded-xl p-3 ${g.bg} ${g.text} flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            ${getCleverDriveFaceSvg(cd.score, 'w-8 h-8')}
+            <span class="text-xl font-black">${g.label}</span>
+          </div>
+          <span class="text-xs font-extrabold">急加速 ${cd.harshAccel} · 急煞 ${cd.harshBrake} · 急彎 ${cd.sharpTurn} · 超速 ${cd.overspeed}</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="trAccel" class="py-3 rounded-lg bg-amber-500 text-black font-black text-sm">模擬急加速</button>
+          <button id="trBrake" class="py-3 rounded-lg bg-red-600 text-white font-black text-sm">模擬急煞車</button>
+          <button id="trTurn" class="py-3 rounded-lg bg-amber-600 text-white font-black text-sm">模擬急轉彎</button>
+          <button id="trSpeed" class="py-3 rounded-lg bg-red-700 text-white font-black text-sm">模擬超速</button>
+        </div>
+        <button id="trReset" class="w-full py-2.5 rounded-lg bg-emerald-600 text-white font-black text-sm">恢復「好」狀態</button>
+      </div>
+    `;
+    bar.innerHTML = `
+      <button id="botSetBack" class="h-11 rounded-lg bg-[#007AFF] text-white font-black text-2xl flex items-center justify-center">‹</button>
+      <button class="h-11 rounded-lg bg-zinc-600/80 text-zinc-300 font-black text-xl flex items-center justify-center">↑</button>
+      <button class="h-11 rounded-lg bg-zinc-600/80 text-zinc-300 font-black text-xl flex items-center justify-center">↓</button>
+      <button id="botBackRoute" class="h-11 rounded-lg bg-[#007AFF] text-white font-black text-xs flex items-center justify-center">返回路線</button>
+    `;
+    document.getElementById('trAccel').onclick = () => { triggerCleverDriveEvent('accel'); renderMain(); };
+    document.getElementById('trBrake').onclick = () => { triggerCleverDriveEvent('brake'); renderMain(); };
+    document.getElementById('trTurn').onclick = () => { triggerCleverDriveEvent('turn'); renderMain(); };
+    document.getElementById('trSpeed').onclick = () => { triggerCleverDriveEvent('overspeed'); renderMain(); };
+    document.getElementById('trReset').onclick = () => { resetCleverDrive(); renderMain(); };
+    document.getElementById('botSetBack').onclick = () => { state.settingsPage = 'menu'; renderAll(); };
+    document.getElementById('botBackRoute').onclick = () => { state.settingsPage = 'menu'; state.currentTab = 'route'; renderAll(); };
+    return;
+  }
+
+  // 子頁 5：預定班次（還原實機 車長行程／巴士行程）
+  if (state.settingsPage === 'schedule') {
+    const sampleTrips = [
+      { route: '973', type: '正常路線', from: '赤柱村', to: '尖沙咀(麼地道)', bus: '用此車', time: '17:30', duty: '073016' },
+      { route: '973', type: '正常路線', from: '尖沙咀(麼地道)', to: '赤柱村', bus: '用此車', time: '19:00', duty: '073016' },
+      { route: 'DEAD', type: '', from: '赤柱村', to: '海洋公園車廠', bus: '用車 9147', time: '20:27', duty: '073016' }
+    ];
+    const isDriverTab = state.scheduleTab === 'driver';
+    vp.innerHTML = `
+      <div class="grid grid-cols-2 text-xs font-black border-b ${th.dark ? 'border-zinc-700 bg-[#1b2230]' : 'border-zinc-300 bg-zinc-200'} shrink-0">
+        <button id="schTabDriver" class="py-2.5 text-center ${isDriverTab ? (th.dark ? 'bg-[#141923] text-white border-b-2 border-[#007AFF]' : 'bg-white text-black') : th.muted}">車長行程</button>
+        <button id="schTabBus" class="py-2.5 text-center ${!isDriverTab ? (th.dark ? 'bg-[#141923] text-white border-b-2 border-[#007AFF]' : 'bg-white text-black') : th.muted}">巴士行程</button>
+      </div>
+      <div class="flex-1 overflow-y-auto no-scrollbar divide-y-2 ${th.dark ? 'divide-zinc-700' : 'divide-zinc-800'}">
+        ${sampleTrips.map(it => `
+          <div data-sroute="${esc(it.route)}" class="sch-item flex items-stretch ${th.row} cursor-pointer">
+            <div class="flex-1 p-2.5 space-y-1 min-w-0">
+              <div class="text-sm font-black">${esc(it.route)} ${esc(it.type)}</div>
+              <div class="text-xs font-bold ${th.muted} truncate">由 ${esc(it.from)}</div>
+              <div class="text-xs font-bold truncate">往 ${esc(it.to)}</div>
+            </div>
+            <div class="w-[118px] flex flex-col text-center text-xs font-black shrink-0 border-l ${th.dark ? 'border-zinc-700' : 'border-zinc-300'}">
+              <div class="bg-[#181b22] text-white py-1">${esc(it.bus)}</div>
+              <div class="bg-[#c7c4e8] text-[#111] py-2 text-sm font-black">${esc(it.time)}</div>
+              <div class="bg-[#f3f2c9] text-[#222] py-1 font-mono">${esc(it.duty)}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    bar.innerHTML = `
+      <button id="botSetBack" class="h-11 rounded-lg bg-[#007AFF] text-white font-black text-2xl flex items-center justify-center">‹</button>
+      <button class="h-11 rounded-lg bg-zinc-600/80 text-zinc-300 font-black text-xl flex items-center justify-center">↑</button>
+      <button class="h-11 rounded-lg bg-zinc-600/80 text-zinc-300 font-black text-xl flex items-center justify-center">↓</button>
+      <button id="botBackRoute" class="h-11 rounded-lg bg-[#007AFF] text-white font-black text-xs flex items-center justify-center">返回路線</button>
+    `;
+    document.getElementById('schTabDriver').onclick = () => { state.scheduleTab = 'driver'; renderMain(); };
+    document.getElementById('schTabBus').onclick = () => { state.scheduleTab = 'bus'; renderMain(); };
+    vp.querySelectorAll('.sch-item').forEach(row => {
+      row.onclick = () => {
+        const rno = row.dataset.sroute;
+        if (rno && rno !== 'DEAD' && state.uniqueRouteNos.includes(rno)) {
+          state.selectedRouteNo = rno;
+          state.currentTab = 'route';
+          state.routeStage = 'bound';
+          state.pageOffset = 0;
+          state.settingsPage = 'menu';
+          renderAll();
+        } else {
+          showToast(rno === 'DEAD' ? '非載客車程 (DEAD)' : `路線 ${rno} 未在資料庫內`);
+        }
+      };
+    });
+    document.getElementById('botSetBack').onclick = () => { state.settingsPage = 'menu'; renderAll(); };
+    document.getElementById('botBackRoute').onclick = () => { state.settingsPage = 'menu'; state.currentTab = 'route'; renderAll(); };
+    return;
+  }
+
+  // 主頁：實機「選項」六宮格藍色功能鍵
+  vp.innerHTML = `
+    <div class="pt-4 pb-3 text-center text-base font-black tracking-widest shrink-0">選項</div>
+    <div class="px-3 grid grid-cols-3 gap-2.5">
+      <!-- 1. 車長喜好設定 -->
+      <button id="optPrefs" class="h-[88px] rounded-xl bg-[#007AFF] active:brightness-90 text-white flex flex-col items-center justify-center gap-1.5 px-1 shadow">
+        <svg class="w-9 h-9" viewBox="0 0 36 36" fill="currentColor">
+          <path d="M18 6a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm0 2.5a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>
+          <path d="M17 4h2v2.4h-2zM17 16.6h2V19h-2zM10.5 10.5h2.4v2h-2.4zM23.1 10.5h2.4v2h-2.4zM12.2 6.2l1.7 1.7-1.4 1.4-1.7-1.7zM22.1 16.1l1.7 1.7-1.4 1.4-1.7-1.7zM23.8 6.2l-1.7 1.7 1.4 1.4 1.7-1.7zM13.9 16.1l-1.7 1.7 1.4 1.4 1.7-1.7z"/>
+          <path d="M8.5 30c.6-5.2 4.3-8.5 9.5-8.5s8.9 3.3 9.5 8.5H8.5zm9.5-6.2l-1.6 3.7 1.6 2 1.6-2-1.6-3.7z"/>
+        </svg>
+        <span class="text-[11px] font-black leading-tight">車長喜好設定</span>
       </button>
-      <button id="setOpenCD" class="w-full py-2.5 rounded-lg bg-emerald-600 text-white font-black">
-        打開「智駕全城 Clever Driving」面板
+
+      <!-- 2. 診斷模式 -->
+      <button id="optDiag" class="h-[88px] rounded-xl bg-[#007AFF] active:brightness-90 text-white flex flex-col items-center justify-center gap-1.5 px-1 shadow">
+        <svg class="w-9 h-9" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="6" y="7" width="24" height="19" rx="2"/>
+          <path d="M3 17h7l2.6-6 3.8 11 3-6.5 2.1 2.5H33"/>
+        </svg>
+        <span class="text-[11px] font-black leading-tight">診斷模式</span>
       </button>
-      <button id="setToggleGps" class="w-full py-2.5 rounded-lg bg-[#0068FF] text-white font-black">
-        報站模式：${state.gpsEnabled ? 'GPS 自動報站' : '手動模式 (M)'}（點擊切換）
+
+      <!-- 3. 維修模式 -->
+      <button id="optMaint" class="h-[88px] rounded-xl bg-[#007AFF] active:brightness-90 text-white flex flex-col items-center justify-center gap-1.5 px-1 shadow">
+        <svg class="w-9 h-9" viewBox="0 0 36 36" fill="currentColor">
+          <path d="M19.8 13.6a5.4 5.4 0 0 0-6.8-6.8l2.8 2.8-2.2 2.2-2.8-2.8a5.4 5.4 0 0 0 6.8 6.8l6.2 6.2a2.2 2.2 0 1 0 3.1-3.1l-6.1-5.3z"/>
+          <rect x="20" y="21" width="9" height="8" rx="1.5"/>
+          <path d="M22 21v-2a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <span class="text-[11px] font-black leading-tight">維修模式</span>
       </button>
-      <button id="setReplayBoot" class="w-full py-2.5 rounded-lg bg-zinc-700 text-white font-black">
-        重新播放開機與診斷畫面
+
+      <!-- 4. 訓練模式 -->
+      <button id="optTrain" class="h-[88px] rounded-xl bg-[#007AFF] active:brightness-90 text-white flex flex-col items-center justify-center gap-1.5 px-1 shadow">
+        <svg class="w-9 h-9" viewBox="0 0 36 36" fill="currentColor">
+          <path d="M18 8L4 14.5 18 21l11.5-5.3V23H32v-8.5L18 8z"/>
+          <path d="M10.5 19.2V25c0 2.2 3.4 4 7.5 4s7.5-1.8 7.5-4v-5.8L18 22.8l-7.5-3.6z"/>
+        </svg>
+        <span class="text-[11px] font-black leading-tight">訓練模式</span>
       </button>
-      <button id="setClearCache" class="w-full py-2.5 rounded-lg bg-red-600 text-white font-black">
-        清除離線快取並重新載入
+
+      <!-- 5. 輸入員工編號 -->
+      <button id="optStaff" class="h-[88px] rounded-xl bg-[#007AFF] active:brightness-90 text-white flex flex-col items-center justify-center gap-1.5 px-1 shadow">
+        <svg class="w-9 h-9" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="18" r="12"/>
+          <path d="M11 18h13"/>
+          <path d="M19 13l5 5-5 5"/>
+        </svg>
+        <span class="text-[11px] font-black leading-tight">輸入員工編號</span>
+      </button>
+
+      <!-- 6. 預定班次 -->
+      <button id="optSchedule" class="h-[88px] rounded-xl bg-[#007AFF] active:brightness-90 text-white flex flex-col items-center justify-center gap-1.5 px-1 shadow">
+        <svg class="w-9 h-9" viewBox="0 0 36 36" fill="none">
+          <circle cx="18" cy="18" r="13" fill="white"/>
+          <rect x="13" y="12" width="10" height="13" rx="1.5" fill="#1f2937"/>
+          <rect x="15.5" y="10" width="5" height="3" rx="1" fill="#1f2937"/>
+          <line x1="15" y1="16.5" x2="21" y2="16.5" stroke="white" stroke-width="1.3"/>
+          <line x1="15" y1="19.5" x2="21" y2="19.5" stroke="white" stroke-width="1.3"/>
+          <line x1="15" y1="22.5" x2="19" y2="22.5" stroke="white" stroke-width="1.3"/>
+        </svg>
+        <span class="text-[11px] font-black leading-tight">預定班次</span>
       </button>
     </div>
   `;
+
   bar.innerHTML = `
-    <button id="botBackRoute" class="col-span-4 h-11 rounded-lg bg-[#0068FF] text-white font-black text-sm">返回路線</button>
+    <button id="botBackRoute" class="col-span-4 h-11 rounded-lg bg-[#007AFF] text-white font-black text-sm">返回路線</button>
   `;
-  document.getElementById('setToggleTheme').onclick = () => toggleTheme();
-  document.getElementById('setOpenCD').onclick = () => openCleverDriveModal();
-  document.getElementById('setToggleGps').onclick = () => toggleGpsMode();
-  document.getElementById('setReplayBoot').onclick = () => runBootSequence(true);
-  document.getElementById('setClearCache').onclick = async () => {
-    try {
-      if ('caches' in window) {
-        const keys = await caches.keys();
-        await Promise.all(keys.map(k => caches.delete(k)));
-      }
-      if ('serviceWorker' in navigator) {
-        const regs = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(regs.map(r => r.unregister()));
-      }
-    } catch (_) {}
-    location.reload();
+
+  document.getElementById('optPrefs').onclick = () => { state.settingsPage = 'prefs'; renderAll(); };
+  document.getElementById('optDiag').onclick = () => { state.settingsPage = 'diag'; renderAll(); };
+  document.getElementById('optMaint').onclick = () => { state.settingsPage = 'maint'; renderAll(); };
+  document.getElementById('optTrain').onclick = () => { state.settingsPage = 'train'; renderAll(); };
+  document.getElementById('optStaff').onclick = () => {
+    const nextId = prompt('輸入車長姓名及員工編號（例如：袁錦昌 37095）：', state.driverId);
+    if (nextId && nextId.trim()) {
+      state.driverId = nextId.trim();
+      renderTopStatus();
+      showToast('已更新員工編號');
+    }
   };
+  document.getElementById('optSchedule').onclick = () => { state.settingsPage = 'schedule'; renderAll(); };
   document.getElementById('botBackRoute').onclick = () => { state.currentTab = 'route'; renderAll(); };
 }
 
@@ -2045,6 +2345,7 @@ function bindGlobalEvents() {
         toggleGpsMode();
         return;
       }
+      if (target === 'settings') state.settingsPage = 'menu';
       state.currentTab = target;
       renderAll();
     };
@@ -2052,24 +2353,29 @@ function bindGlobalEvents() {
 
   document.getElementById('btnOctopus').onclick = () => {
     state.octopusMode = (state.octopusMode + 1) % 3;
+    const labels = ['八達通正常', '八達通暫停收費', '八達通未連接'];
+    showToast(labels[state.octopusMode]);
     renderTopStatus();
   };
-  document.getElementById('btnThemeToggle').onclick = () => toggleTheme();
-  document.getElementById('btnLangToggle').onclick = () => {
+
+  document.getElementById('btnDisplayBox').onclick = () => {
+    state.isStopped3s = !state.isStopped3s;
+    state.gpsSpeedKmh = state.isStopped3s ? 0 : 32;
+    showToast(state.isStopped3s ? '車輛狀態：已停 ≥3s' : '車輛狀態：行駛中 (32 km/h)');
+    renderTopStatus();
+  };
+
+  document.getElementById('btnGlobe').onclick = () => {
     state.lang = state.lang === 'tc' ? 'en' : 'tc';
+    showToast(state.lang === 'tc' ? '語言：繁體中文' : 'Language: English');
     renderAll();
   };
+
   document.getElementById('btnCleverDriveBar').onclick = () => openCleverDriveModal();
   document.getElementById('btnCloseCD').onclick = () => document.getElementById('cleverDriveModal').classList.add('hidden');
 
-  document.getElementById('btnStopState').onclick = () => {
-    state.isStopped3s = !state.isStopped3s;
-    state.gpsSpeedKmh = state.isStopped3s ? 0 : 32;
-    renderTopStatus();
-  };
-
   document.getElementById('btnDriverBadge').onclick = () => {
-    const nextId = prompt('輸入車長編號／名稱：', state.driverId);
+    const nextId = prompt('輸入車長姓名及員工編號（例如：袁錦昌 37095）：', state.driverId);
     if (nextId && nextId.trim()) {
       state.driverId = nextId.trim();
       renderTopStatus();
@@ -2090,7 +2396,12 @@ function bindGlobalEvents() {
   document.getElementById('btnCloseMore').onclick = closeMore;
   document.getElementById('moreReplayAudio').onclick = () => { closeMore(); triggerStopAnnouncement(state.currentStopIdx, true); };
   document.getElementById('moreToggleGps').onclick = () => { closeMore(); toggleGpsMode(); };
-  document.getElementById('moreToggleTheme').onclick = () => { closeMore(); toggleTheme(); };
+  document.getElementById('moreToggleTheme').onclick = () => {
+    closeMore();
+    state.currentTab = 'settings';
+    state.settingsPage = 'prefs';
+    renderAll();
+  };
   document.getElementById('moreOpenCD').onclick = () => { closeMore(); openCleverDriveModal(); };
   document.getElementById('morePickStart').onclick = () => {
     closeMore();
