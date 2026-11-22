@@ -118,13 +118,7 @@
           <button id="readNowBtn" class="px-2.5 py-1 rounded bg-[#22c55e] text-black font-black text-xs">立即閱讀</button>
         </div>
       </div>
-
-      <!-- 車廂動態顯示屏預覽條 (報站或播放特別訊息時同步顯示) -->
-      <div id="cabinLedBar" class="hidden bg-[#090b0e] text-[#ff9d00] border-b border-zinc-700 px-2 py-1 flex items-center justify-between gap-2 shrink-0">
-        <span class="text-[9px] font-black bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded shrink-0">車廂LED</span>
-        <span id="cabinLedText" class="font-mono font-bold text-[11px] truncate flex-1">CTB 1 -> 跑馬地 (上)</span>
-      </div>
-      <!-- 3. 中間主畫面區 -->
+<!-- 3. 中間主畫面區 -->
       <div id="mainViewport" class="flex-1 overflow-hidden flex flex-col">
         <div class="flex-1 flex flex-col items-center justify-center p-4 text-center">
           <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
@@ -211,7 +205,6 @@ const state = {
   ],
   scheduledDuty: null,       // { routeNo, originCode, destCode, departTime, mode }
   lastAnnouncedKey: '',
-  cabinLedOverride: '',
   cleverScore: 100
 };
 
@@ -421,25 +414,6 @@ function renderTopStatus() {
   } else {
     stopBtn.textContent = `${state.gpsSpeedKmh || 32} km/h`;
     stopBtn.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-600 text-white';
-  }
-
-  // 同步車廂動態顯示屏預覽列
-  const ledBar = document.getElementById('cabinLedBar');
-  const ledText = document.getElementById('cabinLedText');
-  if (ledBar && ledText) {
-    if (state.cabinLedOverride) {
-      ledBar.classList.remove('hidden');
-      ledText.textContent = state.cabinLedOverride;
-    } else if (state.routeStage === 'stops' && state.selectedTrip) {
-      const dispNo = fmtRouteNo(state.selectedTrip);
-      const dest = state.selectedTrip.destTc || state.selectedTrip.endStopNameTc || '';
-      const cur = state.tripStops[state.currentStopIdx] || {};
-      const curName = cur.nameTc || cur.nameZh || cur.name || '';
-      ledBar.classList.remove('hidden');
-      ledText.textContent = `${dispNo} 往 ${dest} | ${state.currentStopIdx + 1}. ${curName}`;
-    } else {
-      ledBar.classList.add('hidden');
-    }
   }
   // 收到新訊息黃底彈出提示條 (僅於停車達 3 秒且有未讀訊息時顯示)
   const unreadCount = state.messages.filter(m => m.unread).length;
@@ -1517,6 +1491,7 @@ startGpsWatcher();
 </script>
 </body>
 </html>
+
 
 
 
