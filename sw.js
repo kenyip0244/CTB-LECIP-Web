@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'ctb-lecip-web-v5';
+﻿const CACHE_NAME = 'ctb-lecip-web-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -30,3 +30,4 @@ self.addEventListener('fetch', (e) => {
     caches.match(e.request).then((cached) => cached || fetch(e.request))
   );
 });
+
