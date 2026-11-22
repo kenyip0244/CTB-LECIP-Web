@@ -624,12 +624,39 @@ function playSectionFareChime() {
   return playSynthChime([[880, 0.14, 0.07], [1175, 0.22, 0.04]]);
 }
 
+function playShortAssetAudio(path, fallbackNotes) {
+  return new Promise(resolve => {
+    try {
+      const fx = new Audio(path);
+      fx.volume = state.volume;
+      let done = false;
+      const finish = () => { if (!done) { done = true; resolve(); } };
+      fx.onended = finish;
+      fx.onerror = () => {
+        if (done) return;
+        done = true;
+        playSynthChime(fallbackNotes).then(resolve);
+      };
+      fx.play().catch(() => {
+        if (done) return;
+        done = true;
+        playSynthChime(fallbackNotes).then(resolve);
+      });
+    } catch (_) {
+      playSynthChime(fallbackNotes).then(resolve);
+    }
+  });
+}
+
 function playNewMessageChime() {
-  return playSynthChime([[1046, 0.11, 0.05], [1318, 0.15, 0.02]]);
+  return playShortAssetAudio('./assets/msg_chime.mp3', [[1046, 0.11, 0.05], [1318, 0.15, 0.02]]);
 }
 
 function playAlertBeep(isDanger = false) {
-  playSynthChime(isDanger ? [[960, 0.16, 0.06], [960, 0.2, 0.02]] : [[740, 0.16, 0.02]]);
+  playShortAssetAudio(
+    './assets/speed_alert.mp3',
+    isDanger ? [[960, 0.16, 0.06], [960, 0.2, 0.02]] : [[740, 0.16, 0.02]]
+  );
 }
 
 // ============ 音檔播放與 Google TTS 序列引擎 ============
@@ -889,8 +916,7 @@ function triggerStopAnnouncement(idx, force = false) {
   const segments = [];
 
   if (idx > 0 && secInfo.badgeFare != null && state.octopusMode === 0) {
-    segments.push({ chime: 'section' });
-    segments.push({ files: [], tc: `八達通已轉分段，收費 ${fmtFare(secInfo.badgeFare)}`, en: '', sc: '' });
+    segments.push({ files: ['./assets/check_fare.mp3'], tc: '請檢查八達通收費', en: '', sc: '' });
     showToast(`八達通轉分段：分段 ${secInfo.sectionNo}（${fmtFare(secInfo.badgeFare)}）`);
   }
 
@@ -2495,7 +2521,7 @@ function renderSettingsView(vp, bar) {
       <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">診斷模式</div>
       <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5 text-xs">
         <div class="p-3 rounded-xl border ${th.card} space-y-1.5">
-          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v44)</div>
+          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v45)</div>
           <div>App Version：<b>23.06.25</b> ｜ Config：<b>ctb_prod_v10</b></div>
           <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
           <div>站點資料庫：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
@@ -2540,7 +2566,7 @@ function renderSettingsView(vp, bar) {
       };
       state.messages.unshift(voiceMsg);
       state.dismissedPopup = false;
-      playNewMessageChime().then(() => playVoiceMessage(voiceMsg));
+      playVoiceMessage(voiceMsg);
       renderTopStatus();
     };
     document.getElementById('diagToggleDispFault').onclick = () => {
@@ -2575,8 +2601,7 @@ function renderSettingsView(vp, bar) {
     `;
     document.getElementById('maintTestSecChime').onclick = () => {
       playAnnouncementSegments([
-        { chime: 'section' },
-        { files: [], tc: '八達通已轉分段，收費六元二角', en: '', sc: '' }
+        { files: ['./assets/check_fare.mp3'], tc: '請檢查八達通收費', en: '', sc: '' }
       ]);
     };
     document.getElementById('maintResetCD').onclick = () => resetCleverDrive();
