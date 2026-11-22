@@ -1,0 +1,17 @@
+﻿{
+  "name": "CTB LECIP 報站控制器",
+  "short_name": "CTB-LECIP",
+  "description": "城巴 LECIP 7吋 faytech 司機報站控制器模擬系統",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#111317",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "./assets/lecip_faytech_controller.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

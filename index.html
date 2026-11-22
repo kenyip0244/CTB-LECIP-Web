@@ -1,0 +1,711 @@
+﻿<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>CTB LECIP 報站控制器</title>
+  <link rel="manifest" href="./manifest.json" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #0e1013; overflow: hidden; font-family: "Noto Sans TC", "PingFang HK", "Microsoft JhengHei", sans-serif; }
+    .faytech-shell {
+      position: relative;
+      height: 98dvh;
+      max-height: 920px;
+      aspect-ratio: 0.50;
+      background: linear-gradient(145deg, #1b1e23, #101215);
+      border: 3px solid #2e333b;
+      border-radius: 22px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.85), inset 0 1px 1px rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      padding: 26px 18px 14px 18px;
+    }
+    @media (max-width: 520px) {
+      .faytech-shell {
+        width: 100vw;
+        height: 100dvh;
+        max-height: none;
+        aspect-ratio: auto;
+        border-radius: 0;
+        border: none;
+        padding: 8px 8px 10px 8px;
+      }
+    }
+    .lecip-screen {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      border-radius: 6px;
+      border: 2px solid #3c434e;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #e5e7eb;
+    }
+    .lecip-screen.dark-mode { background: #14181f; color: #f1f5f9; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .tab-active-day { background: #d5daff; color: #000000; border-top-left-radius: 8px; border-top-right-radius: 8px; }
+    .tab-active-dark { background: #263142; color: #ffffff; border-top-left-radius: 8px; border-top-right-radius: 8px; }
+  </style>
+</head>
+<body class="flex items-center justify-center">
+  <div class="faytech-shell">
+    <div class="w-full flex justify-center items-center pb-2 shrink-0">
+      <div class="w-2.5 h-2.5 rounded-full bg-[#262a31] border border-[#3e444f]"></div>
+    </div>
+
+    <div id="lecipScreen" class="lecip-screen">
+      <div id="brightnessMask" class="pointer-events-none absolute inset-0 bg-black z-50 transition-opacity duration-150" style="opacity: 0;"></div>
+
+      <div class="bg-black text-white px-2.5 py-1 flex items-center justify-between text-xs shrink-0">
+        <div class="flex items-center gap-2">
+          <span id="clockText" class="font-mono font-bold text-[15px] tracking-wider">00:00:00</span>
+          <span id="driverBadge" class="bg-[#1e293b] text-[#93c5fd] px-1.5 py-0.5 rounded text-[10px] font-semibold">未登入</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span id="gpsStatusChip" class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-700 text-white">GPS 待命</span>
+          <span id="speedChip" class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-amber-300">0 km/h</span>
+        </div>
+      </div>
+
+      <div id="tabStrip" class="bg-[#111111] px-1 pt-1 grid grid-cols-5 gap-0.5 shrink-0 text-white">
+        <button data-tab="route" class="tab-btn py-1.5 flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold">
+          <span id="modeIcon" class="w-5 h-5 rounded-full border border-current flex items-center justify-center text-[11px] font-black">A</span>
+          <span id="modeLabel">自動</span>
+        </button>
+        <button data-tab="broadcast" class="tab-btn py-1.5 flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/></svg>
+          <span>廣播</span>
+        </button>
+        <button data-tab="message" class="tab-btn relative py-1.5 flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span>訊息</span>
+          <span id="msgBadge" class="hidden absolute top-1 right-2 bg-[#0068FF] text-white text-[9px] px-1 rounded-full">1</span>
+        </button>
+        <button data-tab="incident" class="tab-btn py-1.5 flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold">
+          <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+          <span>事故</span>
+        </button>
+        <button data-tab="settings" class="tab-btn py-1.5 flex flex-col items-center justify-center gap-0.5 text-[11px] font-bold">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <span>設定</span>
+        </button>
+      </div>
+
+      <div id="trainingBanner" class="hidden bg-yellow-400 text-black text-xs font-bold px-3 py-1 text-center shrink-0">訓練模式已啟動</div>
+      <div id="incidentBanner" class="hidden bg-red-600 text-white text-xs font-bold px-3 py-1 text-center shrink-0">事故模式已啟動</div>
+
+      <div id="mainViewport" class="flex-1 overflow-hidden flex flex-col">
+        <div class="flex-1 flex flex-col items-center justify-center p-4 text-center">
+          <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+          <div id="loadingText" class="font-bold text-sm">正在載入城巴路線庫 (856 班次)...</div>
+        </div>
+      </div>
+
+      <div id="screenBottomBar" class="bg-[#181c22] p-1.5 grid grid-cols-4 gap-1.5 shrink-0">
+        <button id="btnBack" class="h-11 rounded-md bg-[#2a313d] active:bg-blue-700 text-white flex items-center justify-center font-bold">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button id="btnUp" class="h-11 rounded-md bg-[#2a313d] active:bg-blue-700 text-white flex items-center justify-center font-bold">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg>
+        </button>
+        <button id="btnDown" class="h-11 rounded-md bg-[#2a313d] active:bg-blue-700 text-white flex items-center justify-center font-bold">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14m0 0l-6-6m6 6l6-6"/></svg>
+        </button>
+        <button id="btnAction" class="h-11 rounded-md bg-[#2a313d] active:bg-blue-700 text-white flex items-center justify-center font-bold">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="pt-2.5 px-1 flex flex-col gap-1.5 shrink-0 relative">
+      <div class="flex justify-end items-center gap-1.5 pr-2">
+        <span id="ledPower" class="w-2 h-1.5 rounded-sm bg-[#c6e635]"></span>
+        <span id="ledGps" class="w-1.5 h-1.5 rounded-full bg-[#d9f94b] shadow-[0_0_6px_#d9f94b]"></span>
+        <span id="ledStatus" class="w-2.5 h-2.5 rounded-full bg-[#9be62b] shadow-[0_0_8px_#9be62b]"></span>
+      </div>
+      <div class="flex items-center justify-between gap-2 text-zinc-200">
+        <div class="flex items-center gap-1.5 flex-1">
+          <svg class="w-5 h-5 shrink-0 text-zinc-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07"/></svg>
+          <div class="flex-1 h-10 rounded-md bg-[#1a1d22] border border-[#3a414b] grid grid-cols-2 divide-x divide-[#3a414b] overflow-hidden">
+            <button id="hwVolDown" class="flex items-center justify-center active:bg-zinc-700 text-lg font-bold">⊖</button>
+            <button id="hwVolUp" class="flex items-center justify-center active:bg-zinc-700 text-lg font-bold">⊕</button>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 flex-1">
+          <div class="flex-1 h-10 rounded-md bg-[#1a1d22] border border-[#3a414b] grid grid-cols-2 divide-x divide-[#3a414b] overflow-hidden">
+            <button id="hwBrightDown" class="flex items-center justify-center active:bg-zinc-700 text-lg font-bold">⊖</button>
+            <button id="hwBrightUp" class="flex items-center justify-center active:bg-zinc-700 text-lg font-bold">⊕</button>
+          </div>
+          <svg class="w-5 h-5 shrink-0 text-zinc-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastBox" class="hidden fixed top-12 left-1/2 -translate-x-1/2 bg-black/90 text-white text-xs font-bold px-3.5 py-2 rounded-full border border-zinc-600 z-50 shadow-lg"></div>
+  <input type="file" id="zipInput" accept=".zip" class="hidden" />
+
+<script>
+const state = {
+  routes: [],
+  stopsByTrip: new Map(),
+  announcements: [],
+  currentTab: 'route',
+  routeStage: 'route',
+  routeQuery: '',
+  selectedRouteNo: null,
+  selectedTrip: null,
+  tripStops: [],
+  currentStopIdx: 0,
+  stopMode: 'auto',
+  volume: 1.0,
+  brightnessDim: 0.0,
+  darkMode: false,
+  trainingMode: false,
+  incidentActive: false,
+  incidentLabel: '',
+  driverNo: '',
+  broadcastQuery: '',
+  messages: [
+    { id: 'm1', title: '控制中心通告', time: '08:30', body: '各線車長請留意路面交通情況，保持安全車距。', unread: true }
+  ],
+  gpsSpeedKmh: 0,
+  lastAnnouncedKey: '',
+  cleverScore: 100
+};
+
+function showToast(msg) {
+  const el = document.getElementById('toastBox');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => el.classList.add('hidden'), 2200);
+}
+
+function speakAnnouncement(zhText, enText) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  if (zhText) {
+    const uZh = new SpeechSynthesisUtterance(zhText);
+    uZh.lang = 'zh-HK';
+    uZh.volume = state.volume;
+    uZh.rate = 1.02;
+    window.speechSynthesis.speak(uZh);
+  }
+  if (enText) {
+    const uEn = new SpeechSynthesisUtterance(enText);
+    uEn.lang = 'en-GB';
+    uEn.volume = state.volume;
+    uEn.rate = 0.98;
+    window.speechSynthesis.speak(uEn);
+  }
+}
+
+setInterval(() => {
+  const now = new Date();
+  document.getElementById('clockText').textContent = now.toTimeString().slice(0, 8);
+}, 500);
+
+async function initData() {
+  try {
+    const [rRes, sRes, aRes] = await Promise.all([
+      fetch('./data/routes.json'),
+      fetch('./data/stops.json'),
+      fetch('./data/announcements.json')
+    ]);
+    const routes = await rRes.json();
+    const stops = await sRes.json();
+    const anns = await aRes.json();
+    applyPackData(routes, stops, anns);
+  } catch (err) {
+    document.getElementById('loadingText').textContent = '載入資料失敗，請確認 data/*.json 已上傳：' + err.message;
+  }
+}
+
+function applyPackData(routes, stops, anns) {
+  state.routes = Array.isArray(routes) ? routes : [];
+  state.announcements = Array.isArray(anns) ? anns : [];
+  state.stopsByTrip.clear();
+  for (const st of (Array.isArray(stops) ? stops : [])) {
+    const key = `${st.routeId}|${st.bound}|${st.patternId || ''}`;
+    if (!state.stopsByTrip.has(key)) state.stopsByTrip.set(key, []);
+    state.stopsByTrip.get(key).push(st);
+  }
+  for (const list of state.stopsByTrip.values()) {
+    list.sort((a, b) => (a.seq || 0) - (b.seq || 0));
+  }
+  renderAll();
+}
+
+function calcDistanceM(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function startGpsWatcher() {
+  if (!('geolocation' in navigator)) return;
+  navigator.geolocation.watchPosition((pos) => {
+    const { latitude, longitude, speed } = pos.coords;
+    const kmh = speed != null && speed >= 0 ? Math.round(speed * 3.6) : 0;
+    state.gpsSpeedKmh = kmh;
+    document.getElementById('speedChip').textContent = `${kmh} km/h`;
+    document.getElementById('gpsStatusChip').textContent = 'GPS 正常';
+    document.getElementById('gpsStatusChip').className = 'px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white';
+
+    if (state.stopMode === 'auto' && state.currentTab === 'route' && state.routeStage === 'stops' && state.tripStops.length > 0) {
+      const target = state.tripStops[state.currentStopIdx];
+      if (target && target.lat && target.lng) {
+        const dist = calcDistanceM(latitude, longitude, target.lat, target.lng);
+        const radius = target.geofenceM || 55;
+        const annKey = `${target.routeId}|${target.bound}|${target.seq}`;
+        if (dist <= radius && state.lastAnnouncedKey !== annKey) {
+          state.lastAnnouncedKey = annKey;
+          triggerStopAnnouncement(state.currentStopIdx);
+          if (state.currentStopIdx + 1 < state.tripStops.length) {
+            state.currentStopIdx++;
+            renderMain();
+          }
+        }
+      }
+    }
+  }, () => {
+    document.getElementById('gpsStatusChip').textContent = '無 GPS 訊號';
+    document.getElementById('gpsStatusChip').className = 'px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-700 text-white';
+  }, { enableHighAccuracy: true, maximumAge: 2000 });
+}
+
+function triggerStopAnnouncement(idx) {
+  const st = state.tripStops[idx];
+  if (!st) return;
+  const zh = st.nameZh || st.name || '';
+  const en = st.nameEn || '';
+  showToast(`報站：${zh}`);
+  speakAnnouncement(`下一站，${zh}`, en ? `Next stop, ${en}` : '');
+}
+
+function renderTabs() {
+  const screen = document.getElementById('lecipScreen');
+  screen.classList.toggle('dark-mode', state.darkMode);
+  document.getElementById('modeIcon').textContent = state.stopMode === 'auto' ? 'A' : 'M';
+  document.getElementById('modeLabel').textContent = state.stopMode === 'auto' ? '自動' : '手動';
+  document.getElementById('trainingBanner').classList.toggle('hidden', !state.trainingMode);
+  document.getElementById('incidentBanner').classList.toggle('hidden', !state.incidentActive);
+  document.getElementById('driverBadge').textContent = state.driverNo ? `車長 ${state.driverNo}` : '未登入';
+
+  const unread = state.messages.filter(m => m.unread).length;
+  const badge = document.getElementById('msgBadge');
+  badge.textContent = unread;
+  badge.classList.toggle('hidden', unread === 0);
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    const active = btn.dataset.tab === state.currentTab;
+    btn.classList.remove('tab-active-day', 'tab-active-dark');
+    if (active) btn.classList.add(state.darkMode ? 'tab-active-dark' : 'tab-active-day');
+  });
+}
+
+function renderMain() {
+  const vp = document.getElementById('mainViewport');
+  const bgBanner = state.darkMode ? 'bg-[#1e293b] text-white' : 'bg-[#d5daff] text-black';
+  const rowBg = state.darkMode ? 'bg-[#1b222c] border-slate-700 text-slate-100' : 'bg-white border-slate-300 text-slate-900';
+
+  if (state.currentTab === 'route') {
+    if (state.routeStage === 'route') {
+      const uniqueNos = [...new Set(state.routes.map(r => r.routeId))].filter(no =>
+        !state.routeQuery || no.toUpperCase().includes(state.routeQuery.toUpperCase())
+      );
+      vp.innerHTML = `
+        <div class="${bgBanner} px-3 py-2 font-bold text-sm flex items-center justify-between shrink-0">
+          <span>輸入路線 (${uniqueNos.length} 條)</span>
+          ${state.routeQuery ? `<button id="clearRouteQ" class="text-xs bg-black/20 px-2 py-0.5 rounded">清除</button>` : ''}
+        </div>
+        <div class="p-2 shrink-0">
+          <input id="routeSearchInput" type="text" value="${state.routeQuery}" placeholder="輸入路線號例如 971 / 788 / A11..."
+            class="w-full px-3 py-2 rounded border border-slate-400 text-black font-bold text-base focus:outline-none focus:ring-2 focus:ring-blue-600" />
+        </div>
+        <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar px-2 pb-2 grid grid-cols-3 gap-1.5 content-start">
+          ${uniqueNos.slice(0, 180).map(no => `
+            <button data-rno="${no}" class="pick-route-btn py-3 rounded border font-black text-lg ${rowBg} active:bg-blue-600 active:text-white shadow-sm">
+              ${no}
+            </button>
+          `).join('')}
+        </div>
+      `;
+      const inp = document.getElementById('routeSearchInput');
+      inp.addEventListener('input', e => { state.routeQuery = e.target.value.trim(); renderMain(); });
+      if (document.getElementById('clearRouteQ')) {
+        document.getElementById('clearRouteQ').onclick = () => { state.routeQuery = ''; renderMain(); };
+      }
+      document.querySelectorAll('.pick-route-btn').forEach(b => {
+        b.onclick = () => {
+          state.selectedRouteNo = b.dataset.rno;
+          state.routeStage = 'pattern';
+          renderMain();
+        };
+      });
+    } else if (state.routeStage === 'pattern') {
+      const trips = state.routes.filter(r => r.routeId === state.selectedRouteNo);
+      vp.innerHTML = `
+        <div class="${bgBanner} px-3 py-2 font-bold text-sm shrink-0">
+          路線 ${state.selectedRouteNo} — 選擇方向／特別班次
+        </div>
+        <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar divide-y divide-slate-300">
+          ${trips.map((t, idx) => `
+            <button data-tidx="${idx}" class="pick-trip-btn w-full text-left px-3 py-3 ${rowBg} active:bg-blue-600 active:text-white flex items-center justify-between">
+              <div>
+                <div class="font-bold text-base">${t.destZh || t.destination || '往總站'}</div>
+                <div class="text-xs opacity-75">${t.patternName || (t.patternId ? '特別班次 ' + t.patternId : '正常班次')} · 往 ${t.destEn || ''}</div>
+              </div>
+              <span class="font-black text-lg">›</span>
+            </button>
+          `).join('')}
+        </div>
+      `;
+      document.querySelectorAll('.pick-trip-btn').forEach(b => {
+        b.onclick = () => {
+          const t = trips[Number(b.dataset.tidx)];
+          state.selectedTrip = t;
+          const key = `${t.routeId}|${t.bound}|${t.patternId || ''}`;
+          state.tripStops = state.stopsByTrip.get(key) || [];
+          state.currentStopIdx = 0;
+          state.routeStage = 'start_stop';
+          renderMain();
+        };
+      });
+    } else if (state.routeStage === 'start_stop') {
+      const t = state.selectedTrip;
+      vp.innerHTML = `
+        <div class="${bgBanner} px-3 py-1.5 shrink-0">
+          <div class="text-xs font-bold opacity-80">${t.routeId}-${t.destZh || ''}-${t.bound}</div>
+          <div class="font-black text-base">選擇開始站位</div>
+        </div>
+        <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar divide-y divide-slate-300">
+          ${state.tripStops.map((s, idx) => `
+            <button data-sidx="${idx}" class="pick-start-btn w-full text-left px-3 py-2.5 flex items-center justify-between ${idx === 0 ? 'bg-[#f4f728] text-black font-bold' : rowBg}">
+              <span class="text-base truncate">${idx + 1}. ${s.nameZh || s.name}</span>
+              <span class="font-bold text-lg ml-2">›</span>
+            </button>
+          `).join('')}
+        </div>
+      `;
+      document.querySelectorAll('.pick-start-btn').forEach(b => {
+        b.onclick = () => {
+          state.currentStopIdx = Number(b.dataset.sidx);
+          state.routeStage = 'stops';
+          state.lastAnnouncedKey = '';
+          renderMain();
+          triggerStopAnnouncement(state.currentStopIdx);
+        };
+      });
+    } else if (state.routeStage === 'stops') {
+      const t = state.selectedTrip;
+      const cur = state.tripStops[state.currentStopIdx] || {};
+      const nextStops = state.tripStops.slice(state.currentStopIdx + 1, state.currentStopIdx + 5);
+      vp.innerHTML = `
+        <div class="${bgBanner} px-3 py-1.5 flex items-center justify-between shrink-0">
+          <div>
+            <div class="text-xs font-bold">${t.routeId} 往 ${t.destZh || ''}</div>
+            <div class="text-[11px] opacity-80">第 ${state.currentStopIdx + 1} / ${state.tripStops.length} 站 · 車費 $${cur.fare || t.fullFare || '--'}</div>
+          </div>
+          <button id="toggleModeBtn" class="px-2.5 py-1 rounded bg-blue-700 text-white text-xs font-bold">
+            ${state.stopMode === 'auto' ? '自動報站' : '手動報站'}
+          </button>
+        </div>
+
+        <button id="replayCurStop" class="w-full text-left bg-[#f4f728] text-black px-3 py-3 border-b-2 border-amber-500 shrink-0 active:brightness-95">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold uppercase tracking-wider bg-black text-[#f4f728] px-1.5 py-0.5 rounded">目前 / 下一站 (點擊重播)</span>
+            <span class="text-xs font-bold">🔊</span>
+          </div>
+          <div class="text-xl font-black mt-1 leading-tight">${state.currentStopIdx + 1}. ${cur.nameZh || cur.name || '總站'}</div>
+          <div class="text-xs font-semibold text-zinc-800 mt-0.5">${cur.nameEn || ''}</div>
+        </button>
+
+        <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar divide-y divide-slate-300">
+          ${nextStops.map((s, offset) => {
+            const realIdx = state.currentStopIdx + 1 + offset;
+            return `
+              <button data-jump="${realIdx}" class="jump-stop-btn w-full text-left px-3 py-2.5 ${rowBg} flex items-center justify-between">
+                <span class="text-base font-medium truncate">${realIdx + 1}. ${s.nameZh || s.name}</span>
+                <span class="text-xs opacity-60">$${s.fare || ''}</span>
+              </button>
+            `;
+          }).join('') || `<div class="p-4 text-center text-sm opacity-70">已到達終點站</div>`}
+        </div>
+      `;
+      document.getElementById('toggleModeBtn').onclick = () => {
+        state.stopMode = state.stopMode === 'auto' ? 'manual' : 'auto';
+        renderAll();
+        showToast(state.stopMode === 'auto' ? '已切換至 GPS 自動報站' : '已切換至手動報站');
+      };
+      document.getElementById('replayCurStop').onclick = () => triggerStopAnnouncement(state.currentStopIdx);
+      document.querySelectorAll('.jump-stop-btn').forEach(b => {
+        b.onclick = () => {
+          state.currentStopIdx = Number(b.dataset.jump);
+          renderMain();
+          triggerStopAnnouncement(state.currentStopIdx);
+        };
+      });
+    }
+  } else if (state.currentTab === 'broadcast') {
+    const list = state.announcements.filter(a => {
+      if (!state.broadcastQuery) return true;
+      const q = state.broadcastQuery.toLowerCase();
+      return String(a.code || a.id || '').toLowerCase().includes(q) || String(a.titleZh || a.label || '').toLowerCase().includes(q);
+    });
+    vp.innerHTML = `
+      <div class="${bgBanner} px-3 py-2 font-bold text-sm shrink-0">特別訊息廣播 (${list.length})</div>
+      <div class="p-2 shrink-0">
+        <input id="annSearchInput" type="text" value="${state.broadcastQuery}" placeholder="搜尋廣播代碼或內容..."
+          class="w-full px-3 py-1.5 rounded border border-slate-400 text-black text-sm font-bold" />
+      </div>
+      <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar divide-y divide-slate-300">
+        ${list.slice(0, 100).map((a, i) => {
+          const title = a.titleZh || a.label || a.name || `廣播 ${i+1}`;
+          const code = a.code || a.id || (i + 1);
+          return `
+            <button data-aidx="${i}" class="play-ann-btn w-full text-left px-3 py-2.5 ${rowBg} active:bg-blue-600 active:text-white flex items-center justify-between">
+              <span class="font-bold text-sm truncate">${code}. ${title}</span>
+              <span class="text-xs bg-blue-600 text-white px-2 py-0.5 rounded ml-2 shrink-0">播放</span>
+            </button>
+          `;
+        }).join('')}
+      </div>
+    `;
+    document.getElementById('annSearchInput').addEventListener('input', e => { state.broadcastQuery = e.target.value; renderMain(); });
+    document.querySelectorAll('.play-ann-btn').forEach(b => {
+      b.onclick = () => {
+        const item = list[Number(b.dataset.aidx)];
+        const zh = item.titleZh || item.label || '';
+        const en = item.titleEn || '';
+        showToast(`播放廣播：${zh}`);
+        speakAnnouncement(zh, en);
+      };
+    });
+  } else if (state.currentTab === 'message') {
+    vp.innerHTML = `
+      <div class="${bgBanner} px-3 py-2 font-bold text-sm shrink-0">控制中心訊息</div>
+      <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar p-2 space-y-2">
+        ${state.messages.map(m => `
+          <div data-mid="${m.id}" class="read-msg-card p-3 rounded border ${rowBg} cursor-pointer">
+            <div class="flex justify-between items-center text-xs font-bold mb-1">
+              <span class="text-blue-500">${m.title}</span>
+              <span class="opacity-60">${m.time}</span>
+            </div>
+            <div class="text-sm">${m.body}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    document.querySelectorAll('.read-msg-card').forEach(c => {
+      c.onclick = () => {
+        const m = state.messages.find(x => x.id === c.dataset.mid);
+        if (m) m.unread = false;
+        renderTabs();
+        showToast('已標記為已讀');
+      };
+    });
+  } else if (state.currentTab === 'incident') {
+    const items = ['交通意外', '車輛故障', '乘客不適', '道路阻塞 / 改道', '其他緊急事故'];
+    vp.innerHTML = `
+      <div class="bg-[#b91c1c] text-white px-3 py-2.5 text-center font-bold text-base shrink-0">
+        ${state.incidentActive ? `已啟動：${state.incidentLabel}` : '選擇事故項目'}
+      </div>
+      ${state.incidentActive ? `
+        <div class="p-4 flex-1 flex flex-col justify-between">
+          <div class="p-3 rounded bg-red-950/90 text-white text-sm space-y-2">
+            <div class="font-bold text-base">${state.incidentLabel}</div>
+            <div>車長請依照控制中心發出指示處理，並留意乘客安全。</div>
+          </div>
+          <button id="clearIncidentBtn" class="w-full py-3.5 rounded-lg bg-blue-600 text-white font-bold text-base">完成處理並恢復正常</button>
+        </div>
+      ` : `
+        <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar divide-y divide-slate-300">
+          ${items.map(label => `
+            <button data-inc="${label}" class="pick-inc-btn w-full text-left px-4 py-4 ${rowBg} font-bold text-lg active:bg-red-600 active:text-white">
+              ${label}
+            </button>
+          `).join('')}
+        </div>
+      `}
+    `;
+    if (document.getElementById('clearIncidentBtn')) {
+      document.getElementById('clearIncidentBtn').onclick = () => {
+        state.incidentActive = false;
+        state.incidentLabel = '';
+        renderAll();
+        showToast('已返回正常報站程序');
+      };
+    }
+    document.querySelectorAll('.pick-inc-btn').forEach(b => {
+      b.onclick = () => {
+        state.incidentLabel = b.dataset.inc;
+        state.incidentActive = true;
+        renderAll();
+        showToast(`事故通報：${state.incidentLabel}`);
+      };
+    });
+  } else if (state.currentTab === 'settings') {
+    vp.innerHTML = `
+      <div class="px-3 py-2 text-center font-bold text-base shrink-0">選項</div>
+      <div id="scrollList" class="flex-1 overflow-y-auto no-scrollbar px-2.5 pb-2">
+        <div class="grid grid-cols-3 gap-2">
+          <button id="tileTheme" class="h-16 rounded-lg bg-[#1d85d6] active:brightness-90 text-white p-1.5 flex flex-col items-center justify-center gap-1 text-center">
+            <span class="text-base">🌓</span>
+            <span class="text-[10px] font-bold leading-tight">${state.darkMode ? '切換日間模式' : '車長喜好設定'}</span>
+          </button>
+          <button id="tileDiag" class="h-16 rounded-lg bg-[#1877cb] active:brightness-90 text-white p-1.5 flex flex-col items-center justify-center gap-1 text-center">
+            <span class="text-base">📈</span>
+            <span class="text-[10px] font-bold leading-tight">診斷模式</span>
+          </button>
+          <button id="tileImport" class="h-16 rounded-lg bg-[#1159c4] active:brightness-90 text-white p-1.5 flex flex-col items-center justify-center gap-1 text-center">
+            <span class="text-base">📦</span>
+            <span class="text-[10px] font-bold leading-tight">匯入路線 ZIP</span>
+          </button>
+          <button id="tileTrain" class="h-16 rounded-lg bg-[#1d85d6] active:brightness-90 text-white p-1.5 flex flex-col items-center justify-center gap-1 text-center">
+            <span class="text-base">🎓</span>
+            <span class="text-[10px] font-bold leading-tight">訓練模式</span>
+          </button>
+          <button id="tileDriver" class="h-16 rounded-lg bg-[#1877cb] active:brightness-90 text-white p-1.5 flex flex-col items-center justify-center gap-1 text-center">
+            <span class="text-base">🪪</span>
+            <span class="text-[10px] font-bold leading-tight">輸入員工編號</span>
+          </button>
+          <button id="tileClever" class="h-16 rounded-lg bg-[#1159c4] active:brightness-90 text-white p-1.5 flex flex-col items-center justify-center gap-1 text-center">
+            <span class="text-base">🛡️</span>
+            <span class="text-[10px] font-bold leading-tight">智駕全城 (${state.cleverScore})</span>
+          </button>
+          <button id="tileCall" class="h-16 rounded-lg bg-[#8e96a0] active:brightness-90 text-white p-1.5 flex flex-col items-center justify-center gap-1 text-center">
+            <span class="text-base">🎧</span>
+            <span class="text-[10px] font-bold leading-tight">Call control center</span>
+          </button>
+        </div>
+      </div>
+    `;
+    document.getElementById('tileTheme').onclick = () => { state.darkMode = !state.darkMode; renderAll(); };
+    document.getElementById('tileDiag').onclick = () => showToast(`已載入 ${state.routes.length} 班次 / ${state.stopsByTrip.size} 路線表`);
+    document.getElementById('tileImport').onclick = () => document.getElementById('zipInput').click();
+    document.getElementById('tileTrain').onclick = () => { state.trainingMode = !state.trainingMode; renderAll(); };
+    document.getElementById('tileDriver').onclick = () => {
+      const no = prompt('請輸入車長員工編號：', state.driverNo || '54321');
+      if (no !== null) { state.driverNo = no.trim(); renderAll(); }
+    };
+    document.getElementById('tileClever').onclick = () => showToast(`智駕全城評分：${state.cleverScore} 分 (良好)`);
+    document.getElementById('tileCall').onclick = () => showToast('正在接通控制中心...');
+  }
+}
+
+function renderAll() {
+  renderTabs();
+  renderMain();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.onclick = () => {
+    state.currentTab = btn.dataset.tab;
+    renderAll();
+  };
+});
+
+document.getElementById('btnBack').onclick = () => {
+  if (state.currentTab === 'route') {
+    if (state.routeStage === 'stops') state.routeStage = 'start_stop';
+    else if (state.routeStage === 'start_stop') state.routeStage = 'pattern';
+    else if (state.routeStage === 'pattern') state.routeStage = 'route';
+    renderMain();
+  } else {
+    state.currentTab = 'route';
+    renderAll();
+  }
+};
+document.getElementById('btnUp').onclick = () => {
+  if (state.currentTab === 'route' && state.routeStage === 'stops' && state.currentStopIdx > 0) {
+    state.currentStopIdx--;
+    renderMain();
+    triggerStopAnnouncement(state.currentStopIdx);
+  } else {
+    const sc = document.getElementById('scrollList');
+    if (sc) sc.scrollBy({ top: -140, behavior: 'smooth' });
+  }
+};
+document.getElementById('btnDown').onclick = () => {
+  if (state.currentTab === 'route' && state.routeStage === 'stops' && state.currentStopIdx + 1 < state.tripStops.length) {
+    state.currentStopIdx++;
+    renderMain();
+    triggerStopAnnouncement(state.currentStopIdx);
+  } else {
+    const sc = document.getElementById('scrollList');
+    if (sc) sc.scrollBy({ top: 140, behavior: 'smooth' });
+  }
+};
+document.getElementById('btnAction').onclick = () => {
+  const inp = document.getElementById('routeSearchInput') || document.getElementById('annSearchInput');
+  if (inp) inp.focus();
+  else if (state.currentTab === 'route' && state.routeStage === 'stops') {
+    state.stopMode = state.stopMode === 'auto' ? 'manual' : 'auto';
+    renderAll();
+    showToast(state.stopMode === 'auto' ? '模式：自動' : '模式：手動');
+  }
+};
+
+document.getElementById('hwVolDown').onclick = () => {
+  state.volume = Math.max(0, +(state.volume - 0.15).toFixed(2));
+  showToast(`報站音量：${Math.round(state.volume * 100)}%`);
+};
+document.getElementById('hwVolUp').onclick = () => {
+  state.volume = Math.min(1, +(state.volume + 0.15).toFixed(2));
+  showToast(`報站音量：${Math.round(state.volume * 100)}%`);
+};
+document.getElementById('hwBrightDown').onclick = () => {
+  state.brightnessDim = Math.min(0.65, +(state.brightnessDim + 0.12).toFixed(2));
+  document.getElementById('brightnessMask').style.opacity = state.brightnessDim;
+  showToast(`螢幕亮度：${Math.round((1 - state.brightnessDim) * 100)}%`);
+};
+document.getElementById('hwBrightUp').onclick = () => {
+  state.brightnessDim = Math.max(0, +(state.brightnessDim - 0.12).toFixed(2));
+  document.getElementById('brightnessMask').style.opacity = state.brightnessDim;
+  showToast(`螢幕亮度：${Math.round((1 - state.brightnessDim) * 100)}%`);
+};
+
+document.getElementById('zipInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const zip = await JSZip.loadAsync(file);
+    let rJson = null, sJson = null, aJson = null;
+    for (const [name, entry] of Object.entries(zip.files)) {
+      if (name.endsWith('routes.json')) rJson = JSON.parse(await entry.async('string'));
+      if (name.endsWith('stops.json')) sJson = JSON.parse(await entry.async('string'));
+      if (name.endsWith('announcements.json')) aJson = JSON.parse(await entry.async('string'));
+    }
+    if (rJson && sJson) {
+      applyPackData(rJson, sJson, aJson || state.announcements);
+      showToast(`已成功匯入 ${file.name} (${rJson.length} 班次)`);
+    } else {
+      showToast('ZIP 內找不到 routes.json 或 stops.json');
+    }
+  } catch (err) {
+    showToast('匯入失敗：' + err.message);
+  }
+});
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+initData();
+startGpsWatcher();
+</script>
+</body>
+</html>

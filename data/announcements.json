@@ -1,0 +1,492 @@
+[
+  {
+    "audioFile": "audio/announcements/01.wav",
+    "code": 1,
+    "titleEn": "Special Announcement 1",
+    "titleSc": "特别信息 1",
+    "titleTc": "特別訊息 1",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/02.wav",
+    "code": 2,
+    "titleEn": "Special Announcement 2",
+    "titleSc": "特别信息 2",
+    "titleTc": "特別訊息 2",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/03.wav",
+    "code": 3,
+    "titleEn": "Special Announcement 3",
+    "titleSc": "特别信息 3",
+    "titleTc": "特別訊息 3",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/04.wav",
+    "code": 4,
+    "titleEn": "Special Announcement 4",
+    "titleSc": "特别信息 4",
+    "titleTc": "特別訊息 4",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/05.wav",
+    "code": 5,
+    "titleEn": "Special Announcement 5",
+    "titleSc": "特别信息 5",
+    "titleTc": "特別訊息 5",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/06.wav",
+    "code": 6,
+    "titleEn": "Special Announcement 6",
+    "titleSc": "特别信息 6",
+    "titleTc": "特別訊息 6",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/07.wav",
+    "code": 7,
+    "titleEn": "Special Announcement 7",
+    "titleSc": "特别信息 7",
+    "titleTc": "特別訊息 7",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/08.wav",
+    "code": 8,
+    "titleEn": "Special Announcement 8",
+    "titleSc": "特别信息 8",
+    "titleTc": "特別訊息 8",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/09.wav",
+    "code": 9,
+    "titleEn": "Special Announcement 9",
+    "titleSc": "特别信息 9",
+    "titleTc": "特別訊息 9",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/LECIP_test (9-5).wav",
+    "code": 9,
+    "titleEn": "Special Announcement 9 LECIP test ( )",
+    "titleSc": "特别信息 9 LECIP test ( )",
+    "titleTc": "特別訊息 9 LECIP test ( )",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/10.wav",
+    "code": 10,
+    "titleEn": "Special Announcement 10",
+    "titleSc": "特别信息 10",
+    "titleTc": "特別訊息 10",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/11.wav",
+    "code": 11,
+    "titleEn": "Special Announcement 11",
+    "titleSc": "特别信息 11",
+    "titleTc": "特別訊息 11",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/12.wav",
+    "code": 12,
+    "titleEn": "Special Announcement 12",
+    "titleSc": "特别信息 12",
+    "titleTc": "特別訊息 12",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/13.wav",
+    "code": 13,
+    "titleEn": "Special Announcement 13",
+    "titleSc": "特别信息 13",
+    "titleTc": "特別訊息 13",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/14.wav",
+    "code": 14,
+    "titleEn": "Special Announcement 14",
+    "titleSc": "特别信息 14",
+    "titleTc": "特別訊息 14",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/15.wav",
+    "code": 15,
+    "titleEn": "Special Announcement 15",
+    "titleSc": "特别信息 15",
+    "titleTc": "特別訊息 15",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/16.wav",
+    "code": 16,
+    "titleEn": "Special Announcement 16",
+    "titleSc": "特别信息 16",
+    "titleTc": "特別訊息 16",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/17.wav",
+    "code": 17,
+    "titleEn": "Special Announcement 17",
+    "titleSc": "特别信息 17",
+    "titleTc": "特別訊息 17",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/18.wav",
+    "code": 18,
+    "titleEn": "Special Announcement 18",
+    "titleSc": "特别信息 18",
+    "titleTc": "特別訊息 18",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/19.wav",
+    "code": 19,
+    "titleEn": "Special Announcement 19",
+    "titleSc": "特别信息 19",
+    "titleTc": "特別訊息 19",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/20.wav",
+    "code": 20,
+    "titleEn": "Special Announcement 20",
+    "titleSc": "特别信息 20",
+    "titleTc": "特別訊息 20",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/21.wav",
+    "code": 21,
+    "titleEn": "Special Announcement 21",
+    "titleSc": "特别信息 21",
+    "titleTc": "特別訊息 21",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/22.wav",
+    "code": 22,
+    "titleEn": "Special Announcement 22",
+    "titleSc": "特别信息 22",
+    "titleTc": "特別訊息 22",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/23.wav",
+    "code": 23,
+    "titleEn": "Special Announcement 23",
+    "titleSc": "特别信息 23",
+    "titleTc": "特別訊息 23",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/24.wav",
+    "code": 24,
+    "titleEn": "Special Announcement 24",
+    "titleSc": "特别信息 24",
+    "titleTc": "特別訊息 24",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/25.wav",
+    "code": 25,
+    "titleEn": "Special Announcement 25",
+    "titleSc": "特别信息 25",
+    "titleTc": "特別訊息 25",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/26.wav",
+    "code": 26,
+    "titleEn": "Special Announcement 26",
+    "titleSc": "特别信息 26",
+    "titleTc": "特別訊息 26",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/27.wav",
+    "code": 27,
+    "titleEn": "Special Announcement 27",
+    "titleSc": "特别信息 27",
+    "titleTc": "特別訊息 27",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/28.wav",
+    "code": 28,
+    "titleEn": "Special Announcement 28",
+    "titleSc": "特别信息 28",
+    "titleTc": "特別訊息 28",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/29.wav",
+    "code": 29,
+    "titleEn": "Special Announcement 29",
+    "titleSc": "特别信息 29",
+    "titleTc": "特別訊息 29",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/30.wav",
+    "code": 30,
+    "titleEn": "Special Announcement 30",
+    "titleSc": "特别信息 30",
+    "titleTc": "特別訊息 30",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/31.wav",
+    "code": 31,
+    "titleEn": "Special Announcement 31",
+    "titleSc": "特别信息 31",
+    "titleTc": "特別訊息 31",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/32.wav",
+    "code": 32,
+    "titleEn": "Special Announcement 32",
+    "titleSc": "特别信息 32",
+    "titleTc": "特別訊息 32",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/33.wav",
+    "code": 33,
+    "titleEn": "Special Announcement 33",
+    "titleSc": "特别信息 33",
+    "titleTc": "特別訊息 33",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/34.wav",
+    "code": 34,
+    "titleEn": "Special Announcement 34",
+    "titleSc": "特别信息 34",
+    "titleTc": "特別訊息 34",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/36.wav",
+    "code": 36,
+    "titleEn": "Special Announcement 36",
+    "titleSc": "特别信息 36",
+    "titleTc": "特別訊息 36",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/37.wav",
+    "code": 37,
+    "titleEn": "Special Announcement 37",
+    "titleSc": "特别信息 37",
+    "titleTc": "特別訊息 37",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/38.wav",
+    "code": 38,
+    "titleEn": "Special Announcement 38",
+    "titleSc": "特别信息 38",
+    "titleTc": "特別訊息 38",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/39.wav",
+    "code": 39,
+    "titleEn": "Special Announcement 39",
+    "titleSc": "特别信息 39",
+    "titleTc": "特別訊息 39",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/40.wav",
+    "code": 40,
+    "titleEn": "Special Announcement 40",
+    "titleSc": "特别信息 40",
+    "titleTc": "特別訊息 40",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/41.wav",
+    "code": 41,
+    "titleEn": "Special Announcement 41",
+    "titleSc": "特别信息 41",
+    "titleTc": "特別訊息 41",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/42.wav",
+    "code": 42,
+    "titleEn": "Special Announcement 42",
+    "titleSc": "特别信息 42",
+    "titleTc": "特別訊息 42",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/43.wav",
+    "code": 43,
+    "titleEn": "Special Announcement 43",
+    "titleSc": "特别信息 43",
+    "titleTc": "特別訊息 43",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/44.wav",
+    "code": 44,
+    "titleEn": "Special Announcement 44",
+    "titleSc": "特别信息 44",
+    "titleTc": "特別訊息 44",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/45.wav",
+    "code": 45,
+    "titleEn": "Special Announcement 45",
+    "titleSc": "特别信息 45",
+    "titleTc": "特別訊息 45",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/49.wav",
+    "code": 49,
+    "titleEn": "Special Announcement 49",
+    "titleSc": "特别信息 49",
+    "titleTc": "特別訊息 49",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/LECIP_50_speed.wav",
+    "code": 50,
+    "titleEn": "Special Announcement 50 LECIP speed",
+    "titleSc": "特别信息 50 LECIP speed",
+    "titleTc": "特別訊息 50 LECIP speed",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/51.wav",
+    "code": 51,
+    "titleEn": "Special Announcement 51",
+    "titleSc": "特别信息 51",
+    "titleTc": "特別訊息 51",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  },
+  {
+    "audioFile": "audio/announcements/52.wav",
+    "code": 52,
+    "titleEn": "Special Announcement 52",
+    "titleSc": "特别信息 52",
+    "titleTc": "特別訊息 52",
+    "ttsEn": "",
+    "ttsSc": "",
+    "ttsTc": ""
+  }
+]
