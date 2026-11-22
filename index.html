@@ -223,6 +223,7 @@
             <button id="btnCloseMore" class="px-2 py-0.5 rounded bg-zinc-700 text-xs font-bold">關閉</button>
           </div>
           <button id="moreReplayAudio" class="w-full py-2.5 rounded-lg bg-emerald-600 font-black text-sm">重播當前站報站</button>
+          <button id="morePrevStop" class="w-full py-2.5 rounded-lg bg-zinc-600 font-black text-sm">返回上一站</button>
           <button id="moreToggleGps" class="w-full py-2.5 rounded-lg bg-[#0068FF] font-black text-sm">切換 手動模式 / GPS 自動</button>
           <button id="moreToggleTheme" class="w-full py-2.5 rounded-lg bg-amber-600 font-black text-sm">車長喜好設定（日夜模式／DCP 測試）</button>
           <button id="moreOpenCD" class="w-full py-2.5 rounded-lg bg-teal-600 font-black text-sm">查看 智駕全城 狀態</button>
@@ -395,6 +396,7 @@ const state = {
   selectedTripSeq: 1,
   tripStops: [],
   currentStopIdx: 0,
+  stopsPage: 0,
   lastAnnouncedKey: '',
 
   dismissedPopup: false,
@@ -1370,6 +1372,8 @@ function startGpsTracking() {
 
             if (standardLeave || offsetLeave || alreadyAtNext) {
               state.currentStopIdx = curIdx + 1;
+              state.stopsPage = 0;
+              state.etaMap = {};
               state.gpsArrivedCur = alreadyAtNext;
               state.gpsMinDistToCur = alreadyAtNext ? distNext : Infinity;
               state.gpsDistanceM = hasNextCoord ? distNext : null;
@@ -2309,6 +2313,8 @@ function renderStartStopList(vp, bar) {
 
   const enterStops = startIdx => {
     state.currentStopIdx = startIdx;
+    state.stopsPage = 0;
+    state.etaMap = {};
     state.stopProgressPct = 20;
     state.gpsDistanceM = null;
     state.gpsArrivedCur = false;
@@ -2358,7 +2364,7 @@ function estimateFallbackEtas(curIdx) {
   }
 
   let cumSec = 0;
-  const maxIdx = Math.min(stops.length - 1, curIdx + 6);
+  const maxIdx = Math.min(stops.length - 1, curIdx + Math.max(3, (state.stopsPage + 1) * 3));
   for (let i = curIdx; i <= maxIdx; i++) {
     const lat = getStopLat(stops[i]);
     const lng = getStopLng(stops[i]);
@@ -2414,7 +2420,7 @@ async function refreshRouteEtas(force = false) {
 
   const now = Date.now();
   const hasLiveGps = state.gpsEnabled && Number.isFinite(state.gpsLat) && Number.isFinite(state.gpsLng);
-  const fetchKey = `${state.selectedTrip?.routeId || ''}|${state.selectedTrip?.bound || ''}|${curIdx}|${hasLiveGps ? 'gps' : 'sim'}`;
+  const fetchKey = `${state.selectedTrip?.routeId || ''}|${state.selectedTrip?.bound || ''}|${curIdx}|p${state.stopsPage}|${hasLiveGps ? 'gps' : 'sim'}`;
 
   if (!force && state.etaLastFetchKey === fetchKey) {
     const elapsed = now - state.etaLastFetchMs;
@@ -2515,6 +2521,12 @@ function renderStopsView(vp, bar) {
     return;
   }
 
+  const UPCOMING_PER_PAGE = 3; // 連同正在前往的車站，每頁同時最多顯示 4 個車站
+  const remainingTotal = Math.max(0, state.tripStops.length - 1 - state.currentStopIdx);
+  const totalStopPages = Math.max(1, Math.ceil(remainingTotal / UPCOMING_PER_PAGE));
+  if (state.stopsPage >= totalStopPages) state.stopsPage = totalStopPages - 1;
+  if (state.stopsPage < 0) state.stopsPage = 0;
+
   if (state.gpsEnabled) estimateFallbackEtas(state.currentStopIdx);
   const curEta = state.etaMap[state.currentStopIdx] || { mins: 1, distM: state.gpsDistanceM ?? 0 };
   const sections = computeTripSections(state.tripStops, state.selectedTrip);
@@ -2522,7 +2534,12 @@ function renderStopsView(vp, bar) {
   const trip = state.selectedTrip || {};
   const dest = state.lang === 'en' ? (getDestEn(trip) || getDestTc(trip)) : (getDestTc(trip) || getDestEn(trip));
   const remark = getRealTripRemark(trip) || (state.lang === 'en' ? 'Normal Route' : '正常路線');
-  const upcoming = state.tripStops.slice(state.currentStopIdx + 1, state.currentStopIdx + 6);
+
+  const startOffset = state.stopsPage * UPCOMING_PER_PAGE;
+  const upcoming = state.tripStops.slice(
+    state.currentStopIdx + 1 + startOffset,
+    state.currentStopIdx + 1 + startOffset + UPCOMING_PER_PAGE
+  );
   const curName = state.lang === 'en' ? (getStopNameEn(cur) || getStopNameTc(cur)) : getStopNameTc(cur);
   const curSub = getStopSub(cur);
 
@@ -2535,7 +2552,7 @@ function renderStopsView(vp, bar) {
   const curDistText = formatDistanceLabel(curEta.distM);
 
   vp.innerHTML = `
-    <!-- 路線與分段標頭（實機排版：A21-機場-1 / 正常路線 + 右側「分段 / 數字」） -->
+    <!-- 路線與分段標頭 -->
     <div class="px-3.5 py-2 ${headerBg} flex items-stretch justify-between gap-2 shrink-0">
       <div class="min-w-0 flex flex-col justify-center">
         <div class="text-[20px] font-black tracking-tight leading-snug truncate">${esc(state.selectedRouteNo)}-${esc(dest || '終點')}-${esc(state.selectedTripSeq || 1)}</div>
@@ -2547,7 +2564,7 @@ function renderStopsView(vp, bar) {
       </div>
     </div>
 
-    <!-- 當前車站卡片（自動模式：時鐘＋分鐘、距離＋巴士站牌圖示、綠色進度條；手動模式：停止／下一站） -->
+    <!-- 正在前往的車站（第 1 站位） -->
     <div class="px-3.5 py-3 ${curPanelCls} shrink-0">
       <button id="btnReplayCurrent" class="w-full text-left active:opacity-80">
         <div class="text-[23px] font-black leading-snug">${state.currentStopIdx + 1}. ${esc(curName)}</div>
@@ -2565,7 +2582,6 @@ function renderStopsView(vp, bar) {
         </div>
       ` : `
         <div class="mt-3 space-y-1.5">
-          <!-- 進度條上方：時鐘 icon + 分鐘 ｜ 巴士站距離 + 巴士站牌 icon -->
           <div class="flex items-center justify-end gap-5 text-[15px] font-extrabold ${th.dark ? 'text-zinc-200' : 'text-[#2b303a]'}">
             <div class="flex items-center gap-1.5">
               <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2587,7 +2603,6 @@ function renderStopsView(vp, bar) {
             </div>
           </div>
 
-          <!-- 實機圓角綠色進度條 -->
           <div class="w-full h-[26px] rounded-full bg-[#454b54] overflow-hidden shadow-inner">
             <div id="stopProgressFill" class="h-full bg-[#00a846] transition-all duration-300" style="width:${Math.max(12, state.stopProgressPct)}%"></div>
           </div>
@@ -2595,17 +2610,17 @@ function renderStopsView(vp, bar) {
       `}
     </div>
 
-    <!-- 後續站位列表（右側顯示實機疊排 ETA 分鐘） -->
-    <div class="flex-1 overflow-y-auto no-scrollbar">
+    <!-- 後續站位列表（每頁最多顯示 3 個，連同上方共 4 站；不足 3 站時下方留白） -->
+    <div class="flex-1 flex flex-col overflow-hidden">
       ${upcoming.length === 0 ? `
         <div class="px-4 py-6 text-center text-sm font-black ${th.dark ? 'text-amber-400' : 'text-zinc-800'}">已到達本班次終點站</div>
       ` : upcoming.map((st, offset) => {
-        const targetIdx = state.currentStopIdx + 1 + offset;
+        const targetIdx = state.currentStopIdx + 1 + startOffset + offset;
         const nm = state.lang === 'en' ? (getStopNameEn(st) || getStopNameTc(st)) : getStopNameTc(st);
         const sInfo = sections[targetIdx] || {};
-        const uEta = state.etaMap[targetIdx] || { mins: Math.max(2, (offset + 1) * 3) };
+        const uEta = state.etaMap[targetIdx] || { mins: Math.max(2, (startOffset + offset + 1) * 3) };
         return `
-          <button data-jump="${targetIdx}" class="jump-stop-btn w-full px-3.5 py-3 text-left border-b ${upRowCls} flex items-center justify-between gap-2">
+          <button data-jump="${targetIdx}" class="jump-stop-btn w-full h-1/3 px-3.5 text-left border-b ${upRowCls} flex items-center justify-between gap-2 shrink-0">
             <div class="min-w-0 flex items-center gap-2">
               <span class="text-[20px] font-bold truncate">${targetIdx + 1}. ${esc(nm)}</span>
               ${sInfo.badgeFare != null ? `<span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black shrink-0">${esc(fmtFare(sInfo.badgeFare))}</span>` : ''}
@@ -2622,19 +2637,25 @@ function renderStopsView(vp, bar) {
     </div>
   `;
 
-  const canPrev = state.currentStopIdx > 0;
-  const canNext = state.currentStopIdx < state.tripStops.length - 1;
+  const canPrev = state.stopsPage > 0;
+  const canNext = state.stopsPage < totalStopPages - 1;
   bar.className = 'grid grid-cols-4 gap-1.5 p-1.5 bg-[#0d1118] border-t border-zinc-800 shrink-0';
   bar.innerHTML = `
     <button id="botBack" class="h-11 rounded-lg bg-[#e53935] text-white font-black text-2xl flex items-center justify-center active:brightness-90">‹</button>
-    <button id="botPrev" class="h-11 rounded-lg ${canPrev ? 'bg-[#0074f0] text-white' : 'bg-[#5a6069] text-zinc-200'} font-black text-2xl flex items-center justify-center active:brightness-90">↑</button>
-    <button id="botNext" class="h-11 rounded-lg ${canNext ? 'bg-[#0074f0] text-white' : 'bg-[#5a6069] text-zinc-200'} font-black text-2xl flex items-center justify-center active:brightness-90">↓</button>
+    <button id="botPrev" class="h-11 rounded-lg ${canPrev ? 'bg-[#0074f0] text-white active:brightness-90' : 'bg-[#5a6069] text-zinc-200'}" ${canPrev ? '' : 'disabled'}>↑</button>
+    <button id="botNext" class="h-11 rounded-lg ${canNext ? 'bg-[#0074f0] text-white active:brightness-90' : 'bg-[#5a6069] text-zinc-200'}" ${canNext ? '' : 'disabled'}>↓</button>
     <button id="botMore" class="h-11 rounded-lg bg-[#0074f0] text-white font-black text-xl flex items-center justify-center active:brightness-90">•••</button>
   `;
+  // 確保箭咀字體置中且粗體
+  const bPrev = document.getElementById('botPrev');
+  const bNext = document.getElementById('botNext');
+  if (bPrev) bPrev.className += ' font-black text-2xl flex items-center justify-center';
+  if (bNext) bNext.className += ' font-black text-2xl flex items-center justify-center';
 
   const advanceStop = () => {
     if (state.currentStopIdx < state.tripStops.length - 1) {
       state.currentStopIdx++;
+      state.stopsPage = 0;
       state.stopProgressPct = 20;
       state.gpsDistanceM = null;
       state.gpsArrivedCur = false;
@@ -2644,18 +2665,6 @@ function renderStopsView(vp, bar) {
       triggerStopAnnouncement(state.currentStopIdx, true);
     } else {
       showToast('已到達終點站');
-    }
-  };
-  const prevStop = () => {
-    if (state.currentStopIdx > 0) {
-      state.currentStopIdx--;
-      state.stopProgressPct = 20;
-      state.gpsDistanceM = null;
-      state.gpsArrivedCur = false;
-      state.gpsMinDistToCur = Infinity;
-      state.etaMap = {};
-      renderAll();
-      triggerStopAnnouncement(state.currentStopIdx, true);
     }
   };
 
@@ -2674,6 +2683,7 @@ function renderStopsView(vp, bar) {
     btnStop.onclick = () => {
       stopAllAudio();
       stopGpsTracking();
+      state.stopsPage = 0;
       state.routeStage = 'start_stop';
       renderAll();
       showToast('已停止報站');
@@ -2685,6 +2695,7 @@ function renderStopsView(vp, bar) {
   vp.querySelectorAll('.jump-stop-btn').forEach(btn => {
     btn.onclick = () => {
       state.currentStopIdx = Number(btn.dataset.jump);
+      state.stopsPage = 0;
       state.stopProgressPct = 20;
       state.gpsDistanceM = null;
       state.gpsArrivedCur = false;
@@ -2698,15 +2709,15 @@ function renderStopsView(vp, bar) {
   document.getElementById('botBack').onclick = () => {
     stopAllAudio();
     stopGpsTracking();
+    state.stopsPage = 0;
     state.routeStage = 'start_stop';
     renderAll();
   };
-  document.getElementById('botPrev').onclick = prevStop;
-  document.getElementById('botNext').onclick = advanceStop;
+  if (bPrev) bPrev.onclick = () => { if (canPrev) { state.stopsPage--; renderMain(); } };
+  if (bNext) bNext.onclick = () => { if (canNext) { state.stopsPage++; renderMain(); } };
   document.getElementById('botMore').onclick = () => document.getElementById('moreModal').classList.remove('hidden');
 
-  // 僅於 GPS 自動模式向 OSRM 地圖 API 查詢實際道路距離與預計分鐘
-  if (state.gpsEnabled) refreshRouteEtas(true);
+  if (state.gpsEnabled) refreshRouteEtas(false);
 }
 
 // ============ 特別廣播分頁（實機螢光綠 ▶ / 紅 ■ ＋ 內嵌 2×5 鍵盤 3 秒自動播） ============
@@ -3252,7 +3263,7 @@ function renderSettingsView(vp, bar) {
       <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">診斷模式</div>
       <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5 text-xs">
         <div class="p-3 rounded-xl border ${th.card} space-y-1.5">
-          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v51)</div>
+          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v52)</div>
           <div>App Version：<b>23.06.25</b> ｜ Config：<b>ctb_prod_v10</b></div>
           <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
           <div>站點資料庫：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
@@ -3672,6 +3683,23 @@ function bindGlobalEvents() {
   const closeMore = () => document.getElementById('moreModal').classList.add('hidden');
   document.getElementById('btnCloseMore').onclick = closeMore;
   document.getElementById('moreReplayAudio').onclick = () => { closeMore(); triggerStopAnnouncement(state.currentStopIdx, true); };
+  const _morePrev = document.getElementById('morePrevStop');
+  if (_morePrev) _morePrev.onclick = () => {
+    closeMore();
+    if (state.routeStage === 'stops' && state.currentStopIdx > 0) {
+      state.currentStopIdx--;
+      state.stopsPage = 0;
+      state.stopProgressPct = 20;
+      state.gpsDistanceM = null;
+      state.gpsArrivedCur = false;
+      state.gpsMinDistToCur = Infinity;
+      state.etaMap = {};
+      renderAll();
+      triggerStopAnnouncement(state.currentStopIdx, true);
+    } else {
+      showToast('已位於第 1 站');
+    }
+  };
   document.getElementById('moreToggleGps').onclick = () => { closeMore(); toggleGpsMode(); };
   document.getElementById('moreToggleTheme').onclick = () => {
     closeMore();
