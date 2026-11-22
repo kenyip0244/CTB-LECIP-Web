@@ -247,6 +247,64 @@ function lookupLocName(code) {
   return hit ? hit.nameTc : c;
 }
 
+const AUDIO_CDN_BASE = 'https://kenyip0244.github.io/CTB-LECIP-Audio';
+let currentAudioPlayer = null;
+
+function playAudioSequence(urls, fallbackZh, fallbackEn) {
+  if (currentAudioPlayer) {
+    currentAudioPlayer.pause();
+    currentAudioPlayer = null;
+  }
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+  const validUrls = (urls || []).filter(Boolean).map(u => {
+    const clean = String(u).replace(/^\/+/, '').replace(/\.wav$/i, '.mp3');
+    return ${AUDIO_CDN_BASE}/;
+  });
+
+  if (validUrls.length === 0) {
+    speakTtsFallback(fallbackZh, fallbackEn);
+    return;
+  }
+
+  let idx = 0;
+  const playNext = () => {
+    if (idx >= validUrls.length) return;
+    const audio = new Audio(validUrls[idx]);
+    audio.volume = state.volume;
+    currentAudioPlayer = audio;
+    audio.onended = () => { idx++; playNext(); };
+    audio.onerror = () => {
+      if (idx === 0) speakTtsFallback(fallbackZh, fallbackEn);
+    };
+    audio.play().catch(() => speakTtsFallback(fallbackZh, fallbackEn));
+  };
+  playNext();
+}
+
+function speakTtsFallback(zhText, enText) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  if (zhText) {
+    const uZh = new SpeechSynthesisUtterance(zhText);
+    uZh.lang = 'zh-HK';
+    uZh.volume = state.volume;
+    uZh.rate = 1.02;
+    window.speechSynthesis.speak(uZh);
+  }
+  if (enText) {
+    const uEn = new SpeechSynthesisUtterance(enText);
+    uEn.lang = 'en-GB';
+    uEn.volume = state.volume;
+    uEn.rate = 0.98;
+    window.speechSynthesis.speak(uEn);
+  }
+}
+
+function speakAnnouncement(zhText, enText, audioFiles = []) {
+  playAudioSequence(audioFiles, zhText, enText);
+}
+
 function showToast(msg) {
   const el = document.getElementById('toastBox');
   el.textContent = msg;
@@ -895,7 +953,7 @@ function renderMain() {
         const zh = item.ttsTc || item.titleTc || '';
         const en = item.ttsEn || item.titleEn || '';
         showToast(`播放：${item.titleTc || zh}`);
-        speakAnnouncement(zh, en);
+        playAudioSequence([item.audioFile], zh, en);
       };
     });
 
@@ -1491,6 +1549,7 @@ startGpsWatcher();
 </script>
 </body>
 </html>
+
 
 
 
