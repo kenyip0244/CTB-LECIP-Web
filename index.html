@@ -300,6 +300,19 @@ function showToast(msg) {
 }
 
 // ============ 資料欄位相容解析工具 ============
+function cleanJointName(raw) {
+  const s = String(raw || '').trim();
+  if (!s || !s.includes('/')) return s;
+  const parts = s.split(/\s*\/\s*/).map(p => p.trim()).filter(Boolean);
+  if (parts.length !== 2) return s;
+  const [p1, p2] = parts;
+  if (/^(G|UG|LG|M|B\d?|\d+)$/i.test(p1) && /^F$/i.test(p2)) return s;
+  if (p1.length <= 1 || p2.length <= 1) return s;
+  const norm = x => x.toLowerCase().replace(/[\s\-\(\)（）]/g, '');
+  if (norm(p1) === norm(p2)) return p2;
+  if (/\/\s+/.test(s) || (p1 === p1.toUpperCase() && p2 !== p2.toUpperCase())) return p2;
+  return s;
+}
 function getRouteNo(r) {
   return String(r?.routeNo || r?.route || r?.lineNo || String(r?.routeId || '').replace(/^CTB-/i, '') || '').trim().toUpperCase();
 }
@@ -307,25 +320,25 @@ function getBound(r) {
   return String(r?.bound || r?.dir || r?.direction || 'O').trim().toUpperCase();
 }
 function getOrigTc(r) {
-  return String(r?.origTc || r?.originTc || r?.fromTc || r?.orig_tc || r?.startTc || r?.orig || r?.origin || '').trim();
+  return cleanJointName(r?.origTc || r?.originTc || r?.fromTc || r?.orig_tc || r?.startTc || r?.orig || r?.origin || '');
 }
 function getDestTc(r) {
-  return String(r?.destTc || r?.destinationTc || r?.toTc || r?.dest_tc || r?.endTc || r?.dest || r?.destination || '').trim();
+  return cleanJointName(r?.destTc || r?.destinationTc || r?.toTc || r?.dest_tc || r?.endTc || r?.dest || r?.destination || '');
 }
 function getOrigEn(r) {
-  return String(r?.origEn || r?.originEn || r?.fromEn || r?.orig_en || r?.startEn || '').trim();
+  return cleanJointName(r?.origEn || r?.originEn || r?.fromEn || r?.orig_en || r?.startEn || '');
 }
 function getDestEn(r) {
-  return String(r?.destEn || r?.destinationEn || r?.toEn || r?.dest_en || r?.endEn || '').trim();
+  return cleanJointName(r?.destEn || r?.destinationEn || r?.toEn || r?.dest_en || r?.endEn || '');
 }
 function getDestGroupKey(r) {
   return getDestTc(r) || getDestEn(r) || getBound(r);
 }
 function getTripDesc(r) {
   if (state.lang === 'en') {
-    return String(r?.descEn || r?.remarksEn || r?.patternDescEn || r?.serviceTypeNameEn || r?.viaEn || r?.remarkEn || '').trim();
+    return cleanJointName(r?.descEn || r?.remarksEn || r?.patternDescEn || r?.serviceTypeNameEn || r?.viaEn || r?.remarkEn || '');
   }
-  return String(r?.descTc || r?.remarksTc || r?.patternDescTc || r?.serviceTypeNameTc || r?.viaTc || r?.remarkTc || r?.remark || '').trim();
+  return cleanJointName(r?.descTc || r?.remarksTc || r?.patternDescTc || r?.serviceTypeNameTc || r?.viaTc || r?.remarkTc || r?.remark || '');
 }
 function formatTripSubtitle(r, fallbackSeq) {
   const raw = getTripDesc(r);
@@ -343,14 +356,14 @@ function getTripFare(r) {
   return Number.isFinite(n) ? `$${n.toFixed(1)}` : String(f);
 }
 function getStopNameTc(s) {
-  return String(s?.nameTc || s?.stopNameTc || s?.name_tc || s?.tc || s?.name || '未命名車站').trim();
+  return cleanJointName(s?.nameTc || s?.stopNameTc || s?.name_tc || s?.tc || s?.name || '未命名車站');
 }
 function getStopNameEn(s) {
-  return String(s?.nameEn || s?.stopNameEn || s?.name_en || s?.en || '').trim();
+  return cleanJointName(s?.nameEn || s?.stopNameEn || s?.name_en || s?.en || '');
 }
 function getStopSub(s) {
   if (state.lang === 'en') return getStopNameTc(s);
-  return String(s?.roadTc || s?.locationTc || s?.subTc || getStopNameEn(s) || '').trim();
+  return cleanJointName(s?.roadTc || s?.locationTc || s?.subTc || getStopNameEn(s) || '');
 }
 function getStopLat(s) {
   return Number(s?.lat ?? s?.latitude ?? s?.y);
@@ -440,10 +453,12 @@ function speakTtsFallback(tcText, enText) {
 function playAudioSequence(relPaths, fallbackTc, fallbackEn) {
   stopAllAudio();
   const seqToken = audioPlaySeqId;
-  const urls = (relPaths || [])
-    .filter(Boolean)
-    .map(p => buildAudioUrl(resolveManifestPath(p)))
-    .filter(Boolean);
+  const urls = Array.from(new Set(
+    (relPaths || [])
+      .filter(Boolean)
+      .map(p => buildAudioUrl(resolveManifestPath(p)))
+      .filter(Boolean)
+  ));
 
   if (urls.length === 0) {
     speakTtsFallback(fallbackTc, fallbackEn);
@@ -463,13 +478,17 @@ function playAudioSequence(relPaths, fallbackTc, fallbackEn) {
     const audio = new Audio(url);
     audio.volume = state.volume;
     currentAudio = audio;
-    audio.onended = () => next();
-    audio.onerror = () => next();
+    let settled = false;
+    const advance = () => {
+      if (settled || seqToken !== audioPlaySeqId) return;
+      settled = true;
+      next();
+    };
+    audio.onended = advance;
+    audio.onerror = advance;
     audio.play().then(() => {
       playedAny = true;
-    }).catch(() => {
-      next();
-    });
+    }).catch(advance);
   };
   next();
 }
@@ -948,6 +967,7 @@ function renderTripList(vp, bar) {
   document.getElementById('botPrev').onclick = () => { if (canPrev) { state.pageOffset--; renderAll(); } };
   document.getElementById('botNext').onclick = () => { if (canNext) { state.pageOffset++; renderAll(); } };
 }
+
 function renderStartStopList(vp, bar) {
   vp.className = 'flex-1 flex flex-col overflow-hidden bg-white text-black';
   const totalPages = Math.max(1, Math.ceil(state.tripStops.length / PAGE_SIZE));
