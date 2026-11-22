@@ -546,123 +546,192 @@ function buildGoogleTtsUrl(text, tl) {
   return `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${encodeURIComponent(tl)}&q=${encodeURIComponent(q)}`;
 }
 
-function speakWebSpeechFallback(tcText, enText, scText) {
-  if (!('speechSynthesis' in window)) return;
-  try {
-    window.speechSynthesis.cancel();
-    const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
-    const pickGoogleVoice = (langPrefix) =>
-      voices.find(v => /google/i.test(v.name) && v.lang.toLowerCase().startsWith(langPrefix)) ||
-      voices.find(v => v.lang.toLowerCase().startsWith(langPrefix)) ||
-      null;
-
-    const items = [];
-    if (tcText) items.push({ text: tcText, lang: 'zh-HK', voice: pickGoogleVoice('zh-hk') || pickGoogleVoice('yue') });
-    if (enText) items.push({ text: enText, lang: 'en-GB', voice: pickGoogleVoice('en-gb') || pickGoogleVoice('en') });
-    if (scText) items.push({ text: scText, lang: 'zh-CN', voice: pickGoogleVoice('zh-cn') });
-
-    for (const it of items) {
-      const u = new SpeechSynthesisUtterance(it.text);
-      u.lang = it.lang;
-      if (it.voice) u.voice = it.voice;
-      u.volume = state.volume;
-      window.speechSynthesis.speak(u);
-    }
-  } catch (_) {}
-}
-
-// 優先使用 Google Translate TTS（粵語 yue -> 英語 en -> 普通話 zh-CN），若離線則自動降級至 Web Speech Google 聲線
-function speakGoogleTts(tcText, enText, scText, seqToken) {
-  const ttsUrls = [];
-  if (tcText) ttsUrls.push(buildGoogleTtsUrl(tcText, 'yue'));
-  if (enText) ttsUrls.push(buildGoogleTtsUrl(enText, 'en'));
-  if (scText) ttsUrls.push(buildGoogleTtsUrl(scText, 'zh-CN'));
-  const cleanUrls = ttsUrls.filter(Boolean);
-  if (cleanUrls.length === 0) return;
-
-  let idx = 0;
-  let playedAny = false;
-  const playClip = () => {
-    if (seqToken !== audioPlaySeqId) return;
-    if (idx >= cleanUrls.length) {
-      if (!playedAny) speakWebSpeechFallback(tcText, enText, scText);
+function playUrlListAsync(urls, seqToken) {
+  return new Promise(resolve => {
+    if (!urls || urls.length === 0 || seqToken !== audioPlaySeqId) {
+      resolve(false);
       return;
     }
-    const url = cleanUrls[idx++];
-    const audio = new Audio(url);
-    audio.volume = state.volume;
-    currentAudio = audio;
-    let settled = false;
-    const advance = () => {
-      if (settled || seqToken !== audioPlaySeqId) return;
-      settled = true;
-      playClip();
+    let playedAny = false;
+    let idx = 0;
+    const next = () => {
+      if (seqToken !== audioPlaySeqId || idx >= urls.length) {
+        resolve(playedAny);
+        return;
+      }
+      const url = urls[idx++];
+      const audio = new Audio(url);
+      audio.volume = state.volume;
+      currentAudio = audio;
+      let settled = false;
+      const advance = () => {
+        if (settled) return;
+        settled = true;
+        next();
+      };
+      audio.onended = advance;
+      audio.onerror = advance;
+      audio.play().then(() => { playedAny = true; }).catch(advance);
     };
-    audio.onended = advance;
-    audio.onerror = advance;
-    audio.play().then(() => { playedAny = true; }).catch(advance);
-  };
-  playClip();
+    next();
+  });
 }
 
-function playAudioSequence(relPaths, fallbackTc, fallbackEn, fallbackSc = '') {
-  stopAllAudio();
-  const seqToken = audioPlaySeqId;
+function speakWebSpeechAsync(tcText, enText, scText, seqToken) {
+  return new Promise(resolve => {
+    if (!('speechSynthesis' in window) || seqToken !== audioPlaySeqId) {
+      resolve();
+      return;
+    }
+    try {
+      window.speechSynthesis.cancel();
+      const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+      const pickGoogleVoice = (langPrefix) =>
+        voices.find(v => /google/i.test(v.name) && v.lang.toLowerCase().startsWith(langPrefix)) ||
+        voices.find(v => v.lang.toLowerCase().startsWith(langPrefix)) ||
+        null;
+
+      const items = [];
+      if (tcText) items.push({ text: tcText, lang: 'zh-HK', voice: pickGoogleVoice('zh-hk') || pickGoogleVoice('yue') });
+      if (enText) items.push({ text: enText, lang: 'en-GB', voice: pickGoogleVoice('en-gb') || pickGoogleVoice('en') });
+      if (scText) items.push({ text: scText, lang: 'zh-CN', voice: pickGoogleVoice('zh-cn') });
+      if (items.length === 0) { resolve(); return; }
+
+      let idx = 0;
+      const speakNext = () => {
+        if (seqToken !== audioPlaySeqId || idx >= items.length) { resolve(); return; }
+        const it = items[idx++];
+        const u = new SpeechSynthesisUtterance(it.text);
+        u.lang = it.lang;
+        if (it.voice) u.voice = it.voice;
+        u.volume = state.volume;
+        u.onend = speakNext;
+        u.onerror = speakNext;
+        window.speechSynthesis.speak(u);
+      };
+      speakNext();
+    } catch (_) {
+      resolve();
+    }
+  });
+}
+
+async function playSingleSegment(relPaths, fallbackTc, fallbackEn, fallbackSc, seqToken) {
+  if (seqToken !== audioPlaySeqId) return;
   const urls = Array.from(new Set(
     (relPaths || [])
       .filter(Boolean)
       .map(p => buildAudioUrl(resolveManifestPath(p)))
       .filter(Boolean)
   ));
-
-  if (urls.length === 0) {
-    speakGoogleTts(fallbackTc, fallbackEn, fallbackSc, seqToken);
-    return;
+  if (urls.length > 0) {
+    const ok = await playUrlListAsync(urls, seqToken);
+    if (ok || seqToken !== audioPlaySeqId) return;
   }
+  const ttsUrls = [
+    fallbackTc ? buildGoogleTtsUrl(fallbackTc, 'yue') : '',
+    fallbackEn ? buildGoogleTtsUrl(fallbackEn, 'en') : '',
+    fallbackSc ? buildGoogleTtsUrl(fallbackSc, 'zh-CN') : ''
+  ].filter(Boolean);
+  const ttsOk = await playUrlListAsync(ttsUrls, seqToken);
+  if (!ttsOk && seqToken === audioPlaySeqId) {
+    await speakWebSpeechAsync(fallbackTc, fallbackEn, fallbackSc, seqToken);
+  }
+}
 
-  let playedAny = false;
-  let idx = 0;
-  const next = () => {
-    if (seqToken !== audioPlaySeqId) return;
-    if (idx >= urls.length) {
-      if (!playedAny) speakGoogleTts(fallbackTc, fallbackEn, fallbackSc, seqToken);
-      return;
+async function playAnnouncementSegments(segments) {
+  stopAllAudio();
+  const seqToken = audioPlaySeqId;
+  for (const seg of (segments || [])) {
+    if (seqToken !== audioPlaySeqId) break;
+    await playSingleSegment(seg.files, seg.tc, seg.en, seg.sc, seqToken);
+  }
+}
+
+function playAudioSequence(relPaths, fallbackTc, fallbackEn, fallbackSc = '') {
+  playAnnouncementSegments([{ files: relPaths, tc: fallbackTc, en: fallbackEn, sc: fallbackSc }]);
+}
+
+function getWelcomeAudioFile() {
+  const firstStop = state.tripStops[0];
+  if (firstStop && firstStop.stopAudioFile) {
+    const stem = String(firstStop.stopAudioFile).split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
+    // 只有非純數字站點編號（例如 102_mef、9_sho_1、15_pea）才屬於 HOF 歡迎詞音檔
+    if (stem && !/^\d+_[a-z]$/i.test(stem)) {
+      return firstStop.stopAudioFile;
     }
-    const url = urls[idx++];
-    const audio = new Audio(url);
-    audio.volume = state.volume;
-    currentAudio = audio;
-    let settled = false;
-    const advance = () => {
-      if (settled || seqToken !== audioPlaySeqId) return;
-      settled = true;
-      next();
-    };
-    audio.onended = advance;
-    audio.onerror = advance;
-    audio.play().then(() => { playedAny = true; }).catch(advance);
+  }
+  const routeNo = String(state.selectedRouteNo || '').toLowerCase();
+  if (routeNo && state.audioStemMap.size > 0) {
+    const prefix = routeNo + '_';
+    const matches = [];
+    for (const [stem, path] of state.audioStemMap.entries()) {
+      if (stem.startsWith(prefix) && !/^\d+_[a-z]$/i.test(stem)) {
+        matches.push(path);
+      }
+    }
+    if (matches.length === 1) return matches[0];
+  }
+  return '';
+}
+
+function buildWelcomeSegment() {
+  const trip = state.selectedTrip || {};
+  const routeNo = state.selectedRouteNo || getRouteNo(trip);
+  const destTc = getDestTc(trip) || state.selectedBound || '終點站';
+  const destEn = getDestEn(trip) || destTc;
+  const wFile = getWelcomeAudioFile();
+  return {
+    files: wFile ? [wFile] : [],
+    tc: `歡迎乘搭城巴 ${routeNo} 號線，前往 ${destTc}，祝旅途愉快。`,
+    en: `Welcome aboard Citybus route ${routeNo} towards ${destEn}. Thank you and enjoy the journey.`,
+    sc: `欢迎乘坐城巴第 ${routeNo} 路，前往 ${destTc}，祝您旅途愉快。`
   };
-  next();
+}
+
+function buildStopSegment(st) {
+  const files = [];
+  const mainAudio = getEffectiveStopAudio(st);
+  if (mainAudio) files.push(mainAudio);
+  if (st.approachAudioFile) files.push(st.approachAudioFile);
+  const tcName = getStopNameTc(st);
+  const enName = getStopNameEn(st);
+  return {
+    files,
+    tc: `下一站，${tcName}`,
+    en: enName ? `Next stop, ${enName}` : '',
+    sc: `下一站，${tcName}`
+  };
 }
 
 function triggerStopAnnouncement(idx, force = false) {
   const st = state.tripStops[idx];
   if (!st) return;
-  const key = `${state.selectedTrip?.routeId || ''}|${state.selectedTrip?.bound || ''}|${idx}`;
+  const modeTag = state.gpsEnabled ? 'auto' : 'manual';
+  const key = `${state.selectedTrip?.routeId || ''}|${state.selectedTrip?.bound || ''}|${modeTag}|${idx}`;
   if (!force && state.lastAnnouncedKey === key) return;
   state.lastAnnouncedKey = key;
 
-  const files = [];
-  const mainAudio = getEffectiveStopAudio(st);
-  if (mainAudio) files.push(mainAudio);
-  if (st.approachAudioFile) files.push(st.approachAudioFile);
+  // 自動模式：第 1 站冇聲；第 2 站先播歡迎詞再播第 2 個站名
+  if (state.gpsEnabled) {
+    if (idx === 0) {
+      stopAllAudio();
+      return;
+    }
+    if (idx === 1) {
+      playAnnouncementSegments([buildWelcomeSegment(), buildStopSegment(st)]);
+      return;
+    }
+    playAnnouncementSegments([buildStopSegment(st)]);
+    return;
+  }
 
-  const tcName = getStopNameTc(st);
-  const enName = getStopNameEn(st);
-  const tc = `下一站，${tcName}`;
-  const en = enName ? `Next stop, ${enName}` : '';
-  const sc = `下一站，${tcName}`;
-  playAudioSequence(files, tc, en, sc);
+  // 手動模式：第 1 站播歡迎詞；第 2 站起播站名
+  if (idx === 0) {
+    playAnnouncementSegments([buildWelcomeSegment()]);
+    return;
+  }
+  playAnnouncementSegments([buildStopSegment(st)]);
 }
 
 // ============ 智駕全城 (Clever Driving) 引擎 ============
@@ -688,8 +757,8 @@ function playAlertBeep(isDanger = false) {
 
 function getCleverDriveGrade(score) {
   if (score >= 85) return { face: '☺', label: '好', en: 'Good', bg: 'bg-emerald-500', text: 'text-black', ring: 'border-emerald-400' };
-  if (score >= 65) return { face: '😐', label: '一般', en: 'Fair', bg: 'bg-amber-400', text: 'text-black', ring: 'border-amber-400' };
-  return { face: '☹', label: '差', en: 'Poor', bg: 'bg-red-600', text: 'text-white', ring: 'border-red-500' };
+  if (score >= 65) return { face: '😐', label: '留意', en: 'Attention', bg: 'bg-amber-400', text: 'text-black', ring: 'border-amber-400' };
+  return { face: '☹', label: '需改善', en: 'Need Improvement', bg: 'bg-red-600', text: 'text-white', ring: 'border-red-500' };
 }
 
 function triggerCleverDriveEvent(kind) {
@@ -919,6 +988,7 @@ function toggleGpsMode() {
     showToast('已切換為手動模式 (M)');
   } else {
     state.gpsEnabled = true;
+    if (state.routeStage === 'stops' && state.currentStopIdx === 0) stopAllAudio();
     startGpsTracking();
     showToast('已開啟 GPS 自動報站');
   }
@@ -1468,7 +1538,7 @@ function renderStopsView(vp, bar) {
           <div class="flex items-center gap-1 shrink-0 mt-1">
             ${curSec.badgeFare != null ? `<span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black">${esc(fmtFare(curSec.badgeFare))}</span>` : ''}
             <span class="px-1.5 py-0.5 rounded ${th.dark ? 'bg-zinc-800 border border-zinc-600 text-emerald-400' : 'bg-zinc-100 border border-zinc-300 text-emerald-700'} text-[10px] font-black">
-              ${hasAudio ? 'HKOWS' : 'G-TTS'}
+              ${state.gpsEnabled && state.currentStopIdx === 0 ? '自動靜音' : (!state.gpsEnabled && state.currentStopIdx === 0 ? (getWelcomeAudioFile() ? 'HKOWS 歡迎詞' : 'G-TTS 歡迎詞') : (state.gpsEnabled && state.currentStopIdx === 1 ? '歡迎詞+站名' : (hasAudio ? 'HKOWS' : 'G-TTS')))}
             </span>
           </div>
         </div>
@@ -1558,8 +1628,13 @@ function renderStopsView(vp, bar) {
   };
 
   document.getElementById('btnReplayCurrent').onclick = () => {
+    if (state.gpsEnabled && state.currentStopIdx === 0) {
+      stopAllAudio();
+      showToast('自動模式第 1 站不播報，將於第 2 站播歡迎詞及站名');
+      return;
+    }
     triggerStopAnnouncement(state.currentStopIdx, true);
-    showToast('重播報站');
+    showToast(state.currentStopIdx === 0 ? '重播歡迎詞' : '重播報站');
   };
   document.getElementById('btnToggleGpsInline').onclick = () => toggleGpsMode();
 
