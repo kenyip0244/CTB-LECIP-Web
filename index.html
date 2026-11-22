@@ -99,7 +99,7 @@
               <span id="incidentTopBadge" class="hidden px-1.5 py-0.5 rounded bg-white text-red-700 text-[10px] font-black leading-none shrink-0">事故中</span>
             </div>
             <button id="btnDriverBadge" class="mt-1 text-[13px] font-extrabold text-zinc-100 hover:text-amber-300 truncate block text-left leading-tight">
-              0001 KEN YIP
+              KEN YIP 0001
             </button>
           </div>
 
@@ -277,11 +277,49 @@ function detectInitialTheme() {
   return (hr >= 6 && hr < 19) ? 'day' : 'night';
 }
 
+function loadSavedDriverProfile() {
+  try {
+    const raw = localStorage.getItem('ctb_lecip_driver_profile');
+    if (raw) {
+      const obj = JSON.parse(raw);
+      const name = String(obj?.name || '').trim();
+      const staffNo = String(obj?.staffNo || '').trim();
+      if (name || staffNo) return { name, staffNo };
+    }
+  } catch (_) {}
+  return { name: 'KEN YIP', staffNo: '0001' };
+}
+
+function formatDriverLabel(name, staffNo) {
+  return [String(name || '').trim(), String(staffNo || '').trim()].filter(Boolean).join(' ') || 'KEN YIP 0001';
+}
+
+function saveDriverProfile(name, staffNo) {
+  const cleanName = String(name || '').trim();
+  const cleanNo = String(staffNo || '').trim();
+  const label = formatDriverLabel(cleanName, cleanNo);
+  state.driverName = cleanName;
+  state.driverStaffNo = cleanNo;
+  state.defaultDriverLabel = label;
+  state.driverId = label;
+  state.isManualDriver = false;
+  try {
+    localStorage.setItem('ctb_lecip_driver_profile', JSON.stringify({ name: cleanName, staffNo: cleanNo }));
+  } catch (_) {}
+  renderTopStatus();
+  return label;
+}
+
+const _initDriver = loadSavedDriverProfile();
+const _initDriverLabel = formatDriverLabel(_initDriver.name, _initDriver.staffNo);
+
 const state = {
   lang: 'tc',
   theme: detectInitialTheme(), // 'day' | 'night'
-  defaultDriverLabel: '0001 KEN YIP',
-  driverId: '0001 KEN YIP',
+  driverName: _initDriver.name,
+  driverStaffNo: _initDriver.staffNo,
+  defaultDriverLabel: _initDriverLabel,
+  driverId: _initDriverLabel,
   isManualDriver: false, // 手動輸入 5 位數員工編號時為 true（頂欄黃字顯示）
   trainingMode: false,   // 路線訓練模式（密碼 9999，頂欄黃標＋電子牌暫停載客）
   displayFault: false,   // 電子牌連接失靈模擬（頂部 [123] 轉紅）
@@ -3081,6 +3119,23 @@ function renderSettingsView(vp, bar) {
       <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">車長喜好設定</div>
       <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-3">
         <div class="p-3 rounded-xl border ${th.card} space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black">車長名牌設定（永久儲存）</span>
+            <span id="prefDriverPreview" class="text-[11px] font-mono font-bold text-[#007AFF] truncate max-w-[155px]">${esc(formatDriverLabel(state.driverName, state.driverStaffNo))}</span>
+          </div>
+          <div class="grid grid-cols-5 gap-2">
+            <input id="prefDriverName" type="text" maxlength="20" value="${esc(state.driverName)}" placeholder="姓名（如 KEN YIP）"
+                   class="col-span-3 px-2.5 py-2 rounded-lg border text-xs font-bold select-text outline-none focus:border-[#007AFF] ${th.dark ? 'bg-zinc-900 border-zinc-600 text-white placeholder-zinc-500' : 'bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400'}" />
+            <input id="prefDriverNo" type="text" maxlength="10" value="${esc(state.driverStaffNo)}" placeholder="員工編號"
+                   class="col-span-2 px-2.5 py-2 rounded-lg border text-xs font-bold font-mono select-text outline-none focus:border-[#007AFF] ${th.dark ? 'bg-zinc-900 border-zinc-600 text-white placeholder-zinc-500' : 'bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400'}" />
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <button id="prefSaveDriver" class="col-span-2 py-2 rounded-lg bg-[#007AFF] active:brightness-90 text-white font-black text-xs">儲存至本機</button>
+            <button id="prefResetDriver" class="col-span-1 py-2 rounded-lg ${th.dark ? 'bg-zinc-700 text-zinc-200' : 'bg-zinc-200 text-zinc-700'} active:brightness-90 font-black text-xs">重設</button>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl border ${th.card} space-y-2">
           <div class="text-xs font-black">顯示模式（日夜模式）</div>
           <div class="grid grid-cols-2 gap-2">
             <button id="prefDayBtn" class="py-2.5 rounded-lg font-black text-sm flex items-center justify-center gap-1.5 border ${!isNight() ? 'bg-[#007AFF] text-white border-[#007AFF] shadow' : (th.dark ? 'bg-zinc-800 text-zinc-200 border-zinc-700' : 'bg-white text-zinc-700 border-zinc-300')}">
@@ -3137,6 +3192,43 @@ function renderSettingsView(vp, bar) {
       showToast('已切換為夜間模式');
       renderAll();
     };
+    const _nameInput = document.getElementById('prefDriverName');
+    const _noInput = document.getElementById('prefDriverNo');
+    const _prevEl = document.getElementById('prefDriverPreview');
+    const _syncPrev = () => {
+      if (_prevEl) _prevEl.textContent = formatDriverLabel(_nameInput.value, _noInput.value);
+    };
+    const _commitProfile = () => {
+      const n = _nameInput.value.trim();
+      const no = _noInput.value.trim();
+      if (!n && !no) {
+        showToast('請輸入姓名或員工編號');
+        return;
+      }
+      const saved = saveDriverProfile(n, no);
+      showToast(`已儲存：${saved}`);
+      renderMain();
+    };
+    if (_nameInput && _noInput) {
+      _nameInput.oninput = _syncPrev;
+      _noInput.oninput = _syncPrev;
+      _nameInput.onkeydown = e => { if (e.key === 'Enter') _commitProfile(); };
+      _noInput.onkeydown = e => { if (e.key === 'Enter') _commitProfile(); };
+    }
+    const _saveBtn = document.getElementById('prefSaveDriver');
+    if (_saveBtn) _saveBtn.onclick = _commitProfile;
+    const _resetBtn = document.getElementById('prefResetDriver');
+    if (_resetBtn) _resetBtn.onclick = () => {
+      try { localStorage.removeItem('ctb_lecip_driver_profile'); } catch (_) {}
+      const def = loadSavedDriverProfile();
+      state.driverName = def.name;
+      state.driverStaffNo = def.staffNo;
+      state.defaultDriverLabel = formatDriverLabel(def.name, def.staffNo);
+      state.driverId = state.defaultDriverLabel;
+      state.isManualDriver = false;
+      renderAll();
+      showToast(`已重設為 ${state.driverId}`);
+    };
     document.getElementById('prefDcpTest').onclick = () => playDcpSoundTest();
     document.getElementById('prefStaffId').onclick = () => openStaffIdModal();
     document.getElementById('prefTrainMode').onclick = () => handleTrainingModeToggle();
@@ -3155,7 +3247,7 @@ function renderSettingsView(vp, bar) {
       <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">診斷模式</div>
       <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5 text-xs">
         <div class="p-3 rounded-xl border ${th.card} space-y-1.5">
-          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v48)</div>
+          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v49)</div>
           <div>App Version：<b>23.06.25</b> ｜ Config：<b>ctb_prod_v10</b></div>
           <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
           <div>站點資料庫：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
