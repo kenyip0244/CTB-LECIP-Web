@@ -119,6 +119,11 @@
         </div>
       </div>
 
+      <!-- 車廂動態顯示屏預覽條 (報站或播放特別訊息時同步顯示) -->
+      <div id="cabinLedBar" class="hidden bg-[#090b0e] text-[#ff9d00] border-b border-zinc-700 px-2 py-1 flex items-center justify-between gap-2 shrink-0">
+        <span class="text-[9px] font-black bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded shrink-0">車廂LED</span>
+        <span id="cabinLedText" class="font-mono font-bold text-[11px] truncate flex-1">CTB 1 -> 跑馬地 (上)</span>
+      </div>
       <!-- 3. 中間主畫面區 -->
       <div id="mainViewport" class="flex-1 overflow-hidden flex flex-col">
         <div class="flex-1 flex flex-col items-center justify-center p-4 text-center">
@@ -206,6 +211,7 @@ const state = {
   ],
   scheduledDuty: null,       // { routeNo, originCode, destCode, departTime, mode }
   lastAnnouncedKey: '',
+  cabinLedOverride: '',
   cleverScore: 100
 };
 
@@ -417,6 +423,24 @@ function renderTopStatus() {
     stopBtn.className = 'px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-600 text-white';
   }
 
+  // 同步車廂動態顯示屏預覽列
+  const ledBar = document.getElementById('cabinLedBar');
+  const ledText = document.getElementById('cabinLedText');
+  if (ledBar && ledText) {
+    if (state.cabinLedOverride) {
+      ledBar.classList.remove('hidden');
+      ledText.textContent = state.cabinLedOverride;
+    } else if (state.routeStage === 'stops' && state.selectedTrip) {
+      const dispNo = fmtRouteNo(state.selectedTrip);
+      const dest = state.selectedTrip.destTc || state.selectedTrip.endStopNameTc || '';
+      const cur = state.tripStops[state.currentStopIdx] || {};
+      const curName = cur.nameTc || cur.nameZh || cur.name || '';
+      ledBar.classList.remove('hidden');
+      ledText.textContent = `${dispNo} 往 ${dest} | ${state.currentStopIdx + 1}. ${curName}`;
+    } else {
+      ledBar.classList.add('hidden');
+    }
+  }
   // 收到新訊息黃底彈出提示條 (僅於停車達 3 秒且有未讀訊息時顯示)
   const unreadCount = state.messages.filter(m => m.unread).length;
   const popup = document.getElementById('newMsgPopup');
@@ -1028,7 +1052,7 @@ function renderMain() {
           </button>
           <button id="tileCall" class="h-16 rounded-lg bg-[#8e96a0] active:brightness-90 text-white p-1.5 flex flex-col items-center justify-center gap-1 text-center">
             <span class="text-base">🎧</span>
-            <span class="text-[10px] font-bold leading-tight">Call control center</span>
+            <span class="text-[10px] font-bold leading-tight">Call control center</span>`n          </button>`n          <button id="tileClever" class="h-16 rounded-lg bg-[#1159c4] active:brightness-90 text-white p-1.5 flex flex-col items-center justify-center gap-1 text-center col-span-2">`n            <span class="text-sm font-black">🛡️ 智駕全城：${state.cleverScore} 分</span>`n            <span class="text-[10px] font-bold leading-tight">點擊模擬急煞／急轉事件測試</span>
           </button>
         </div>
       </div>
@@ -1040,6 +1064,44 @@ function renderMain() {
     document.getElementById('tileDriver').onclick = openDriverModal;
     document.getElementById('tileDuty').onclick = openDutyModal;
     document.getElementById('tileCall').onclick = () => showToast('正在接通控制中心...');
+    document.getElementById('tileClever').onclick = () => {
+      const ov = document.getElementById('modalOverlay');
+      const card = document.getElementById('modalCard');
+      const tier = state.cleverScore >= 85 ? '良好' : (state.cleverScore >= 65 ? '一般' : '需改善');
+      card.innerHTML = `
+        <div class="font-black text-base text-center">智駕全城 (Clever Driving)</div>
+        <div class="text-center py-2 bg-slate-100 rounded-lg">
+          <div class="text-3xl font-black text-[#0068FF]">${state.cleverScore} <span class="text-sm">分</span></div>
+          <div class="text-xs font-bold mt-0.5">評級：${tier}</div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-xs font-black">
+          <button id="simBrake" class="py-2 rounded bg-amber-400 text-black">模擬急煞 (-5)</button>
+          <button id="simTurn" class="py-2 rounded bg-amber-400 text-black">模擬急轉 (-4)</button>
+          <button id="simReset" class="py-2 rounded bg-emerald-600 text-white">重設 100 分</button>
+          <button id="simClose" class="py-2 rounded bg-zinc-200 text-black">關閉</button>
+        </div>
+      `;
+      ov.classList.remove('hidden');
+      document.getElementById('simBrake').onclick = () => {
+        state.cleverScore = Math.max(0, state.cleverScore - 5);
+        showToast('偵測急煞車 (-5分)');
+        ov.classList.add('hidden');
+        renderMain();
+      };
+      document.getElementById('simTurn').onclick = () => {
+        state.cleverScore = Math.max(0, state.cleverScore - 4);
+        showToast('偵測急轉彎 (-4分)');
+        ov.classList.add('hidden');
+        renderMain();
+      };
+      document.getElementById('simReset').onclick = () => {
+        state.cleverScore = 100;
+        showToast('已重設為 100 分');
+        ov.classList.add('hidden');
+        renderMain();
+      };
+      document.getElementById('simClose').onclick = () => ov.classList.add('hidden');
+    };
   }
 }
 
@@ -1455,5 +1517,6 @@ startGpsWatcher();
 </script>
 </body>
 </html>
+
 
 
