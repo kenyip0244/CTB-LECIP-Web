@@ -378,20 +378,28 @@ function stopAllAudio() {
 }
 
 function buildAudioUrl(relPath) {
-  const clean = String(relPath || '').replace(/^\/+/, '').replace(/\.wav$/i, '.mp3');
+  const clean = String(relPath || '').replace(/\\/g, '/').replace(/^\/+/, '').replace(/\.wav$/i, '.mp3');
   if (!clean) return '';
   if (/^https?:\/\//i.test(clean)) return clean;
-  const encoded = clean.split('/').map(seg => encodeURIComponent(seg)).join('/');
+  const encoded = clean.split('/').filter(Boolean).map(seg => encodeURIComponent(seg)).join('/');
   return `${AUDIO_CDN_BASE}/${encoded}`;
 }
 
 function resolveManifestPath(rawPath) {
   if (!rawPath) return '';
-  const clean = String(rawPath).replace(/^\/+/, '').replace(/\.wav$/i, '.mp3');
+  const clean = String(rawPath).replace(/\\/g, '/').replace(/^\/+/, '').replace(/\.wav$/i, '.mp3');
+  if (state.audioManifest.includes(clean)) return clean;
   const stem = clean.split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
-  if (state.audioStemMap.has(stem)) {
-    return state.audioStemMap.get(stem);
+  const candidates = [stem];
+  if (/^\d+$/.test(stem)) {
+    candidates.push(stem.padStart(2, '0'), stem.replace(/^0+/, ''));
   }
+  for (const c of candidates) {
+    if (c && state.audioStemMap.has(c)) return state.audioStemMap.get(c);
+  }
+  const noSuffix = stem.replace(/_[ab]$/i, '');
+  if (noSuffix && state.audioStemMap.has(noSuffix + '_a')) return state.audioStemMap.get(noSuffix + '_a');
+  if (noSuffix && state.audioStemMap.has(noSuffix + '_b')) return state.audioStemMap.get(noSuffix + '_b');
   return clean;
 }
 
@@ -1389,13 +1397,13 @@ async function fetchInitialLightData() {
   state.uniqueRouteNos = Array.from(set).sort(compareRouteNo);
 
   // 背景載入 HKOWS 音檔索引，不阻塞進入選擇路線畫面
-  fetch(`${AUDIO_CDN_BASE}/audio_manifest.json`)
+  fetch(`${AUDIO_CDN_BASE}/audio_manifest.json?v=37`)
     .then(r => (r.ok ? r.json() : []))
     .then(list => {
       if (!Array.isArray(list)) return;
-      state.audioManifest = list;
+      state.audioManifest = list.map(x => String(x).replace(/\\/g, '/'));
       state.audioStemMap.clear();
-      for (const p of list) {
+      for (const p of state.audioManifest) {
         const stem = String(p).split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
         if (stem && !state.audioStemMap.has(stem)) state.audioStemMap.set(stem, p);
       }
