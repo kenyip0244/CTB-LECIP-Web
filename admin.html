@@ -70,10 +70,11 @@
           <div>
             <label class="block text-[11px] font-bold text-slate-600 mb-1">Gemini 模型</label>
             <select id="geminiModelSel" class="w-full px-2.5 py-2 rounded-lg bg-slate-50 border border-slate-300 text-xs font-bold outline-none focus:border-[#0052CC]">
-              <option value="gemini-3.8-flash" selected>gemini-3.8-flash（最新推薦）</option>
-              <option value="gemini-flash-latest">gemini-flash-latest（自動最新 Flash）</option>
-              <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite（輕量快速）</option>
-              <option value="gemini-3.8-pro">gemini-3.8-pro（高精度）</option>
+              <option value="groq:whisper-large-v3">Whisper · Groq large-v3（推薦）</option>
+              <option value="groq:whisper-large-v3-turbo">Whisper · Groq large-v3-turbo</option>
+              <option value="gemini:gemini-3.8-flash">Gemini · 3.8-flash</option>
+              <option value="gemini:gemini-flash-latest">Gemini · flash-latest</option>
+              <option value="gemini:gemini-3.1-flash-lite">Gemini · 3.1-flash-lite</option>
             </select>
           </div>
           <div>
@@ -226,6 +227,12 @@
         <label class="block text-xs font-black text-slate-800">Gemini API Key（用於直接聽聲辨識與自動配對）</label>
         <input id="geminiKeyInput" type="password" placeholder="AIzaSy..." class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-xs font-mono outline-none focus:border-[#0052CC]" />
         <p class="text-[11px] text-slate-500">可從 Google AI Studio 免費申請，金鑰只會保存在你的本機瀏覽器。</p>
+      </div>
+
+      <div class="space-y-1.5 pt-2 border-t border-slate-100">
+        <label class="block text-xs font-black text-slate-800">Groq API Key（選填，用於網頁版 Whisper 聽聲）</label>
+        <input id="groqKeyInput" type="password" placeholder="gsk_..." class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-xs font-mono outline-none focus:border-[#0052CC]" />
+        <p class="text-[11px] text-slate-500">可於 console.groq.com/keys 免費申請，網頁會直接送音檔至 Groq Whisper 轉錄。</p>
       </div>
 
       <div class="space-y-1.5 pt-2 border-t border-slate-100">
@@ -390,12 +397,93 @@ function findBestStopMatches(heardTc, heardEn) {
 }
 
 // 呼叫 Gemini API 聽取 MP3 音檔並輸出結構化翻譯與站名
+async function transcribeWithGroqWhisper(whisperModel, blob, fileName) {
+  const groqKey = (localStorage.getItem('ctb_groq_api_key') || '').trim();
+  if (!groqKey) {
+    throw new Error('請先點右上角「API / GitHub 設定」填入 Groq API Key（gsk_...）');
+  }
+  const fd = new FormData();
+  fd.append('file', blob, fileName || 'stop.mp3');
+  fd.append('model', whisperModel || 'whisper-large-v3');
+  fd.append('language', 'yue');
+  fd.append('response_format', 'verbose_json');
+  fd.append('prompt', '香港城巴報站，下一站，總站，轉乘站，巴士站，屋邨，苑，廣場，碼頭，醫院，學校，大廈，道，街，路。');
+
+  const wRes = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${groqKey}` },
+    body: fd
+  });
+  if (!wRes.ok) {
+    const errJson = await wRes.json().catch(() => ({}));
+    throw new Error(errJson?.error?.message || `Groq Whisper 錯誤 (${wRes.status})`);
+  }
+  const wData = await wRes.json();
+  const transcript = String(wData?.text || '').trim();
+  const segments = Array.isArray(wData?.segments) ? wData.segments : [];
+  let avgConf = 0.85;
+  if (segments.length > 0) {
+    const probs = segments.map(s => (typeof s.avg_logprob === 'number' ? Math.exp(s.avg_logprob) : 0.85));
+    avgConf = Math.max(0.1, Math.min(0.99, probs.reduce((a, b) => a + b, 0) / probs.length));
+  }
+  // 從粵語報站句式抽核心站名
+  let heardTc = transcript.split(/[。！？
+]|Next stop|next stop/i)[0].trim();
+  heardTc = heardTc.replace(/^(各位乘客[，,]?\s*)?(下一站[是係為：:\s]*|即將到達[：:\s]*|本班車終點站[是係為：:\s]*)/, '');
+  heardTc = heardTc.split(/[，,、]/)[0].trim();
+  return {
+    transcript,
+    stopNameTc: heardTc,
+    stopNameEn: '',
+    type: 'stop',
+    confidence: avgConf
+  };
+}
+
 async function analyzeAudioWithGemini(relPath, customBlob = null) {
+  const rawSel = document.getElementById('geminiModelSel').value || 'groq:whisper-large-v3';
+  const useGroq = rawSel.startsWith('groq:');
+  const model = rawSel.includes(':') ? rawSel.split(':')[1] : rawSel;
+
+  let blob = customBlob;
+  if (!blob) {
+    const res = await fetch(buildAudioUrl(relPath));
+    if (!res.ok) throw new Error(`無法下載音檔 (${res.status})`);
+    blob = await res.blob();
+  }
+
+  if (useGroq) {
+    const wParsed = await transcribeWithGroqWhisper(model, blob, relPath.split('/').pop());
+    const heardTc = String(wParsed.stopNameTc || '').trim();
+    const heardEn = String(wParsed.stopNameEn || '').trim();
+    const candidates = findBestStopMatches(heardTc, heardEn);
+    const topMatch = candidates[0] || null;
+    const rec = getRecord(relPath);
+    rec.transcript = wParsed.transcript;
+    rec.heardTc = heardTc;
+    rec.heardEn = heardEn;
+    rec.type = 'stop';
+    rec.candidates = candidates;
+    if (topMatch && topMatch.score >= 60) {
+      rec.matchedStopId = topMatch.stopId;
+      rec.matchScore = topMatch.score;
+      rec.status = 'ai_matched';
+      const matchedObj = stopById.get(topMatch.stopId);
+      const hasSub = matchedObj?.subTc && normText(heardTc).includes(normText(matchedObj.subTc));
+      rec.scope = hasSub ? 'single' : 'bidirectional';
+    } else {
+      rec.matchedStopId = '';
+      rec.matchScore = 0;
+      rec.status = 'unmatched';
+    }
+    saveLocalDb();
+    return rec;
+  }
+
   const apiKey = (localStorage.getItem('ctb_gemini_api_key') || '').trim();
   if (!apiKey) {
     throw new Error('請先點右上角「API / GitHub 設定」填入 Gemini API Key');
   }
-  const model = document.getElementById('geminiModelSel').value || 'gemini-3.8-flash';
 
   let blob = customBlob;
   if (!blob) {
@@ -551,9 +639,9 @@ function updateCountsAndBadges() {
   document.getElementById('cntAiMatched').textContent = String(cAi);
   document.getElementById('cntConfirmed').textContent = String(cConf);
 
-  const hasKey = !!(localStorage.getItem('ctb_gemini_api_key') || '').trim();
+  const hasKey = !!((localStorage.getItem('ctb_groq_api_key') || '').trim() || (localStorage.getItem('ctb_gemini_api_key') || '').trim());
   const badge = document.getElementById('apiKeyStatusBadge');
-  badge.textContent = hasKey ? 'Gemini 已就緒' : '未設 API Key';
+  badge.textContent = hasKey ? '聽聲引擎已就緒' : '未設 API Key';
   badge.className = hasKey
     ? 'text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800'
     : 'text-[11px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800';
@@ -1007,7 +1095,7 @@ async function transcodeToMp3Blob(file) {
 
 async function handleNewAudioFiles(fileList) {
   const token = (localStorage.getItem('ctb_gh_token') || '').trim();
-  const hasGemini = !!(localStorage.getItem('ctb_gemini_api_key') || '').trim();
+  const hasGemini = !!((localStorage.getItem('ctb_groq_api_key') || '').trim() || (localStorage.getItem('ctb_gemini_api_key') || '').trim());
 
   for (const file of Array.from(fileList || [])) {
     try {
@@ -1201,12 +1289,14 @@ async function init() {
   const sModal = document.getElementById('settingsModal');
   document.getElementById('btnSettings').onclick = () => {
     document.getElementById('geminiKeyInput').value = localStorage.getItem('ctb_gemini_api_key') || '';
+    document.getElementById('groqKeyInput').value = localStorage.getItem('ctb_groq_api_key') || '';
     document.getElementById('ghTokenInput').value = localStorage.getItem('ctb_gh_token') || '';
     sModal.classList.remove('hidden');
   };
   document.getElementById('btnCloseSettings').onclick = () => sModal.classList.add('hidden');
   document.getElementById('btnSaveKeys').onclick = () => {
     localStorage.setItem('ctb_gemini_api_key', document.getElementById('geminiKeyInput').value.trim());
+    localStorage.setItem('ctb_groq_api_key', document.getElementById('groqKeyInput').value.trim());
     localStorage.setItem('ctb_gh_token', document.getElementById('ghTokenInput').value.trim());
     sModal.classList.add('hidden');
     updateCountsAndBadges();
@@ -1214,6 +1304,8 @@ async function init() {
   };
   document.getElementById('btnClearKeys').onclick = () => {
     localStorage.removeItem('ctb_gemini_api_key');
+    localStorage.removeItem('ctb_groq_api_key');
+    document.getElementById('groqKeyInput').value = '';
     localStorage.removeItem('ctb_gh_token');
     document.getElementById('geminiKeyInput').value = '';
     document.getElementById('ghTokenInput').value = '';
