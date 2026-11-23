@@ -1146,6 +1146,123 @@ document.addEventListener('click', (e) => {
   }
 });
 
+/* V74_HF_FORCE_OVERRIDE */
+
+async function transcribeWithHuggingFace(hfModel, blob) {
+  const hfKey = (localStorage.getItem('ctb_hf_api_key') || '').trim();
+  if (!hfKey) {
+    throw new Error('請先點右上角「API / GitHub 設定」填入 Hugging Face Token（hf_...）');
+  }
+  const modelId = hfModel || 'openai/whisper-large-v3';
+  const endpoint = `https://router.huggingface.co/hf-inference/models/${encodeURIComponent(modelId)}`;
+  const hRes = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${hfKey}`,
+      'Content-Type': blob.type || 'audio/mpeg'
+    },
+    body: blob
+  });
+  if (!hRes.ok) {
+    const errJson = await hRes.json().catch(() => ({}));
+    throw new Error(errJson?.error || `Hugging Face 錯誤 (${hRes.status})`);
+  }
+  const hData = await hRes.json();
+  const transcript = String(hData?.text || '').trim();
+  let heardTc = transcript.split(/[。！？\n]|Next stop|next stop/i)[0].trim();
+  heardTc = heardTc.replace(/^(各位乘客[，,]?\s*)?(下一站[是係為：:\s]*|即將到達[：:\s]*|本班車終點站[是係為：:\s]*)/, '');
+  heardTc = heardTc.split(/[，,、]/)[0].trim();
+  return { transcript, stopNameTc: heardTc, stopNameEn: '', type: 'stop' };
+}
+
+async function analyzeAudio(relPath, customBlob = null) {
+  const selEl = document.getElementById('engineModelSel');
+  const rawSel = (selEl ? selEl.value : '') || 'hf:openai/whisper-large-v3';
+  const model = rawSel.includes(':') ? rawSel.split(':')[1] : rawSel;
+
+  let blob = customBlob;
+  if (!blob) {
+    const res = await fetch(buildAudioUrl(relPath));
+    if (!res.ok) throw new Error(`無法下載音檔 (${res.status})`);
+    blob = await res.blob();
+  }
+
+  let heardTc = '';
+  let heardEn = '';
+  let transcript = '';
+  let recType = 'stop';
+
+  if (rawSel.startsWith('hf:') || /whisper-large-v3/i.test(rawSel)) {
+    const hfParsed = await transcribeWithHuggingFace(
+      model && model.includes('/') ? model : 'openai/whisper-large-v3',
+      blob
+    );
+    transcript = hfParsed.transcript;
+    heardTc = String(hfParsed.stopNameTc || '').trim();
+    heardEn = String(hfParsed.stopNameEn || '').trim();
+    recType = hfParsed.type || 'stop';
+  } else if (rawSel.startsWith('groq:')) {
+    const wParsed = await transcribeWithGroqWhisper(model, blob, relPath.split('/').pop());
+    transcript = wParsed.transcript;
+    heardTc = String(wParsed.stopNameTc || '').trim();
+    heardEn = String(wParsed.stopNameEn || '').trim();
+    recType = wParsed.type || 'stop';
+  } else {
+    const apiKey = (localStorage.getItem('ctb_gemini_api_key') || '').trim();
+    if (!apiKey) {
+      throw new Error('請先點右上角「API / GitHub 設定」填入 Gemini API Key');
+    }
+    const base64Audio = await blobToBase64(blob);
+    const mimeType = (blob.type && blob.type.startsWith('audio/')) ? blob.type : 'audio/mp3';
+    const prompt = `你係香港城巴報站語音辨識專家。請聆聽呢段巴士報站錄音，嚴格只以 JSON 格式回覆：{"transcript":"完整逐字轉錄","stopNameTc":"核心中文站名","stopNameEn":"核心英文站名","type":"stop"}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model || 'gemini-2.5-flash')}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const gRes = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ inline_data: { mime_type: mimeType, data: base64Audio } }, { text: prompt }] }],
+        generationConfig: { responseMimeType: 'application/json', temperature: 0.1 }
+      })
+    });
+    if (!gRes.ok) {
+      const errJson = await gRes.json().catch(() => ({}));
+      throw new Error(errJson?.error?.message || `Gemini API 錯誤 (${gRes.status})`);
+    }
+    const gData = await gRes.json();
+    const rawText = gData?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    const parsed = JSON.parse(rawText.replace(/^```json\s*|\s*```$/g, '').trim() || '{}');
+    transcript = String(parsed.transcript || '').trim();
+    heardTc = String(parsed.stopNameTc || '').trim();
+    heardEn = String(parsed.stopNameEn || '').trim();
+    recType = String(parsed.type || 'stop');
+  }
+
+  const candidates = findBestStopMatches(heardTc, heardEn);
+  const topMatch = candidates[0] || null;
+  const rec = getRecord(relPath);
+  rec.transcript = transcript;
+  rec.heardTc = heardTc;
+  rec.heardEn = heardEn;
+  rec.type = recType;
+  rec.candidates = candidates;
+
+  if (topMatch && topMatch.score >= 60) {
+    rec.matchedStopId = topMatch.stopId;
+    rec.matchScore = topMatch.score;
+    rec.status = 'ai_matched';
+    const matchedObj = stopById.get(topMatch.stopId);
+    const hasSub = matchedObj?.subTc && normText(heardTc).includes(normText(matchedObj.subTc));
+    rec.scope = hasSub ? 'single' : 'bidirectional';
+  } else {
+    rec.matchedStopId = '';
+    rec.matchScore = 0;
+    rec.status = 'unmatched';
+  }
+
+  saveLocalDb();
+  return rec;
+}
+
 init();
 </script>
 </body>
