@@ -1093,16 +1093,16 @@ async function init() {
     const cloud = await mapRes.json().catch(() => ({}));
     const details = cloud?.details || {};
     for (const [path, info] of Object.entries(details)) {
-      if (!audioDb[path] || audioDb[path].status === 'unmatched') {
+      if (!audioDb[path] || (!audioDb[path].transcript && info.transcript)) {
         audioDb[path] = {
-          status: 'confirmed',
+          status: info.status || (info.stopId ? 'confirmed' : 'unmatched'),
           transcript: info.transcript || '',
           heardTc: info.heardTc || '',
           heardEn: info.heardEn || '',
           type: 'stop',
           matchedStopId: info.stopId || '',
-          matchScore: 100,
-          candidates: []
+          matchScore: Number(info.matchScore) || (info.stopId ? 95 : 0),
+          candidates: Array.isArray(info.candidates) ? info.candidates : []
         };
       }
     }
