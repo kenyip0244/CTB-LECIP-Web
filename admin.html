@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23FBBF24'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='%23111827' font-family='sans-serif' font-weight='900' font-size='32'%3EC%3C/text%3E%3C/svg%3E" />
   <title>城巴報站音檔 · Gemini 聽聲自動配對工作台</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -488,7 +489,10 @@ function getFilteredManifest() {
     if (folderMode === 'stops_only') {
       if (p.includes('/announcements/') || p.startsWith('audio/announcements/')) return false;
       const fn = p.split('/').pop();
+      const lower = fn.toLowerCase();
       if (fn.startsWith('+')) return false;
+      if (lower === 'terminus.mp3' || lower.startsWith('welcome')) return false;
+      if (!/^\d+_/.test(fn)) return false;
     }
     return true;
   });
