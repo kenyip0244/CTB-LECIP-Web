@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>城巴報站聲音檔名冊 · 命名與管理</title>
+  <title>城巴報站音檔 · Gemini 聽聲自動配對工作台</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet" />
@@ -16,35 +16,31 @@
       color: #111827;
       font-variant-numeric: tabular-nums;
     }
-    .row-item {
-      transition: background-color 0.12s ease;
-    }
-    .row-item:hover {
-      background-color: #F1F5F9;
-    }
+    .row-item { transition: background-color 0.12s ease; }
+    .row-item:hover { background-color: #F1F5F9; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
+  <!-- 頂部品牌與同步列 -->
   <header class="bg-white border-b-2 border-[#111827] sticky top-0 z-30">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3.5 min-w-0">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
         <div class="w-10 h-10 rounded-lg bg-[#FBBF24] border-2 border-[#111827] flex items-center justify-center font-black text-lg text-[#111827] shrink-0">
           C
         </div>
         <div class="min-w-0">
-          <h1 class="text-lg font-black tracking-tight text-[#111827] truncate">城巴報站聲音檔名冊</h1>
-          <p class="text-xs text-slate-500 font-medium truncate">按城巴站號自動命名為中文／英文，全港路線共用同一錄音</p>
+          <h1 class="text-base sm:text-lg font-black tracking-tight text-[#111827] truncate">城巴報站音檔 · Gemini 聽聲配對台</h1>
+          <p class="text-xs text-slate-500 font-medium truncate">由 Gemini 實時聽聲轉錄中英文站名，按「未配對／自動分好／已確認」三類管理</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2.5 shrink-0">
-        <div class="hidden sm:flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-300 text-xs font-bold">
-          <button id="langTcBtn" class="px-2.5 py-1 rounded-md bg-[#111827] text-white">中文命名</button>
-          <button id="langEnBtn" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-black">English</button>
-        </div>
-        <button id="btnGithubConfig" class="px-3 py-2 rounded-lg bg-white hover:bg-slate-50 text-[#111827] text-xs font-bold border border-slate-300">
-          雲端直傳設定
+      <div class="flex items-center gap-2 shrink-0">
+        <button id="btnSettings" class="px-3 py-2 rounded-lg bg-white hover:bg-slate-50 text-[#111827] text-xs font-bold border border-slate-300">
+          API / GitHub 設定
+        </button>
+        <button id="btnPublishMapping" class="px-3.5 py-2 rounded-lg bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold">
+          同步已確認表
         </button>
         <a href="./index.html" class="px-3.5 py-2 rounded-lg bg-[#0052CC] hover:bg-[#0041A3] text-white text-xs font-bold">
           返回報站器
@@ -53,118 +49,218 @@
     </div>
   </header>
 
-  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
+    <!-- 左側控制台（4 欄）：Gemini 批次聽聲引擎 + 篩選 + 上傳新錄音 -->
     <aside class="lg:col-span-4 space-y-5 lg:sticky lg:top-22">
-      <div class="bg-white rounded-xl border border-slate-200 p-4 space-y-4">
-        <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-lg text-xs font-bold">
-          <button id="modeRouteBtn" class="py-2 rounded-md bg-white text-[#111827] shadow-sm">按路線核對</button>
-          <button id="modeLibraryBtn" class="py-2 rounded-md text-slate-600 hover:text-black">已命名音檔庫</button>
-        </div>
 
-        <div id="routeFilterPanel" class="space-y-3">
-          <div class="grid grid-cols-5 gap-2">
-            <div class="col-span-2">
-              <label class="block text-xs font-bold text-slate-600 mb-1">搜尋路線</label>
-              <input id="routeSearchInput" type="text" placeholder="如 796X" class="w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-300 text-sm font-extrabold uppercase outline-none focus:border-[#0052CC] focus:bg-white" />
-            </div>
-            <div class="col-span-3">
-              <label class="block text-xs font-bold text-slate-600 mb-1">選擇路線</label>
-              <select id="routeSelect" class="w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-300 text-sm font-extrabold outline-none focus:border-[#0052CC] focus:bg-white"></select>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">方向與班次</label>
-            <select id="tripSelect" class="w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-300 text-xs font-bold outline-none focus:border-[#0052CC] focus:bg-white"></select>
-          </div>
-        </div>
-
-        <div id="libraryFilterPanel" class="hidden space-y-2">
-          <label class="block text-xs font-bold text-slate-600">搜尋站名或站號</label>
-          <input id="librarySearchInput" type="text" placeholder="輸入中文站名、英文或站號（如 北角碼頭 / 1277）" class="w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-300 text-sm font-bold outline-none focus:border-[#0052CC] focus:bg-white" />
-        </div>
-
-        <div id="routeStatsBox" class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
-          <span>正在讀取站點名冊...</span>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
+      <!-- Gemini 聽聲自動分類控制台 -->
+      <section class="bg-white rounded-xl border border-slate-200 p-4 space-y-3.5">
         <div class="flex items-center justify-between">
-          <h2 class="text-sm font-black text-[#111827]">批次上傳並自動命名</h2>
+          <h2 class="text-sm font-black text-[#111827]">Gemini 聽聲自動配對</h2>
+          <span id="apiKeyStatusBadge" class="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">未設 API Key</span>
+        </div>
+
+        <p class="text-xs text-slate-500 leading-relaxed">
+          Gemini 會直接讀取音檔聲波、聽寫廣東話／英文報站內容，並自動搜尋城巴官方車站表完成配對，放入「Gemini 自動分好」等你核對。
+        </p>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">Gemini 模型</label>
+            <select id="geminiModelSel" class="w-full px-2.5 py-2 rounded-lg bg-slate-50 border border-slate-300 text-xs font-bold outline-none focus:border-[#0052CC]">
+              <option value="gemini-2.5-flash">gemini-2.5-flash（快速推薦）</option>
+              <option value="gemini-2.5-pro">gemini-2.5-pro（高精度）</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">單次批次數量</label>
+            <select id="batchCountSel" class="w-full px-2.5 py-2 rounded-lg bg-slate-50 border border-slate-300 text-xs font-bold outline-none focus:border-[#0052CC]">
+              <option value="5">5 個音檔（試跑）</option>
+              <option value="20" selected>20 個音檔</option>
+              <option value="50">50 個音檔</option>
+              <option value="9999">全部未配對音檔</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button id="btnStartBatch" class="flex-1 py-2.5 rounded-lg bg-[#0052CC] hover:bg-[#0041A3] text-white text-xs font-black">
+            開始批次聽聲分類
+          </button>
+          <button id="btnStopBatch" class="hidden px-4 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-black">
+            暫停
+          </button>
+        </div>
+
+        <!-- 實時運行狀態 -->
+        <div id="batchProgressBox" class="hidden rounded-lg bg-slate-50 border border-slate-200 p-3 space-y-1.5">
+          <div class="flex items-center justify-between text-xs font-bold">
+            <span id="batchProgressTitle" class="text-[#0052CC] truncate">準備中...</span>
+            <span id="batchProgressCount" class="text-slate-600 shrink-0">0 / 0</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+            <div id="batchProgressBar" class="h-full bg-[#0052CC] transition-all duration-200" style="width: 0%"></div>
+          </div>
+          <div id="batchLogLine" class="text-[11px] text-slate-500 truncate">等待啟動</div>
+        </div>
+      </section>
+
+      <!-- 搜尋與路線過濾 -->
+      <section class="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
+        <h2 class="text-sm font-black text-[#111827]">篩選與搜尋</h2>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 mb-1">搜尋檔名、站名、聽寫文字或站號</label>
+          <input id="searchInput" type="text" placeholder="例如 796X / 北角 / 1277 / 機場" class="w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-300 text-xs font-bold outline-none focus:border-[#0052CC] focus:bg-white" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 mb-1">只看包含指定資料夾／類型</label>
+          <select id="folderFilterSel" class="w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-300 text-xs font-bold outline-none focus:border-[#0052CC]">
+            <option value="stops_only">只看車站報站檔（排除特別廣播）</option>
+            <option value="all">全部音檔（含特別廣播與歡迎詞）</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- 上傳新錄音（自動轉 MP3 並交由 Gemini 聽聲） -->
+      <section class="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-black text-[#111827]">上傳新報站錄音</h2>
           <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-[#FBBF24]/25 text-[#111827]">WAV / MP3</span>
         </div>
         <p class="text-xs text-slate-500 leading-relaxed">
-          只要原檔名包含城巴站號（例如 <span class="font-bold text-slate-800">4567_a.wav</span>），上傳時會自動轉碼為 128kbps MP3，並依所選語言自動命名為 <span class="font-bold text-slate-800">4567_站名.mp3</span>。
+          上傳後自動轉為輕量 MP3；如已設定 Gemini API Key，會即時聽聲辨識站名並建議最合適的檔案名稱與站號。
         </p>
-        <label class="block w-full border-2 border-dashed border-slate-300 hover:border-[#0052CC] rounded-xl p-4 text-center cursor-pointer transition-colors bg-slate-50/60">
-          <span class="block text-xs font-black text-[#0052CC]">點擊選擇多個錄音檔</span>
-          <span class="block text-[11px] text-slate-400 mt-0.5">支援同時選取多個 .wav 或 .mp3 檔案</span>
-          <input id="directUploadInput" type="file" accept=".wav,.mp3,.m4a,.ogg" multiple class="hidden" />
+        <label class="block w-full border-2 border-dashed border-slate-300 hover:border-[#0052CC] rounded-xl p-4 text-center cursor-pointer transition-colors bg-slate-50/70">
+          <span class="block text-xs font-black text-[#0052CC]">選擇本地錄音檔（支援多選）</span>
+          <span class="block text-[11px] text-slate-400 mt-0.5">支援 .wav / .mp3 / .m4a</span>
+          <input id="newAudioUploadInput" type="file" accept=".wav,.mp3,.m4a,.ogg" multiple class="hidden" />
         </label>
-      </div>
+      </section>
     </aside>
 
+    <!-- 右側主清單區（8 欄）：三類別分頁切換 + 清晰操作列 -->
     <section class="lg:col-span-8 bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <div class="px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-white">
-        <div>
-          <h2 id="listTitle" class="text-base font-black text-[#111827]">站點錄音對照名冊</h2>
-          <p id="listSubtitle" class="text-xs text-slate-500 mt-0.5">點選「試聽」可即時驗證錄音內容，或點「上傳／替換」自動以站名存檔</p>
+
+      <!-- 三大類別分頁列 -->
+      <div class="grid grid-cols-3 border-b border-slate-200 bg-slate-50">
+        <button id="tabUnmatched" data-cat="unmatched" class="cat-tab px-3 py-4 text-left border-b-2 border-[#111827] bg-white">
+          <div class="text-xs font-bold text-slate-500">類別一</div>
+          <div class="flex items-baseline justify-between gap-2 mt-0.5">
+            <span class="text-sm sm:text-base font-black text-[#111827]">未配對</span>
+            <span id="cntUnmatched" class="text-sm font-black text-slate-700">0</span>
+          </div>
+        </button>
+
+        <button id="tabAiMatched" data-cat="ai_matched" class="cat-tab px-3 py-4 text-left border-b-2 border-transparent hover:bg-slate-100/70">
+          <div class="text-xs font-bold text-amber-700">類別二</div>
+          <div class="flex items-baseline justify-between gap-2 mt-0.5">
+            <span class="text-sm sm:text-base font-black text-[#111827]">Gemini 自動分好</span>
+            <span id="cntAiMatched" class="text-sm font-black text-amber-600">0</span>
+          </div>
+        </button>
+
+        <button id="tabConfirmed" data-cat="confirmed" class="cat-tab px-3 py-4 text-left border-b-2 border-transparent hover:bg-slate-100/70">
+          <div class="text-xs font-bold text-emerald-700">類別三</div>
+          <div class="flex items-baseline justify-between gap-2 mt-0.5">
+            <span class="text-sm sm:text-base font-black text-[#111827]">已確認</span>
+            <span id="cntConfirmed" class="text-sm font-black text-[#059669]">0</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- 工具操作副列 -->
+      <div class="px-5 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 bg-white">
+        <div id="tabHelperText" class="text-xs font-medium text-slate-500">
+          載入音檔庫與車站表中...
         </div>
-        <label id="missingToggleWrap" class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer select-none">
-          <input id="filterMissingChk" type="checkbox" class="w-4 h-4 rounded border-slate-300 text-[#0052CC] focus:ring-[#0052CC]" />
-          只顯示尚未收錄
-        </label>
+        <div class="flex items-center gap-2">
+          <button id="btnConfirmAllHigh" class="hidden px-3 py-1.5 rounded-lg bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold">
+            一鍵確認高信心度結果
+          </button>
+          <button id="btnExportJson" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">
+            匯出對照 JSON
+          </button>
+        </div>
       </div>
 
-      <div class="hidden sm:grid sm:grid-cols-12 px-5 py-2.5 bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500">
-        <div class="col-span-5">站序與車站名稱</div>
-        <div class="col-span-4">已命名聲音檔</div>
-        <div class="col-span-3 text-right">操作</div>
-      </div>
+      <!-- 清單主體 -->
+      <div id="audioListBody" class="divide-y divide-slate-200"></div>
 
-      <div id="stopsTableBody" class="divide-y divide-slate-200"></div>
+      <!-- 底部簡易分頁 -->
+      <div id="paginationBar" class="px-5 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs font-bold">
+        <button id="btnPagePrev" class="px-3 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 disabled:opacity-40">上一頁</button>
+        <span id="pageInfoText" class="text-slate-600">第 1 / 1 頁</span>
+        <button id="btnPageNext" class="px-3 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 disabled:opacity-40">下一頁</button>
+      </div>
     </section>
   </main>
 
-  <input id="rowFileInput" type="file" accept=".wav,.mp3,.m4a,.ogg" class="hidden" />
-
-  <div id="ghModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="w-full max-w-md rounded-2xl bg-white border border-slate-200 p-5 space-y-4 shadow-xl">
+  <!-- 手動搜尋挑選車站彈窗 -->
+  <div id="stopPickerModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
+    <div class="w-full max-w-lg rounded-2xl bg-white border border-slate-200 p-5 space-y-3 shadow-2xl">
       <div class="flex items-center justify-between">
-        <h3 class="text-base font-black text-[#111827]">GitHub 雲端直傳設定</h3>
-        <button id="btnCloseGh" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700">關閉</button>
+        <div>
+          <h3 class="text-base font-black text-[#111827]">手動指定對應車站</h3>
+          <p id="pickerAudioLabel" class="text-xs text-slate-500 truncate max-w-sm mt-0.5"></p>
+        </div>
+        <button id="btnClosePicker" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold">關閉</button>
       </div>
-      <p class="text-xs text-slate-600 leading-relaxed">
-        輸入具備 <span class="font-bold text-slate-900">repo</span> 權限的 GitHub Token（僅儲存於此瀏覽器），上傳錄音時會自動命名並直接推送至 <span class="font-bold text-slate-900">kenyip0244/CTB-LECIP-Audio</span>；未設定時則自動下載改好名的 MP3 檔案。
-      </p>
-      <input id="ghTokenInput" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-xs outline-none focus:border-[#0052CC]" />
-      <div class="flex justify-end gap-2">
-        <button id="btnClearGh" class="px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700">清除</button>
-        <button id="btnSaveGh" class="px-4 py-2 rounded-lg bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold">儲存設定</button>
+      <input id="pickerSearchInput" type="text" placeholder="輸入中文站名、英文站名、站號或途經路線（如 796X）" class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-xs font-bold outline-none focus:border-[#0052CC]" />
+      <div id="pickerResults" class="max-h-72 overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-xl"></div>
+    </div>
+  </div>
+
+  <!-- API Key & GitHub Token 設定彈窗 -->
+  <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-2xl bg-white border border-slate-200 p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-black text-[#111827]">Gemini API 與 GitHub 雲端設定</h3>
+        <button id="btnCloseSettings" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold">關閉</button>
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="block text-xs font-black text-slate-800">Gemini API Key（用於直接聽聲辨識與自動配對）</label>
+        <input id="geminiKeyInput" type="password" placeholder="AIzaSy..." class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-xs font-mono outline-none focus:border-[#0052CC]" />
+        <p class="text-[11px] text-slate-500">可從 Google AI Studio 免費申請，金鑰只會保存在你的本機瀏覽器。</p>
+      </div>
+
+      <div class="space-y-1.5 pt-2 border-t border-slate-100">
+        <label class="block text-xs font-black text-slate-800">GitHub Personal Access Token（選填，用於一鍵寫回雲端）</label>
+        <input id="ghTokenInput" type="password" placeholder="ghp_..." class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-xs font-mono outline-none focus:border-[#059669]" />
+        <p class="text-[11px] text-slate-500">填入具 <span class="font-bold">repo</span> 權限的 Token 後，可一鍵將已確認對照表推送至 <span class="font-bold">CTB-LECIP-Web/data/audio_mapping.json</span>。</p>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button id="btnClearKeys" class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700">清除全部</button>
+        <button id="btnSaveKeys" class="px-4 py-2 rounded-lg bg-[#0052CC] hover:bg-[#0041A3] text-white text-xs font-bold">儲存設定</button>
       </div>
     </div>
   </div>
 
-  <div id="adminToast" class="hidden fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-[#111827] text-white text-xs font-bold shadow-lg"></div>
+  <!-- 提示訊息 Toast -->
+  <div id="adminToast" class="hidden fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-[#111827] text-white text-xs font-bold shadow-xl max-w-sm"></div>
 
 <script>
 const AUDIO_CDN_BASE = 'https://kenyip0244.github.io/CTB-LECIP-Audio';
 const GH_OWNER = 'kenyip0244';
+const GH_WEB_REPO = 'CTB-LECIP-Web';
 const GH_AUDIO_REPO = 'CTB-LECIP-Audio';
+const STORAGE_DB_KEY = 'ctb_lecip_gemini_audio_db_v1';
+const PAGE_SIZE = 30;
 
-let allRoutes = [];
-let allStops = [];
 let audioManifest = [];
-let stemMap = new Map();
-let stopIdMap = new Map();
-let stopMetaMap = new Map();
+let uniqueStops = [];         // [{ stopId, numId, tc, en, normTc, normEn, routes: [] }]
+let stopById = new Map();
+let audioDb = {};             // { [audioPath]: { status: 'unmatched'|'ai_matched'|'confirmed', transcript, heardTc, heardEn, type, matchedStopId, matchScore, candidates: [] } }
+
+let currentTab = 'unmatched'; // 'unmatched' | 'ai_matched' | 'confirmed'
+let currentPage = 0;
 let curAudio = null;
 let playingPath = '';
-let pendingRowStopId = '';
-let fileNamingLang = 'tc';
-let viewMode = 'route';
+let batchRunning = false;
+let batchAbort = false;
+let pickerTargetPath = '';
 
 function esc(v) {
   return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -175,7 +271,7 @@ function toast(msg) {
   el.textContent = msg;
   el.classList.remove('hidden');
   clearTimeout(window._t);
-  window._t = setTimeout(() => el.classList.add('hidden'), 3200);
+  window._t = setTimeout(() => el.classList.add('hidden'), 3500);
 }
 
 function cleanJoint(raw) {
@@ -189,39 +285,40 @@ function cleanJoint(raw) {
   return s;
 }
 
-function getNumStopId(rawStopId) {
-  return String(rawStopId || '').trim().replace(/^0+/, '');
+function normText(s) {
+  return String(s || '')
+    .toLowerCase()
+    .replace(/[\(（][^\)）]*[\)）]/g, '')
+    .replace(/[\s,，\.。\-－·・、'"`]/g, '');
 }
 
-function makeSafeStopFilename(numId, lang = fileNamingLang) {
-  const meta = stopMetaMap.get(numId) || {};
-  const raw = lang === 'en' ? (meta.en || meta.tc || '') : (meta.tc || meta.en || '');
-  let clean = raw.replace(/[\\/:*?"<>|]+/g, '');
-  clean = lang === 'en' ? clean.replace(/\s+/g, '_') : clean.replace(/\s+/g, '');
-  clean = clean.replace(/^[._]+|[._]+$/g, '').slice(0, 48);
-  return clean ? `${numId}_${clean}.mp3` : `${numId}_a.mp3`;
-}
-
-function rebuildAudioIndexes() {
-  stemMap.clear();
-  stopIdMap.clear();
-  for (const p of audioManifest) {
-    const stem = p.split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
-    if (stem && !stemMap.has(stem)) stemMap.set(stem, p);
-    const m = stem.match(/^(\d+)_/);
-    if (m) {
-      const nid = m[1].replace(/^0+/, '') || '0';
-      if (!stopIdMap.has(nid) || !stem.endsWith('_b')) {
-        stopIdMap.set(nid, p);
-      }
-    }
+function saveLocalDb() {
+  try {
+    localStorage.setItem(STORAGE_DB_KEY, JSON.stringify(audioDb));
+  } catch (e) {
+    toast('瀏覽器儲存空間不足：' + e.message);
   }
 }
 
-function getAudioForStop(st) {
-  const numId = getNumStopId(st.stopId);
-  if (numId && stopIdMap.has(numId)) return stopIdMap.get(numId);
-  return st.stopAudioFile || '';
+function getRecord(path) {
+  if (!audioDb[path]) {
+    audioDb[path] = {
+      status: 'unmatched',
+      transcript: '',
+      heardTc: '',
+      heardEn: '',
+      type: 'stop',
+      matchedStopId: '',
+      matchScore: 0,
+      candidates: []
+    };
+  }
+  return audioDb[path];
+}
+
+function buildAudioUrl(relPath) {
+  const clean = String(relPath).replace(/^\/+/, '');
+  return `${AUDIO_CDN_BASE}/${clean.split('/').map(encodeURIComponent).join('/')}`;
 }
 
 function togglePreview(relPath) {
@@ -229,25 +326,580 @@ function togglePreview(relPath) {
     curAudio.pause();
     curAudio = null;
     playingPath = '';
-    renderCurrentView();
+    renderList();
     return;
   }
   if (curAudio) { try { curAudio.pause(); } catch (_) {} }
-  const clean = String(relPath).replace(/^\/+/, '');
-  const url = `${AUDIO_CDN_BASE}/${clean.split('/').map(encodeURIComponent).join('/')}?t=${Date.now()}`;
   playingPath = relPath;
-  renderCurrentView();
-
-  curAudio = new Audio(url);
-  curAudio.onended = () => { playingPath = ''; renderCurrentView(); };
-  curAudio.onerror = () => { playingPath = ''; renderCurrentView(); toast('音檔載入失敗，請稍候重試'); };
-  curAudio.play().catch(e => { playingPath = ''; renderCurrentView(); toast('播放失敗：' + e.message); });
+  renderList();
+  curAudio = new Audio(buildAudioUrl(relPath));
+  curAudio.onended = () => { playingPath = ''; renderList(); };
+  curAudio.onerror = () => { playingPath = ''; renderList(); toast('音檔播放失敗'); };
+  curAudio.play().catch(e => { playingPath = ''; renderList(); toast('播放失敗：' + e.message); });
 }
 
-async function transcodeToMp3Blob(file) {
-  if (file.name.toLowerCase().endsWith('.mp3') && file.size < 450 * 1024) {
-    return file;
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+// 計算聽出站名與官方城巴車站的相似度，回傳前 5 名候選站
+function findBestStopMatches(heardTc, heardEn) {
+  const nTc = normText(heardTc);
+  const nEn = normText(heardEn);
+  if (!nTc && !nEn) return [];
+
+  const scored = [];
+  for (const st of uniqueStops) {
+    let score = 0;
+    if (nTc && st.normTc) {
+      if (st.normTc === nTc) score = Math.max(score, 100);
+      else if (st.normTc.includes(nTc) || nTc.includes(st.normTc)) {
+        const ratio = Math.min(st.normTc.length, nTc.length) / Math.max(st.normTc.length, nTc.length);
+        score = Math.max(score, Math.round(70 + ratio * 25));
+      } else {
+        // 字元重疊率
+        let hits = 0;
+        for (const ch of nTc) if (st.normTc.includes(ch)) hits++;
+        const overlap = hits / Math.max(st.normTc.length, nTc.length);
+        if (overlap >= 0.6) score = Math.max(score, Math.round(overlap * 75));
+      }
+    }
+    if (nEn && st.normEn) {
+      if (st.normEn === nEn) score = Math.max(score, 98);
+      else if (st.normEn.includes(nEn) || nEn.includes(st.normEn)) {
+        const ratio = Math.min(st.normEn.length, nEn.length) / Math.max(st.normEn.length, nEn.length);
+        score = Math.max(score, Math.round(68 + ratio * 25));
+      }
+    }
+    if (score >= 58) {
+      scored.push({ stopId: st.stopId, score });
+    }
   }
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, 6);
+}
+
+// 呼叫 Gemini API 聽取 MP3 音檔並輸出結構化翻譯與站名
+async function analyzeAudioWithGemini(relPath, customBlob = null) {
+  const apiKey = (localStorage.getItem('ctb_gemini_api_key') || '').trim();
+  if (!apiKey) {
+    throw new Error('請先點右上角「API / GitHub 設定」填入 Gemini API Key');
+  }
+  const model = document.getElementById('geminiModelSel').value || 'gemini-2.5-flash';
+
+  let blob = customBlob;
+  if (!blob) {
+    const res = await fetch(buildAudioUrl(relPath));
+    if (!res.ok) throw new Error(`無法下載音檔 (${res.status})`);
+    blob = await res.blob();
+  }
+  const base64Audio = await blobToBase64(blob);
+  const mimeType = (blob.type && blob.type.startsWith('audio/')) ? blob.type : 'audio/mp3';
+
+  const prompt = `你係香港城巴（Citybus）報站語音辨識專家。請細心聆聽呢段巴士報站錄音，並嚴格只以 JSON 格式回覆（唔要 markdown 標記）：
+{
+  "transcript": "完整逐字轉錄內容（包括粵語、英語、普通話原文）",
+  "stopNameTc": "核心香港繁體中文車站名（去除「下一站」、「即將到達」、「本班車終點站」等前綴詞；若非車站報站則留空）",
+  "stopNameEn": "核心英文車站名（去除 Next stop 等前綴；若無則留空）",
+  "type": "stop 或 welcome 或 special",
+  "confidence": 0.0 至 1.0 之間的數值
+}`;
+
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const gRes = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{
+        parts: [
+          { inline_data: { mime_type: mimeType, data: base64Audio } },
+          { text: prompt }
+        ]
+      }],
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.1
+      }
+    })
+  });
+
+  if (!gRes.ok) {
+    const errJson = await gRes.json().catch(() => ({}));
+    throw new Error(errJson?.error?.message || `Gemini API 錯誤 (${gRes.status})`);
+  }
+
+  const gData = await gRes.json();
+  const rawText = gData?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+  let parsed = {};
+  try {
+    parsed = JSON.parse(rawText.replace(/^```json\s*|\s*```$/g, '').trim());
+  } catch (_) {
+    parsed = { transcript: rawText, stopNameTc: '', stopNameEn: '', type: 'stop', confidence: 0.5 };
+  }
+
+  const heardTc = String(parsed.stopNameTc || '').trim();
+  const heardEn = String(parsed.stopNameEn || '').trim();
+  const candidates = findBestStopMatches(heardTc, heardEn);
+  const topMatch = candidates[0] || null;
+
+  const rec = getRecord(relPath);
+  rec.transcript = String(parsed.transcript || '').trim();
+  rec.heardTc = heardTc;
+  rec.heardEn = heardEn;
+  rec.type = String(parsed.type || 'stop');
+  rec.candidates = candidates;
+
+  if (topMatch && topMatch.score >= 60) {
+    rec.matchedStopId = topMatch.stopId;
+    rec.matchScore = topMatch.score;
+    rec.status = 'ai_matched';
+  } else if (rec.type === 'welcome' || rec.type === 'special') {
+    rec.matchedStopId = '';
+    rec.matchScore = Math.round((Number(parsed.confidence) || 0.7) * 100);
+    rec.status = 'ai_matched';
+  } else {
+    rec.matchedStopId = '';
+    rec.matchScore = 0;
+    rec.status = 'unmatched';
+  }
+
+  saveLocalDb();
+  return rec;
+}
+
+function getFilteredManifest() {
+  const folderMode = document.getElementById('folderFilterSel').value;
+  return audioManifest.filter(p => {
+    if (folderMode === 'stops_only') {
+      if (p.includes('/announcements/') || p.startsWith('audio/announcements/')) return false;
+      const fn = p.split('/').pop();
+      if (fn.startsWith('+')) return false;
+    }
+    return true;
+  });
+}
+
+function getItemsByCategory(cat) {
+  const kw = document.getElementById('searchInput').value.trim().toLowerCase();
+  const baseList = getFilteredManifest();
+  const res = [];
+
+  for (const path of baseList) {
+    const rec = getRecord(path);
+    if (rec.status !== cat) continue;
+    if (kw) {
+      const st = rec.matchedStopId ? stopById.get(rec.matchedStopId) : null;
+      const hay = [
+        path,
+        rec.transcript,
+        rec.heardTc,
+        rec.heardEn,
+        rec.matchedStopId,
+        st?.tc || '',
+        st?.en || '',
+        (st?.routes || []).join(' ')
+      ].join(' ').toLowerCase();
+      if (!hay.includes(kw)) continue;
+    }
+    res.push({ path, rec });
+  }
+  return res;
+}
+
+function updateCountsAndBadges() {
+  const baseList = getFilteredManifest();
+  let cUn = 0, cAi = 0, cConf = 0;
+  for (const p of baseList) {
+    const s = getRecord(p).status;
+    if (s === 'confirmed') cConf++;
+    else if (s === 'ai_matched') cAi++;
+    else cUn++;
+  }
+  document.getElementById('cntUnmatched').textContent = String(cUn);
+  document.getElementById('cntAiMatched').textContent = String(cAi);
+  document.getElementById('cntConfirmed').textContent = String(cConf);
+
+  const hasKey = !!(localStorage.getItem('ctb_gemini_api_key') || '').trim();
+  const badge = document.getElementById('apiKeyStatusBadge');
+  badge.textContent = hasKey ? 'Gemini 已就緒' : '未設 API Key';
+  badge.className = hasKey
+    ? 'text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800'
+    : 'text-[11px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800';
+}
+
+function renderList() {
+  updateCountsAndBadges();
+
+  // 更新三個類別分頁外觀
+  document.querySelectorAll('.cat-tab').forEach(btn => {
+    const active = btn.dataset.cat === currentTab;
+    btn.className = active
+      ? 'cat-tab px-3 py-4 text-left border-b-2 border-[#111827] bg-white'
+      : 'cat-tab px-3 py-4 text-left border-b-2 border-transparent hover:bg-slate-100/70';
+  });
+
+  const helper = document.getElementById('tabHelperText');
+  const confirmAllBtn = document.getElementById('btnConfirmAllHigh');
+  if (currentTab === 'unmatched') {
+    helper.textContent = '尚未配對的錄音檔。點「Gemini 聽聲」逐個分析，或在左側啟動批次掃描。';
+    confirmAllBtn.classList.add('hidden');
+  } else if (currentTab === 'ai_matched') {
+    helper.textContent = 'Gemini 已自動聽聲並配對車站。試聽核實無誤後按「確認分類」，即可歸入已確認庫。';
+    confirmAllBtn.classList.remove('hidden');
+  } else {
+    helper.textContent = '你已核實的正式對照庫。按右上角「同步已確認表」即可套用至城巴報站模擬器。';
+    confirmAllBtn.classList.add('hidden');
+  }
+
+  const items = getItemsByCategory(currentTab);
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+  if (currentPage >= totalPages) currentPage = totalPages - 1;
+  if (currentPage < 0) currentPage = 0;
+
+  const slice = items.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+  document.getElementById('pageInfoText').textContent = `第 ${currentPage + 1} / ${totalPages} 頁（本類別共 ${items.length} 項）`;
+  document.getElementById('btnPagePrev').disabled = currentPage <= 0;
+  document.getElementById('btnPageNext').disabled = currentPage >= totalPages - 1;
+
+  const body = document.getElementById('audioListBody');
+  if (slice.length === 0) {
+    body.innerHTML = `<div class="py-14 text-center text-sm font-bold text-slate-400">此類別目前沒有項目</div>`;
+    return;
+  }
+
+  body.innerHTML = slice.map(({ path, rec }) => {
+    const fileName = path.split('/').pop();
+    const isPlaying = playingPath === path;
+    const st = rec.matchedStopId ? stopById.get(rec.matchedStopId) : null;
+
+    // 候選車站下拉選單（僅在 Gemini 自動分好或已有候選時顯示）
+    const candOpts = (rec.candidates || []).map(c => {
+      const cs = stopById.get(c.stopId);
+      if (!cs) return '';
+      const rts = cs.routes.slice(0, 5).join(', ');
+      return `<option value="${esc(cs.stopId)}" ${cs.stopId === rec.matchedStopId ? 'selected' : ''}>${esc(cs.tc)} (${esc(cs.numId)}) · ${c.score}% ${rts ? '[' + esc(rts) + ']' : ''}</option>`;
+    }).join('');
+
+    return `
+      <div class="row-item p-4 sm:px-5 space-y-2.5">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div class="min-w-0 flex-1 space-y-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-sm font-black text-[#111827] break-all">${esc(fileName)}</span>
+              ${st ? `
+                <span class="px-2 py-0.5 rounded-md text-xs font-black ${currentTab === 'confirmed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}">
+                  → ${esc(st.tc)}（站號 ${esc(st.numId)}）
+                </span>
+              ` : (rec.heardTc ? `<span class="px-2 py-0.5 rounded-md text-xs font-bold bg-slate-100 text-slate-700">聽到：${esc(rec.heardTc)}</span>` : '')}
+              ${rec.matchScore > 0 ? `<span class="text-[11px] font-bold text-slate-500">吻合度 ${rec.matchScore}%</span>` : ''}
+            </div>
+
+            ${st ? `
+              <div class="text-xs text-slate-600">
+                <span class="font-bold">${esc(st.en)}</span>
+                ${st.routes.length ? `<span class="ml-2 text-[11px] text-slate-400">途經路線：${esc(st.routes.slice(0, 8).join(' / '))}</span>` : ''}
+              </div>
+            ` : ''}
+
+            ${rec.transcript ? `
+              <div class="text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 leading-relaxed">
+                <span class="font-black text-[#0052CC] mr-1">Gemini 聽寫：</span>${esc(rec.transcript)}
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- 動作按鈕 -->
+          <div class="flex flex-wrap items-center gap-1.5 shrink-0">
+            <button data-play="${esc(path)}" class="btn-play px-3 py-1.5 rounded-lg text-xs font-bold border ${isPlaying ? 'bg-red-600 border-red-600 text-white' : 'bg-white border-slate-300 text-[#111827] hover:bg-slate-100'}">
+              ${isPlaying ? '停止' : '▶ 試聽'}
+            </button>
+
+            ${currentTab === 'unmatched' ? `
+              <button data-ai="${esc(path)}" class="btn-ai px-3 py-1.5 rounded-lg bg-[#0052CC] hover:bg-[#0041A3] text-white text-xs font-bold">
+                Gemini 聽聲
+              </button>
+              <button data-pick="${esc(path)}" class="btn-pick px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">
+                手動配對
+              </button>
+            ` : ''}
+
+            ${currentTab === 'ai_matched' ? `
+              <button data-confirm="${esc(path)}" class="btn-confirm px-3 py-1.5 rounded-lg bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold">
+                ✓ 確認分類
+              </button>
+              <button data-pick="${esc(path)}" class="btn-pick px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">
+                改選車站
+              </button>
+              <button data-reject="${esc(path)}" class="btn-reject px-2.5 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-red-50 hover:text-red-700 text-xs font-bold">
+                退回
+              </button>
+            ` : ''}
+
+            ${currentTab === 'confirmed' ? `
+              <button data-pick="${esc(path)}" class="btn-pick px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">
+                修改站號
+              </button>
+              <button data-reject="${esc(path)}" class="btn-reject px-2.5 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-amber-50 text-xs font-bold">
+                移回待確認
+              </button>
+            ` : ''}
+          </div>
+        </div>
+
+        <!-- 若 Gemini 找到多個同名／相似候選車站，提供快捷切換 -->
+        ${currentTab === 'ai_matched' && (rec.candidates || []).length > 1 ? `
+          <div class="flex items-center gap-2 pt-1">
+            <span class="text-[11px] font-bold text-slate-500 shrink-0">切換候選站：</span>
+            <select data-candsel="${esc(path)}" class="cand-select flex-1 max-w-md px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-xs font-bold">
+              ${candOpts}
+            </select>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+
+  // 綁定列表按鈕事件
+  body.querySelectorAll('.btn-play').forEach(b => b.onclick = () => togglePreview(b.dataset.play));
+
+  body.querySelectorAll('.btn-ai').forEach(b => {
+    b.onclick = async () => {
+      const p = b.dataset.ai;
+      b.disabled = true;
+      b.textContent = '聽聲中...';
+      try {
+        const rec = await analyzeAudioWithGemini(p);
+        toast(rec.status === 'ai_matched' ? `已辨識：${rec.heardTc || rec.heardEn}（移入 Gemini 自動分好）` : '已聽寫但未能自動配對，請手動指定車站');
+        renderList();
+      } catch (e) {
+        toast(e.message);
+        b.disabled = false;
+        b.textContent = 'Gemini 聽聲';
+      }
+    };
+  });
+
+  body.querySelectorAll('.btn-confirm').forEach(b => {
+    b.onclick = () => {
+      const rec = getRecord(b.dataset.confirm);
+      rec.status = 'confirmed';
+      saveLocalDb();
+      toast('已確認分類並寫入本地快取');
+      renderList();
+    };
+  });
+
+  body.querySelectorAll('.btn-reject').forEach(b => {
+    b.onclick = () => {
+      const rec = getRecord(b.dataset.reject);
+      rec.status = currentTab === 'confirmed' ? 'ai_matched' : 'unmatched';
+      saveLocalDb();
+      renderList();
+    };
+  });
+
+  body.querySelectorAll('.cand-select').forEach(sel => {
+    sel.onchange = () => {
+      const rec = getRecord(sel.dataset.candsel);
+      rec.matchedStopId = sel.value;
+      saveLocalDb();
+      renderList();
+    };
+  });
+
+  body.querySelectorAll('.btn-pick').forEach(b => {
+    b.onclick = () => openStopPicker(b.dataset.pick);
+  });
+}
+
+// 批次執行 Gemini 聽聲自動分類
+async function runBatchGemini() {
+  if (batchRunning) return;
+  const apiKey = (localStorage.getItem('ctb_gemini_api_key') || '').trim();
+  if (!apiKey) {
+    document.getElementById('settingsModal').classList.remove('hidden');
+    toast('請先填入 Gemini API Key');
+    return;
+  }
+
+  const limit = Number(document.getElementById('batchCountSel').value) || 20;
+  const queue = getItemsByCategory('unmatched').slice(0, limit).map(x => x.path);
+  if (queue.length === 0) {
+    toast('目前沒有未配對的音檔！');
+    return;
+  }
+
+  batchRunning = true;
+  batchAbort = false;
+  document.getElementById('btnStartBatch').classList.add('hidden');
+  document.getElementById('btnStopBatch').classList.remove('hidden');
+  document.getElementById('batchProgressBox').classList.remove('hidden');
+
+  let done = 0;
+  let matched = 0;
+  for (const path of queue) {
+    if (batchAbort) break;
+    const fn = path.split('/').pop();
+    document.getElementById('batchProgressTitle').textContent = `正在聆聽：${fn}`;
+    document.getElementById('batchProgressCount').textContent = `${done} / ${queue.length}`;
+    document.getElementById('batchProgressBar').style.width = `${Math.round((done / queue.length) * 100)}%`;
+
+    try {
+      const rec = await analyzeAudioWithGemini(path);
+      done++;
+      if (rec.status === 'ai_matched') matched++;
+      document.getElementById('batchLogLine').textContent = `✓ ${fn} → ${rec.heardTc || rec.transcript.slice(0, 24) || '已分析'}`;
+      renderList();
+      // 稍作停頓避免觸發免費 API 速率上限
+      await new Promise(r => setTimeout(r, 900));
+    } catch (err) {
+      document.getElementById('batchLogLine').textContent = `⚠ ${fn} 失敗：${err.message}`;
+      toast(`批次中斷：${err.message}`);
+      break;
+    }
+  }
+
+  document.getElementById('batchProgressCount').textContent = `${done} / ${queue.length}`;
+  document.getElementById('batchProgressBar').style.width = `${Math.round((done / queue.length) * 100)}%`;
+  document.getElementById('batchProgressTitle').textContent = batchAbort ? '已暫停批次聽聲' : `完成！成功自動配對 ${matched} / ${done} 個`;
+
+  batchRunning = false;
+  document.getElementById('btnStartBatch').classList.remove('hidden');
+  document.getElementById('btnStopBatch').classList.add('hidden');
+  renderList();
+}
+
+// 手動指定車站彈窗
+function openStopPicker(audioPath) {
+  pickerTargetPath = audioPath;
+  document.getElementById('pickerAudioLabel').textContent = audioPath.split('/').pop();
+  const rec = getRecord(audioPath);
+  const inp = document.getElementById('pickerSearchInput');
+  inp.value = rec.heardTc || rec.heardEn || '';
+  renderPickerResults();
+  document.getElementById('stopPickerModal').classList.remove('hidden');
+  inp.focus();
+}
+
+function renderPickerResults() {
+  const kw = document.getElementById('pickerSearchInput').value.trim().toLowerCase();
+  const box = document.getElementById('pickerResults');
+  const hits = uniqueStops.filter(st => {
+    if (!kw) return true;
+    return st.tc.toLowerCase().includes(kw) ||
+           st.en.toLowerCase().includes(kw) ||
+           st.numId.includes(kw) ||
+           st.routes.some(r => r.toLowerCase().includes(kw));
+  }).slice(0, 60);
+
+  if (hits.length === 0) {
+    box.innerHTML = `<div class="py-8 text-center text-xs font-bold text-slate-400">找不到符合的城巴車站</div>`;
+    return;
+  }
+
+  box.innerHTML = hits.map(st => `
+    <button data-sid="${esc(st.stopId)}" class="pick-stop-row w-full px-4 py-2.5 text-left hover:bg-blue-50 flex items-center justify-between gap-2">
+      <div class="min-w-0">
+        <div class="text-sm font-black text-[#111827] truncate">${esc(st.tc)} <span class="text-xs font-bold text-[#0052CC]">#${esc(st.numId)}</span></div>
+        <div class="text-xs text-slate-500 truncate">${esc(st.en)}</div>
+        ${st.routes.length ? `<div class="text-[11px] text-slate-400 truncate">途經：${esc(st.routes.slice(0, 8).join(' / '))}</div>` : ''}
+      </div>
+      <span class="px-2.5 py-1 rounded bg-[#059669] text-white text-xs font-bold shrink-0">選定並確認</span>
+    </button>
+  `).join('');
+
+  box.querySelectorAll('.pick-stop-row').forEach(btn => {
+    btn.onclick = () => {
+      const rec = getRecord(pickerTargetPath);
+      rec.matchedStopId = btn.dataset.sid;
+      rec.matchScore = 100;
+      rec.status = 'confirmed';
+      saveLocalDb();
+      document.getElementById('stopPickerModal').classList.add('hidden');
+      toast('已手動配對並歸入「已確認」');
+      renderList();
+    };
+  });
+}
+
+// 匯出或透過 GitHub Token 同步已確認對照表至 data/audio_mapping.json
+function buildConfirmedMappingObject() {
+  const confirmed = {};
+  const details = {};
+  for (const [path, rec] of Object.entries(audioDb)) {
+    if (rec.status === 'confirmed' && rec.matchedStopId) {
+      const rawId = String(rec.matchedStopId).trim();
+      const numId = rawId.replace(/^0+/, '');
+      confirmed[rawId] = path;
+      if (numId) confirmed[numId] = path;
+      details[path] = {
+        stopId: rawId,
+        transcript: rec.transcript || '',
+        heardTc: rec.heardTc || '',
+        heardEn: rec.heardEn || ''
+      };
+    }
+  }
+  return { version: 1, updatedAt: new Date().toISOString(), confirmed, details };
+}
+
+function downloadJson(obj, filename) {
+  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+async function publishMappingToGithub() {
+  const payload = buildConfirmedMappingObject();
+  const count = Object.keys(payload.details).length;
+  if (count === 0) {
+    toast('「已確認」類別目前是空的，請先確認至少一個配對');
+    return;
+  }
+  const token = (localStorage.getItem('ctb_gh_token') || '').trim();
+  if (!token) {
+    downloadJson(payload, 'audio_mapping.json');
+    toast(`已匯出 ${count} 筆已確認對照（放入 G:\\CTB-LECIP-Web\\data\\audio_mapping.json 或設定 GitHub Token 直傳）`);
+    return;
+  }
+
+  try {
+    toast(`正在同步 ${count} 筆已確認對照至 GitHub...`);
+    const apiUrl = `https://api.github.com/repos/${GH_OWNER}/${GH_WEB_REPO}/contents/data/audio_mapping.json`;
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json'
+    };
+    const chk = await fetch(apiUrl, { headers });
+    const sha = chk.ok ? (await chk.json()).sha : undefined;
+    const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+    const put = await fetch(apiUrl, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({
+        message: `Sync ${count} confirmed stop audio mappings from Gemini Studio`,
+        content: b64,
+        sha
+      })
+    });
+    if (!put.ok) throw new Error((await put.json().catch(() => ({}))).message || '推送失敗');
+    toast(`已成功同步 ${count} 筆已確認配對上雲端！約 1 分鐘後全裝置生效`);
+  } catch (e) {
+    toast('雲端同步失敗：' + e.message);
+  }
+}
+
+// 本地新錄音上傳：轉 MP3 -> Gemini 聽聲 -> 自動命名並可推送
+async function transcodeToMp3Blob(file) {
+  if (file.name.toLowerCase().endsWith('.mp3') && file.size < 450 * 1024) return file;
   const arrayBuf = await file.arrayBuffer();
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   const ctx = new AudioCtx();
@@ -260,409 +912,231 @@ async function transcodeToMp3Blob(file) {
   src.start(0);
   const rendered = await offline.startRendering();
   const floatData = rendered.getChannelData(0);
-
   const samples = new Int16Array(floatData.length);
   for (let i = 0; i < floatData.length; i++) {
     const s = Math.max(-1, Math.min(1, floatData[i]));
     samples[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
   }
-
   const encoder = new lamejs.Mp3Encoder(1, targetSr, 128);
-  const mp3Chunks = [];
-  const blockSize = 1152;
-  for (let i = 0; i < samples.length; i += blockSize) {
-    const chunk = samples.subarray(i, i + blockSize);
-    const buf = encoder.encodeBuffer(chunk);
-    if (buf.length > 0) mp3Chunks.push(buf);
+  const chunks = [];
+  for (let i = 0; i < samples.length; i += 1152) {
+    const buf = encoder.encodeBuffer(samples.subarray(i, i + 1152));
+    if (buf.length > 0) chunks.push(buf);
   }
   const endBuf = encoder.flush();
-  if (endBuf.length > 0) mp3Chunks.push(endBuf);
+  if (endBuf.length > 0) chunks.push(endBuf);
   await ctx.close();
-  return new Blob(mp3Chunks, { type: 'audio/mp3' });
+  return new Blob(chunks, { type: 'audio/mp3' });
 }
 
-function blobToBase64(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result).split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
+async function handleNewAudioFiles(fileList) {
+  const token = (localStorage.getItem('ctb_gh_token') || '').trim();
+  const hasGemini = !!(localStorage.getItem('ctb_gemini_api_key') || '').trim();
 
-async function uploadToGithubAudioRepo(targetRelPath, mp3Blob, oldRelPathToRemove = '') {
-  const token = localStorage.getItem('ctb_gh_token') || '';
-  if (!token) {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(mp3Blob);
-    a.download = targetRelPath.split('/').pop();
-    a.click();
-    toast(`已自動命名為 ${a.download} 並下載（設定雲端 Token 可一鍵直傳）`);
-    return;
-  }
+  for (const file of Array.from(fileList || [])) {
+    try {
+      toast(`處理中：${file.name}...`);
+      const mp3Blob = await transcodeToMp3Blob(file);
+      let suggestedName = file.name.replace(/\.[^.]+$/, '') + '.mp3';
+      let tempPath = `audio/stops/${suggestedName}`;
 
-  const apiBase = `https://api.github.com/repos/${GH_OWNER}/${GH_AUDIO_REPO}/contents`;
-  const headers = {
-    'Authorization': `Bearer ${token}`,
-    'Accept': 'application/vnd.github+json',
-    'Content-Type': 'application/json'
-  };
+      if (hasGemini) {
+        const rec = await analyzeAudioWithGemini(tempPath, mp3Blob);
+        if (rec.matchedStopId) {
+          const st = stopById.get(rec.matchedStopId);
+          const cleanNm = (st?.tc || rec.heardTc || '').replace(/[\\/:*?"<>|\s]+/g, '');
+          if (cleanNm) {
+            suggestedName = `${st.numId}_${cleanNm}.mp3`;
+            const finalPath = `audio/stops/${suggestedName}`;
+            audioDb[finalPath] = rec;
+            delete audioDb[tempPath];
+            tempPath = finalPath;
+            saveLocalDb();
+          }
+        }
+      }
 
-  let sha = undefined;
-  const checkRes = await fetch(`${apiBase}/${targetRelPath}`, { headers });
-  if (checkRes.ok) {
-    const info = await checkRes.json();
-    sha = info.sha;
-  }
-
-  const b64 = await blobToBase64(mp3Blob);
-  const putRes = await fetch(`${apiBase}/${targetRelPath}`, {
-    method: 'PUT',
-    headers,
-    body: JSON.stringify({
-      message: `Upload named stop audio ${targetRelPath}`,
-      content: b64,
-      sha
-    })
-  });
-  if (!putRes.ok) {
-    const err = await putRes.json().catch(() => ({}));
-    throw new Error(err.message || 'GitHub 上傳失敗');
-  }
-
-  if (oldRelPathToRemove && oldRelPathToRemove !== targetRelPath) {
-    audioManifest = audioManifest.filter(x => x !== oldRelPathToRemove);
-  }
-  if (!audioManifest.includes(targetRelPath)) {
-    audioManifest.push(targetRelPath);
-    audioManifest.sort();
-  }
-
-  const mCheck = await fetch(`${apiBase}/audio_manifest.json`, { headers });
-  const mInfo = mCheck.ok ? await mCheck.json() : {};
-  const mB64 = btoa(unescape(encodeURIComponent(JSON.stringify(audioManifest))));
-  await fetch(`${apiBase}/audio_manifest.json`, {
-    method: 'PUT',
-    headers,
-    body: JSON.stringify({
-      message: `Update audio_manifest.json for ${targetRelPath}`,
-      content: mB64,
-      sha: mInfo.sha
-    })
-  });
-
-  rebuildAudioIndexes();
-  toast(`已成功命名並上傳：${targetRelPath.split('/').pop()}`);
-}
-
-async function processAndUploadFile(file, forcedNumStopId = '') {
-  try {
-    toast(`正在轉碼並命名 ${file.name}...`);
-    const mp3Blob = await transcodeToMp3Blob(file);
-    let numId = forcedNumStopId;
-    if (!numId) {
-      const m = file.name.match(/^0*(\d+)/);
-      if (m) numId = m[1];
-    }
-    const finalName = numId ? makeSafeStopFilename(numId, fileNamingLang) : file.name.replace(/\.[^.]+$/, '.mp3');
-    const oldPath = numId ? (stopIdMap.get(numId) || '') : '';
-    const targetPath = `audio/stops/${finalName}`;
-    await uploadToGithubAudioRepo(targetPath, mp3Blob, oldPath);
-    renderCurrentView();
-  } catch (e) {
-    toast('處理失敗：' + e.message);
-  }
-}
-
-function renderTripOptions() {
-  const rno = document.getElementById('routeSelect').value;
-  const trips = allRoutes.filter(r => String(r.routeNo || r.route || '').toUpperCase() === rno);
-  const tripSel = document.getElementById('tripSelect');
-  tripSel.innerHTML = trips.map((t, idx) => {
-    const dest = cleanJoint(t.destTc || t.destinationTc || '');
-    const orig = cleanJoint(t.origTc || t.originTc || '');
-    const b = String(t.bound || 'O').toUpperCase();
-    return `<option value="${idx}">${esc(rno)} (${esc(b)}) · ${esc(orig)} → ${esc(dest)}</option>`;
-  }).join('');
-  renderCurrentView();
-}
-
-function renderRouteStopsTable() {
-  const rno = document.getElementById('routeSelect').value;
-  const trips = allRoutes.filter(r => String(r.routeNo || r.route || '').toUpperCase() === rno);
-  const trip = trips[Number(document.getElementById('tripSelect').value) || 0];
-  const body = document.getElementById('stopsTableBody');
-  if (!trip) { body.innerHTML = ''; return; }
-
-  const rid = trip.routeId || `CTB-${rno}`;
-  const b = String(trip.bound || 'O').toUpperCase();
-  const pat = trip.patternId || '';
-  const dest = cleanJoint(trip.destTc || trip.destinationTc || '');
-
-  let list = allStops.filter(s => s.routeId === rid && String(s.bound || '').toUpperCase() === b && (s.patternId || '') === pat);
-  if (list.length === 0) {
-    const fallback = allStops.filter(s => s.routeId === rid && String(s.bound || '').toUpperCase() === b);
-    if (fallback.length > 0) {
-      const firstPat = fallback[0].patternId || '';
-      list = fallback.filter(x => (x.patternId || '') === firstPat);
+      if (token) {
+        const apiBase = `https://api.github.com/repos/${GH_OWNER}/${GH_AUDIO_REPO}/contents`;
+        const headers = { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' };
+        const chk = await fetch(`${apiBase}/${tempPath}`, { headers });
+        const sha = chk.ok ? (await chk.json()).sha : undefined;
+        const b64 = await blobToBase64(mp3Blob);
+        const put = await fetch(`${apiBase}/${tempPath}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ message: `Upload audio ${tempPath}`, content: b64, sha })
+        });
+        if (put.ok) {
+          if (!audioManifest.includes(tempPath)) {
+            audioManifest.push(tempPath);
+            audioManifest.sort();
+            const mChk = await fetch(`${apiBase}/audio_manifest.json`, { headers });
+            const mSha = mChk.ok ? (await mChk.json()).sha : undefined;
+            const mB64 = btoa(unescape(encodeURIComponent(JSON.stringify(audioManifest))));
+            await fetch(`${apiBase}/audio_manifest.json`, {
+              method: 'PUT',
+              headers,
+              body: JSON.stringify({ message: `Add ${tempPath} to manifest`, content: mB64, sha: mSha })
+            });
+          }
+          toast(`已上傳並辨識：${suggestedName}`);
+        }
+      } else {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(mp3Blob);
+        a.download = suggestedName;
+        a.click();
+        toast(`已聽聲命名並下載：${suggestedName}`);
+      }
+      renderList();
+    } catch (e) {
+      toast(`上傳失敗 (${file.name})：${e.message}`);
     }
   }
-  list.sort((a, b) => (a.seq ?? 0) - (b.seq ?? 0));
-
-  const onlyMissing = document.getElementById('filterMissingChk').checked;
-  const matchedCnt = list.filter(s => !!getAudioForStop(s)).length;
-
-  document.getElementById('listTitle').textContent = `${rno} 往 ${dest} · 站點錄音名冊`;
-  document.getElementById('listSubtitle').textContent = `全線共 ${list.length} 站，已收錄 ${matchedCnt} 站錄音`;
-  document.getElementById('routeStatsBox').innerHTML = `
-    <span class="font-bold text-slate-700">收錄進度：<strong class="text-[#059669]">${matchedCnt}</strong> / ${list.length} 站</span>
-    <span class="font-bold text-slate-500">雲端總庫：${audioManifest.length} 檔</span>
-  `;
-
-  const displayList = onlyMissing ? list.filter(s => !getAudioForStop(s)) : list;
-
-  if (displayList.length === 0) {
-    body.innerHTML = `<div class="py-12 text-center text-sm font-bold text-slate-400">此篩選條件下沒有車站</div>`;
-    return;
-  }
-
-  body.innerHTML = displayList.map(st => {
-    const seq = String(st.seq ?? '').padStart(2, '0');
-    const numId = getNumStopId(st.stopId);
-    const nameTc = cleanJoint(st.nameTc || '');
-    const nameEn = cleanJoint(st.nameEn || '');
-    const audioPath = getAudioForStop(st);
-    const displayFile = audioPath ? audioPath.split('/').pop() : '';
-    const isPlaying = audioPath && playingPath === audioPath;
-
-    return `
-      <div class="row-item px-5 py-3.5 grid grid-cols-1 sm:grid-cols-12 items-center gap-3">
-        <div class="sm:col-span-5 flex items-baseline gap-3 min-w-0">
-          <span class="text-xs font-extrabold text-slate-400 w-6 shrink-0">${esc(seq)}</span>
-          <div class="min-w-0">
-            <div class="text-sm font-black text-[#111827] truncate">${esc(nameTc)}</div>
-            <div class="text-xs text-slate-500 truncate">${esc(nameEn)}</div>
-          </div>
-        </div>
-
-        <div class="sm:col-span-4 min-w-0">
-          ${displayFile ? `
-            <div class="inline-flex items-center gap-1.5 max-w-full px-2.5 py-1 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
-              <span class="w-1.5 h-1.5 rounded-full bg-[#059669] shrink-0"></span>
-              <span class="truncate">${esc(displayFile)}</span>
-            </div>
-          ` : `
-            <span class="text-xs font-medium text-slate-400">尚未收錄（站號 ${esc(numId || '無')}）</span>
-          `}
-        </div>
-
-        <div class="sm:col-span-3 flex items-center sm:justify-end gap-2 shrink-0">
-          ${audioPath ? `
-            <button data-play="${esc(audioPath)}" class="btn-play px-3 py-1.5 rounded-lg text-xs font-bold border ${isPlaying ? 'bg-red-600 border-red-600 text-white' : 'bg-white border-slate-300 text-[#111827] hover:bg-slate-100'}">
-              ${isPlaying ? '停止' : '試聽'}
-            </button>
-          ` : ''}
-          <button data-numid="${esc(numId)}" class="btn-upload px-3 py-1.5 rounded-lg bg-[#0052CC] hover:bg-[#0041A3] text-white text-xs font-bold">
-            ${audioPath ? '替換' : '上傳錄音'}
-          </button>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  body.querySelectorAll('.btn-play').forEach(b => {
-    b.onclick = () => togglePreview(b.dataset.play);
-  });
-  body.querySelectorAll('.btn-upload').forEach(b => {
-    b.onclick = () => {
-      pendingRowStopId = b.dataset.numid;
-      document.getElementById('rowFileInput').click();
-    };
-  });
-}
-
-function renderLibraryTable() {
-  const kw = document.getElementById('librarySearchInput').value.trim().toLowerCase();
-  const body = document.getElementById('stopsTableBody');
-
-  const stopEntries = Array.from(stopIdMap.entries()).map(([numId, relPath]) => {
-    const meta = stopMetaMap.get(numId) || { tc: '', en: '' };
-    return {
-      numId,
-      relPath,
-      fileName: relPath.split('/').pop(),
-      tc: meta.tc,
-      en: meta.en
-    };
-  }).filter(item => {
-    if (!kw) return true;
-    return item.numId.includes(kw) ||
-           item.fileName.toLowerCase().includes(kw) ||
-           item.tc.toLowerCase().includes(kw) ||
-           item.en.toLowerCase().includes(kw);
-  });
-
-  document.getElementById('listTitle').textContent = '已命名站點聲音檔總庫';
-  document.getElementById('listSubtitle').textContent = `顯示 ${stopEntries.length} 個已對應城巴站號的獨立聲音檔`;
-  document.getElementById('routeStatsBox').innerHTML = `
-    <span class="font-bold text-slate-700">已命名站號：<strong class="text-[#059669]">${stopIdMap.size}</strong> 個</span>
-    <span class="font-bold text-slate-500">總音檔數：${audioManifest.length}</span>
-  `;
-
-  if (stopEntries.length === 0) {
-    body.innerHTML = `<div class="py-12 text-center text-sm font-bold text-slate-400">找不到符合「${esc(kw)}」的聲音檔</div>`;
-    return;
-  }
-
-  body.innerHTML = stopEntries.slice(0, 200).map(item => {
-    const isPlaying = playingPath === item.relPath;
-    return `
-      <div class="row-item px-5 py-3.5 grid grid-cols-1 sm:grid-cols-12 items-center gap-3">
-        <div class="sm:col-span-5 flex items-baseline gap-3 min-w-0">
-          <span class="text-xs font-bold text-slate-400 w-12 shrink-0">#${esc(item.numId)}</span>
-          <div class="min-w-0">
-            <div class="text-sm font-black text-[#111827] truncate">${esc(item.tc || '未命名車站')}</div>
-            <div class="text-xs text-slate-500 truncate">${esc(item.en)}</div>
-          </div>
-        </div>
-        <div class="sm:col-span-4 min-w-0">
-          <div class="inline-flex items-center gap-1.5 max-w-full px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold">
-            <span class="truncate">${esc(item.fileName)}</span>
-          </div>
-        </div>
-        <div class="sm:col-span-3 flex items-center sm:justify-end gap-2 shrink-0">
-          <button data-play="${esc(item.relPath)}" class="btn-play px-3 py-1.5 rounded-lg text-xs font-bold border ${isPlaying ? 'bg-red-600 border-red-600 text-white' : 'bg-white border-slate-300 text-[#111827] hover:bg-slate-100'}">
-            ${isPlaying ? '停止' : '試聽'}
-          </button>
-          <button data-numid="${esc(item.numId)}" class="btn-upload px-3 py-1.5 rounded-lg bg-[#0052CC] hover:bg-[#0041A3] text-white text-xs font-bold">
-            替換
-          </button>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  body.querySelectorAll('.btn-play').forEach(b => {
-    b.onclick = () => togglePreview(b.dataset.play);
-  });
-  body.querySelectorAll('.btn-upload').forEach(b => {
-    b.onclick = () => {
-      pendingRowStopId = b.dataset.numid;
-      document.getElementById('rowFileInput').click();
-    };
-  });
-}
-
-function renderCurrentView() {
-  if (viewMode === 'route') renderRouteStopsTable();
-  else renderLibraryTable();
 }
 
 async function init() {
-  const [rRes, sRes, mRes] = await Promise.all([
-    fetch('./data/routes.json'),
-    fetch('./data/stops.json'),
-    fetch(`${AUDIO_CDN_BASE}/audio_manifest.json?v=${Date.now()}`).catch(() => null)
-  ]);
-  allRoutes = await rRes.json();
-  allStops = await sRes.json();
+  // 讀取本地儲存進度
+  try {
+    const raw = localStorage.getItem(STORAGE_DB_KEY);
+    if (raw) audioDb = JSON.parse(raw) || {};
+  } catch (_) { audioDb = {}; }
 
+  const [sRes, mRes, mapRes] = await Promise.all([
+    fetch('./data/stops.json'),
+    fetch(`${AUDIO_CDN_BASE}/audio_manifest.json?v=${Date.now()}`).catch(() => null),
+    fetch(`./data/audio_mapping.json?v=${Date.now()}`).catch(() => null)
+  ]);
+
+  const allStops = await sRes.json();
+  const stopMapTemp = new Map();
   for (const s of allStops) {
-    const nid = getNumStopId(s.stopId);
-    if (nid && !stopMetaMap.has(nid)) {
-      stopMetaMap.set(nid, {
-        tc: cleanJoint(s.nameTc || ''),
-        en: cleanJoint(s.nameEn || '')
+    const sid = String(s.stopId || '').trim();
+    if (!sid) continue;
+    const numId = sid.replace(/^0+/, '') || '0';
+    const rno = String(s.routeId || '').replace(/^CTB-/i, '').toUpperCase();
+    if (!stopMapTemp.has(sid)) {
+      const tc = cleanJoint(s.nameTc || '');
+      const en = cleanJoint(s.nameEn || '');
+      stopMapTemp.set(sid, {
+        stopId: sid,
+        numId,
+        tc,
+        en,
+        normTc: normText(tc),
+        normEn: normText(en),
+        routesSet: new Set()
       });
     }
+    if (rno) stopMapTemp.get(sid).routesSet.add(rno);
   }
+
+  uniqueStops = Array.from(stopMapTemp.values()).map(v => ({
+    stopId: v.stopId,
+    numId: v.numId,
+    tc: v.tc,
+    en: v.en,
+    normTc: v.normTc,
+    normEn: v.normEn,
+    routes: Array.from(v.routesSet).sort()
+  }));
+  uniqueStops.forEach(st => stopById.set(st.stopId, st));
 
   if (mRes && mRes.ok) {
     audioManifest = (await mRes.json()).map(x => String(x).replace(/\\/g, '/'));
-    rebuildAudioIndexes();
   }
 
-  const routeNos = Array.from(new Set(allRoutes.map(r => String(r.routeNo || r.route || '').toUpperCase()).filter(Boolean))).sort();
-  const sel = document.getElementById('routeSelect');
-  const renderRouteOpts = (kw = '') => {
-    const list = kw ? routeNos.filter(x => x.includes(kw.toUpperCase())) : routeNos;
-    sel.innerHTML = list.map(no => `<option value="${esc(no)}">${esc(no)}</option>`).join('');
-    if (list.includes('796X') && !kw) sel.value = '796X';
-    renderTripOptions();
-  };
-  renderRouteOpts();
-
-  document.getElementById('routeSearchInput').oninput = e => renderRouteOpts(e.target.value.trim());
-  sel.onchange = renderTripOptions;
-  document.getElementById('tripSelect').onchange = renderCurrentView;
-  document.getElementById('filterMissingChk').onchange = renderCurrentView;
-  document.getElementById('librarySearchInput').oninput = renderCurrentView;
-
-  const modeRouteBtn = document.getElementById('modeRouteBtn');
-  const modeLibraryBtn = document.getElementById('modeLibraryBtn');
-  modeRouteBtn.onclick = () => {
-    viewMode = 'route';
-    modeRouteBtn.className = 'py-2 rounded-md bg-white text-[#111827] shadow-sm';
-    modeLibraryBtn.className = 'py-2 rounded-md text-slate-600 hover:text-black';
-    document.getElementById('routeFilterPanel').classList.remove('hidden');
-    document.getElementById('libraryFilterPanel').classList.add('hidden');
-    document.getElementById('missingToggleWrap').classList.remove('hidden');
-    renderCurrentView();
-  };
-  modeLibraryBtn.onclick = () => {
-    viewMode = 'library';
-    modeLibraryBtn.className = 'py-2 rounded-md bg-white text-[#111827] shadow-sm';
-    modeRouteBtn.className = 'py-2 rounded-md text-slate-600 hover:text-black';
-    document.getElementById('routeFilterPanel').classList.add('hidden');
-    document.getElementById('libraryFilterPanel').classList.remove('hidden');
-    document.getElementById('missingToggleWrap').classList.add('hidden');
-    renderCurrentView();
-  };
-
-  const langTcBtn = document.getElementById('langTcBtn');
-  const langEnBtn = document.getElementById('langEnBtn');
-  langTcBtn.onclick = () => {
-    fileNamingLang = 'tc';
-    langTcBtn.className = 'px-2.5 py-1 rounded-md bg-[#111827] text-white';
-    langEnBtn.className = 'px-2.5 py-1 rounded-md text-slate-600 hover:text-black';
-    toast('上傳新錄音將自動以「中文站名」命名');
-  };
-  langEnBtn.onclick = () => {
-    fileNamingLang = 'en';
-    langEnBtn.className = 'px-2.5 py-1 rounded-md bg-[#111827] text-white';
-    langTcBtn.className = 'px-2.5 py-1 rounded-md text-slate-600 hover:text-black';
-    toast('New uploads will be named with English stop names');
-  };
-
-  document.getElementById('rowFileInput').onchange = async e => {
-    const f = e.target.files?.[0];
-    if (f) await processAndUploadFile(f, pendingRowStopId);
-    e.target.value = '';
-  };
-
-  document.getElementById('directUploadInput').onchange = async e => {
-    for (const f of Array.from(e.target.files || [])) {
-      await processAndUploadFile(f, '');
+  // 合併雲端 data/audio_mapping.json 中已確認的記錄
+  if (mapRes && mapRes.ok) {
+    const cloud = await mapRes.json().catch(() => ({}));
+    const details = cloud?.details || {};
+    for (const [path, info] of Object.entries(details)) {
+      if (!audioDb[path] || audioDb[path].status === 'unmatched') {
+        audioDb[path] = {
+          status: 'confirmed',
+          transcript: info.transcript || '',
+          heardTc: info.heardTc || '',
+          heardEn: info.heardEn || '',
+          type: 'stop',
+          matchedStopId: info.stopId || '',
+          matchScore: 100,
+          candidates: []
+        };
+      }
     }
+  }
+
+  // 綁定三類別分頁
+  document.querySelectorAll('.cat-tab').forEach(btn => {
+    btn.onclick = () => {
+      currentTab = btn.dataset.cat;
+      currentPage = 0;
+      renderList();
+    };
+  });
+
+  document.getElementById('searchInput').oninput = () => { currentPage = 0; renderList(); };
+  document.getElementById('folderFilterSel').onchange = () => { currentPage = 0; renderList(); };
+  document.getElementById('btnPagePrev').onclick = () => { if (currentPage > 0) { currentPage--; renderList(); } };
+  document.getElementById('btnPageNext').onclick = () => { currentPage++; renderList(); };
+
+  document.getElementById('btnStartBatch').onclick = runBatchGemini;
+  document.getElementById('btnStopBatch').onclick = () => { batchAbort = true; };
+
+  document.getElementById('btnConfirmAllHigh').onclick = () => {
+    const items = getItemsByCategory('ai_matched');
+    let moved = 0;
+    for (const { rec } of items) {
+      if (rec.matchedStopId && rec.matchScore >= 90) {
+        rec.status = 'confirmed';
+        moved++;
+      }
+    }
+    saveLocalDb();
+    toast(moved > 0 ? `已一次確認 ${moved} 個高吻合度（≥90%）車站！` : '目前沒有 ≥90% 高吻合度的待確認項目');
+    renderList();
+  };
+
+  document.getElementById('btnExportJson').onclick = () => {
+    downloadJson(buildConfirmedMappingObject(), 'audio_mapping.json');
+    toast('已匯出 audio_mapping.json');
+  };
+  document.getElementById('btnPublishMapping').onclick = publishMappingToGithub;
+
+  document.getElementById('pickerSearchInput').oninput = renderPickerResults;
+  document.getElementById('btnClosePicker').onclick = () => document.getElementById('stopPickerModal').classList.add('hidden');
+
+  document.getElementById('newAudioUploadInput').onchange = async e => {
+    await handleNewAudioFiles(e.target.files);
     e.target.value = '';
   };
 
-  const ghModal = document.getElementById('ghModal');
-  document.getElementById('btnGithubConfig').onclick = () => {
+  // 設定彈窗
+  const sModal = document.getElementById('settingsModal');
+  document.getElementById('btnSettings').onclick = () => {
+    document.getElementById('geminiKeyInput').value = localStorage.getItem('ctb_gemini_api_key') || '';
     document.getElementById('ghTokenInput').value = localStorage.getItem('ctb_gh_token') || '';
-    ghModal.classList.remove('hidden');
+    sModal.classList.remove('hidden');
   };
-  document.getElementById('btnCloseGh').onclick = () => ghModal.classList.add('hidden');
-  document.getElementById('btnSaveGh').onclick = () => {
+  document.getElementById('btnCloseSettings').onclick = () => sModal.classList.add('hidden');
+  document.getElementById('btnSaveKeys').onclick = () => {
+    localStorage.setItem('ctb_gemini_api_key', document.getElementById('geminiKeyInput').value.trim());
     localStorage.setItem('ctb_gh_token', document.getElementById('ghTokenInput').value.trim());
-    ghModal.classList.add('hidden');
-    toast('已儲存雲端直傳 Token');
+    sModal.classList.add('hidden');
+    updateCountsAndBadges();
+    toast('設定已儲存');
   };
-  document.getElementById('btnClearGh').onclick = () => {
+  document.getElementById('btnClearKeys').onclick = () => {
+    localStorage.removeItem('ctb_gemini_api_key');
     localStorage.removeItem('ctb_gh_token');
+    document.getElementById('geminiKeyInput').value = '';
     document.getElementById('ghTokenInput').value = '';
-    toast('已清除 Token');
+    updateCountsAndBadges();
+    toast('已清除金鑰');
   };
+
+  renderList();
 }
 
 init();

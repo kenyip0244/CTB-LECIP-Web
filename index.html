@@ -389,6 +389,7 @@ const state = {
   audioByBaseName: new Map(),
   audioManifest: [],
   audioStemMap: new Map(),
+  confirmedAudioMap: {},
 
   selectedRouteNo: '',
   selectedBound: '',
@@ -602,13 +603,10 @@ function computeTripSections(stops, trip) {
 function getEffectiveStopAudio(st) {
   if (!st) return '';
   if (st.stopId) {
-    const numId = String(st.stopId).trim().replace(/^0+/, '');
-    if (numId) {
-      if (state.audioStemMap.has(`id_${numId}_a`)) return state.audioStemMap.get(`id_${numId}_a`);
-      if (state.audioStemMap.has(`${numId}_a`)) return state.audioStemMap.get(`${numId}_a`);
-      if (state.audioStemMap.has(`id_${numId}_b`)) return state.audioStemMap.get(`id_${numId}_b`);
-      if (state.audioStemMap.has(`${numId}_b`)) return state.audioStemMap.get(`${numId}_b`);
-    }
+    const rawId = String(st.stopId).trim();
+    const numId = rawId.replace(/^0+/, '');
+    if (state.confirmedAudioMap[rawId]) return state.confirmedAudioMap[rawId];
+    if (numId && state.confirmedAudioMap[numId]) return state.confirmedAudioMap[numId];
   }
   if (st.stopAudioFile) return st.stopAudioFile;
   return '';
@@ -3263,7 +3261,7 @@ function renderSettingsView(vp, bar) {
       <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">診斷模式</div>
       <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5 text-xs">
         <div class="p-3 rounded-xl border ${th.card} space-y-1.5">
-          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v55)</div>
+          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v56)</div>
           <div>App Version：<b>23.06.25</b> ｜ Config：<b>ctb_prod_v10</b></div>
           <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
           <div>站點資料庫：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
@@ -3551,7 +3549,29 @@ async function fetchInitialLightData() {
   const set = new Set(state.routes.map(getRouteNo).filter(Boolean));
   state.uniqueRouteNos = Array.from(set).sort(compareRouteNo);
 
-  fetch(`${AUDIO_CDN_BASE}/audio_manifest.json?v=44`)
+  // 載入已確認的站號音檔對照表（雲端 data/audio_mapping.json + 本機 admin.html 即時確認快取）
+  fetch(`./data/audio_mapping.json?v=${Date.now()}`)
+    .then(r => (r.ok ? r.json() : {}))
+    .then(obj => {
+      const merged = Object.assign({}, obj?.confirmed || obj || {});
+      try {
+        const localRaw = localStorage.getItem('ctb_lecip_gemini_audio_db_v1');
+        if (localRaw) {
+          const db = JSON.parse(localRaw);
+          for (const [path, rec] of Object.entries(db || {})) {
+            if (rec?.status === 'confirmed' && rec?.matchedStopId) {
+              const nid = String(rec.matchedStopId).replace(/^0+/, '');
+              if (nid) merged[nid] = path;
+              merged[String(rec.matchedStopId)] = path;
+            }
+          }
+        }
+      } catch (_) {}
+      state.confirmedAudioMap = merged;
+    })
+    .catch(() => {});
+
+    fetch(`${AUDIO_CDN_BASE}/audio_manifest.json?v=44`)
     .then(r => (r.ok ? r.json() : []))
     .then(list => {
       if (!Array.isArray(list)) return;
