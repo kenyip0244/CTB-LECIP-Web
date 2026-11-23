@@ -66,12 +66,11 @@
           <div>
             <label class="block text-[11px] font-bold text-slate-600 mb-1">辨識引擎 / 模型</label>
             <select id="engineModelSel" class="w-full px-2.5 py-2 rounded-lg bg-slate-50 border border-slate-300 text-xs font-bold outline-none focus:border-[#0052CC]">
-              <option value="groq:whisper-large-v3" selected>Whisper · Groq large-v3</option>
-              <option value="groq:whisper-large-v3-turbo">Whisper · Groq large-v3-turbo</option>
-              <option value="gemini:gemini-3.8-flash">Gemini · 3.8-flash</option>
-              <option value="gemini:gemini-flash-latest">Gemini · flash-latest</option>
-              <option value="gemini:gemini-3.1-flash-lite">Gemini · 3.1-flash-lite</option>
-            </select>
+                  <option value="hf:openai/whisper-large-v3" selected>HF · whisper-large-v3（推薦）</option>
+                  <option value="gemini:gemini-3.8-flash">Gemini · 3.8-flash</option>
+                  <option value="gemini:gemini-flash-latest">Gemini · flash-latest</option>
+                  <option value="groq:whisper-large-v3">Groq · whisper-large-v3</option>
+                </select>
           </div>
           <div>
             <label class="block text-[11px] font-bold text-slate-600 mb-1">單次批次數量</label>
@@ -377,6 +376,33 @@ function findBestStopMatches(heardTc, heardEn) {
   return scored.slice(0, 6);
 }
 
+async function transcribeWithHuggingFace(hfModel, blob) {
+  const hfKey = (localStorage.getItem('ctb_hf_api_key') || '').trim();
+  if (!hfKey) {
+    throw new Error('請先點右上角「API / GitHub 設定」填入 Hugging Face Token（hf_...）');
+  }
+  const modelId = hfModel || 'openai/whisper-large-v3';
+  const endpoint = `https://router.huggingface.co/hf-inference/models/${encodeURIComponent(modelId)}`;
+  const hRes = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${hfKey}`,
+      'Content-Type': blob.type || 'audio/mpeg'
+    },
+    body: blob
+  });
+  if (!hRes.ok) {
+    const errJson = await hRes.json().catch(() => ({}));
+    throw new Error(errJson?.error || `Hugging Face 錯誤 (${hRes.status})`);
+  }
+  const hData = await hRes.json();
+  const transcript = String(hData?.text || '').trim();
+  let heardTc = transcript.split(/[。！？\n]|Next stop|next stop/i)[0].trim();
+  heardTc = heardTc.replace(/^(各位乘客[，,]?\s*)?(下一站[是係為：:\s]*|即將到達[：:\s]*|本班車終點站[是係為：:\s]*)/, '');
+  heardTc = heardTc.split(/[，,、]/)[0].trim();
+  return { transcript, stopNameTc: heardTc, stopNameEn: '', type: 'stop' };
+}
+
 async function transcribeWithGroqWhisper(whisperModel, blob, fileName) {
   const groqKey = (localStorage.getItem('ctb_groq_api_key') || '').trim();
   if (!groqKey) {
@@ -539,7 +565,7 @@ function updateCountsAndBadges() {
   document.getElementById('cntAiMatched').textContent = String(cAi);
   document.getElementById('cntConfirmed').textContent = String(cConf);
 
-  const hasKey = !!((localStorage.getItem('ctb_groq_api_key') || '').trim() || (localStorage.getItem('ctb_gemini_api_key') || '').trim());
+  const hasKey = !!((localStorage.getItem('ctb_hf_api_key') || '').trim() || (localStorage.getItem('ctb_groq_api_key') || '').trim() || (localStorage.getItem('ctb_gemini_api_key') || '').trim());
   const badge = document.getElementById('apiKeyStatusBadge');
   badge.textContent = hasKey ? '引擎已就緒' : '未設 API Key';
   badge.className = hasKey
@@ -1006,14 +1032,16 @@ async function init() {
 
   const sModal = document.getElementById('settingsModal');
   document.getElementById('btnSettings').onclick = () => {
-    document.getElementById('groqKeyInput').value = localStorage.getItem('ctb_groq_api_key') || '';
+    document.getElementById('hfKeyInput').value = localStorage.getItem('ctb_hf_api_key') || '';
+        document.getElementById('groqKeyInput').value = localStorage.getItem('ctb_groq_api_key') || '';
     document.getElementById('geminiKeyInput').value = localStorage.getItem('ctb_gemini_api_key') || '';
     document.getElementById('ghTokenInput').value = localStorage.getItem('ctb_gh_token') || '';
     sModal.classList.remove('hidden');
   };
   document.getElementById('btnCloseSettings').onclick = () => sModal.classList.add('hidden');
   document.getElementById('btnSaveKeys').onclick = () => {
-    localStorage.setItem('ctb_groq_api_key', document.getElementById('groqKeyInput').value.trim());
+    localStorage.setItem('ctb_hf_api_key', document.getElementById('hfKeyInput').value.trim());
+        localStorage.setItem('ctb_groq_api_key', document.getElementById('groqKeyInput').value.trim());
     localStorage.setItem('ctb_gemini_api_key', document.getElementById('geminiKeyInput').value.trim());
     localStorage.setItem('ctb_gh_token', document.getElementById('ghTokenInput').value.trim());
     sModal.classList.add('hidden');
