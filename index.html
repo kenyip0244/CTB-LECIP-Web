@@ -2355,8 +2355,6 @@ function renderStartStopList(vp, bar) {
               ${sub ? `<div class="text-xs font-bold ${th.muted} truncate">${esc(sub)}</div>` : ''}
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
-              ${secInfo.badgeFare != null ? `<span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black">${esc(fmtFare(secInfo.badgeFare))}</span>` : ''}
-              ${hasAudio ? `<span class="px-1.5 py-0.5 rounded ${th.dark ? 'bg-zinc-800 text-emerald-400 border border-zinc-600' : 'bg-emerald-100 text-emerald-700'} text-[10px] font-black">MP3</span>` : ''}
               <span class="${th.muted} text-xl font-bold">›</span>
             </div>
           </button>
@@ -2687,7 +2685,6 @@ function renderStopsView(vp, bar) {
           <button data-jump="${targetIdx}" class="jump-stop-btn w-full h-1/3 px-3.5 text-left border-b ${upRowCls} flex items-center justify-between gap-2 shrink-0">
             <div class="min-w-0 flex items-center gap-2">
               <span class="text-[20px] font-bold truncate">${targetIdx + 1}. ${esc(nm)}</span>
-              ${sInfo.badgeFare != null ? `<span class="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-black shrink-0">${esc(fmtFare(sInfo.badgeFare))}</span>` : ''}
             </div>
             ${state.gpsEnabled ? `
             <div class="shrink-0 text-center leading-tight min-w-[38px]">
