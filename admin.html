@@ -851,21 +851,42 @@ function renderPickerResults() {
 function buildConfirmedMappingObject() {
   const confirmed = {};
   const details = {};
+  // 建立「標準化中文站名 -> 所有同名 stopId 陣列（涵蓋來回雙向分站）」
+  const nameToStops = new Map();
+  for (const st of uniqueStops) {
+    if (st.normTc) {
+      if (!nameToStops.has(st.normTc)) nameToStops.set(st.normTc, []);
+      nameToStops.get(st.normTc).push(st);
+    }
+  }
+
   for (const [path, rec] of Object.entries(audioDb)) {
     if (rec.status === 'confirmed' && rec.matchedStopId) {
       const rawId = String(rec.matchedStopId).trim();
       const numId = rawId.replace(/^0+/, '');
+      const stObj = stopById.get(rawId);
+      const sharedTc = stObj?.tc || rec.heardTc || '';
+
       confirmed[rawId] = path;
       if (numId) confirmed[numId] = path;
+
+      // 自動套用至所有來回同名車站
+      const sameNameList = stObj?.normTc ? (nameToStops.get(stObj.normTc) || []) : [];
+      for (const peer of sameNameList) {
+        if (!confirmed[peer.stopId]) confirmed[peer.stopId] = path;
+        if (peer.numId && !confirmed[peer.numId]) confirmed[peer.numId] = path;
+      }
+
       details[path] = {
         stopId: rawId,
+        sharedStopIds: sameNameList.map(x => x.stopId),
         transcript: rec.transcript || '',
-        heardTc: rec.heardTc || '',
-        heardEn: rec.heardEn || ''
+        heardTc: sharedTc,
+        heardEn: stObj?.en || rec.heardEn || ''
       };
     }
   }
-  return { version: 1, updatedAt: new Date().toISOString(), confirmed, details };
+  return { version: 2, updatedAt: new Date().toISOString(), confirmed, details };
 }
 
 function downloadJson(obj, filename) {
