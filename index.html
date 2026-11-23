@@ -918,17 +918,41 @@ function getWelcomeAudioFile() {
   return '';
 }
 
+function getWelcomeAudioFiles() {
+  const rno = String(state.selectedRouteNo || '').trim().toUpperCase();
+  const isFlyer = /^(A|NA)\d+/.test(rno);
+  const all = state.audioManifest || [];
+
+  const findByKw = (kws) => {
+    for (const kw of kws) {
+      const hit = all.find(p => p.toLowerCase().includes(kw));
+      if (hit) return hit;
+    }
+    return '';
+  };
+
+  if (isFlyer) {
+    const flyerHit = findByKw(['welcome_cityflyer', 'welcome_flyer', 'cityflyer_welcome']);
+    if (flyerHit) return [flyerHit];
+  }
+
+  const stdHit = findByKw(['welcome_citybus', 'welcome_ctb', 'welcome.mp3', 'welcome']);
+  if (stdHit) return [stdHit];
+
+  if (state.audioStemMap && state.audioStemMap.has('welcome')) {
+    return [state.audioStemMap.get('welcome')];
+  }
+  return ['Welcome.mp3'];
+}
+
 function buildWelcomeSegment() {
-  const trip = state.selectedTrip || {};
-  const routeNo = state.selectedRouteNo || getRouteNo(trip);
-  const destTc = getDestTc(trip) || state.selectedBound || '終點站';
-  const destEn = getDestEn(trip) || destTc;
-  const wFile = getWelcomeAudioFile();
+  const rno = String(state.selectedRouteNo || '').trim().toUpperCase();
+  const isFlyer = /^(A|NA)\d+/.test(rno);
   return {
-    files: wFile ? [wFile] : [],
-    tc: `歡迎乘搭城巴 ${routeNo} 號線，前往 ${destTc}，祝旅途愉快。`,
-    en: `Welcome aboard Citybus route ${routeNo} towards ${destEn}. Thank you and enjoy the journey.`,
-    sc: `欢迎乘坐城巴第 ${routeNo} 路，前往 ${destTc}，祝您旅途愉快。`
+    files: getWelcomeAudioFiles(),
+    tc: isFlyer ? '歡迎乘搭城巴機場快線。' : '歡迎乘搭城巴。',
+    en: isFlyer ? 'Welcome aboard Cityflyer.' : 'Welcome aboard Citybus.',
+    sc: isFlyer ? '欢迎乘坐城巴机场快线。' : '欢迎乘坐城巴。'
   };
 }
 
@@ -3303,7 +3327,7 @@ function renderSettingsView(vp, bar) {
       <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">診斷模式</div>
       <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5 text-xs">
         <div class="p-3 rounded-xl border ${th.card} space-y-1.5">
-          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v63)</div>
+          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v64)</div>
           <div>App Version：<b>23.06.25</b> ｜ Config：<b>ctb_prod_v10</b></div>
           <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
           <div>站點資料庫：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
