@@ -273,7 +273,7 @@ function cleanJoint(raw) {
   if (parts.length !== 2) return s;
   const [p1, p2] = parts;
   if (/^(G|UG|LG|M|B\d?|\d+)$/i.test(p1) && /^F$/i.test(p2)) return s;
-  if (/\/\s+/.test(s) || (p1 === p1.upperCase?.() && p2 !== p2.upperCase?.())) return p2;
+  if (/\/\s+/.test(s) || (p1 === p1.toUpperCase() && p2 !== p2.toUpperCase())) return p2;
   return s;
 }
 
