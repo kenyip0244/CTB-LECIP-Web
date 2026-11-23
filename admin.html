@@ -1,0 +1,434 @@
+﻿<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CTB LECIP 站號錄音上傳與對照管理</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen font-sans">
+  <header class="bg-zinc-900 border-b border-zinc-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-20">
+    <div class="flex items-center gap-3">
+      <span class="px-2.5 py-1 rounded bg-[#0068FF] text-white font-black text-sm">LECIP AUDIO STUDIO</span>
+      <div>
+        <h1 class="text-base font-black">城巴站號唯一錄音庫 · 上傳與對照後台</h1>
+        <p class="text-xs text-zinc-400">每個站號（如 <code class="text-amber-300">4567_a.mp3</code>）全港路線共用同一份錄音，徹底杜絕轉線／改道錯站</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="./index.html" class="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-bold border border-zinc-700">返回報站模擬器</a>
+      <button id="btnGithubConfig" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black">GitHub 雲端直傳設定</button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <!-- 左側：路線與方向選擇 -->
+    <section class="lg:col-span-4 bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3 h-fit">
+      <div class="text-sm font-black text-amber-400">1. 選擇要核對／補錄的路線</div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-[11px] text-zinc-400 font-bold mb-1">搜尋路線（如 796X）</label>
+          <input id="routeSearchInput" type="text" placeholder="輸入路線號..." class="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-700 text-sm font-black uppercase outline-none focus:border-[#0068FF]" />
+        </div>
+        <div>
+          <label class="block text-[11px] text-zinc-400 font-bold mb-1">選擇路線</label>
+          <select id="routeSelect" class="w-full px-2.5 py-2 rounded-lg bg-zinc-950 border border-zinc-700 text-sm font-black outline-none focus:border-[#0068FF]"></select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-[11px] text-zinc-400 font-bold mb-1">選擇方向 / 班次</label>
+        <select id="tripSelect" class="w-full px-2.5 py-2 rounded-lg bg-zinc-950 border border-zinc-700 text-xs font-bold outline-none focus:border-[#0068FF]"></select>
+      </div>
+
+      <div id="routeStatsBox" class="p-3 rounded-lg bg-zinc-950 border border-zinc-800 text-xs space-y-1 text-zinc-300">
+        載入資料庫中...
+      </div>
+
+      <div class="pt-2 border-t border-zinc-800 space-y-2">
+        <div class="text-xs font-black text-zinc-300">2. 直接上傳新站號錄音（WAV / MP3）</div>
+        <p class="text-[11px] text-zinc-400 leading-relaxed">
+          檔名以城巴站號命名（例如 <code class="text-emerald-400">4567_a.wav</code> 或 <code class="text-emerald-400">4567_a.mp3</code>），瀏覽器會自動轉成 128kbps MP3。
+        </p>
+        <input id="directUploadInput" type="file" accept=".wav,.mp3,.m4a,.ogg" multiple class="block w-full text-xs text-zinc-300 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-black file:bg-[#0068FF] file:text-white hover:file:brightness-110 cursor-pointer" />
+      </div>
+    </section>
+
+    <!-- 右側：該班次站序與城巴站號錄音對照表 -->
+    <section class="lg:col-span-8 bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden flex flex-col">
+      <div class="px-4 py-3 bg-zinc-900 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 id="stopsHeaderTitle" class="text-sm font-black">站點與城巴站號對照表</h2>
+          <p class="text-[11px] text-zinc-400">每列顯示「城巴官方站號」及目前綁定的唯一錄音檔，可逐站試聽或即時上傳替換</p>
+        </div>
+        <label class="flex items-center gap-1.5 text-xs font-bold text-amber-300 cursor-pointer">
+          <input id="filterMissingChk" type="checkbox" class="rounded" />
+          只顯示未有錄音的車站
+        </label>
+      </div>
+
+      <div id="stopsTableBody" class="divide-y divide-zinc-800 max-h-[72vh] overflow-y-auto"></div>
+    </section>
+  </main>
+
+  <!-- 隱藏單站上傳 input -->
+  <input id="rowFileInput" type="file" accept=".wav,.mp3,.m4a,.ogg" class="hidden" />
+
+  <!-- GitHub Token 設定彈窗 -->
+  <div id="ghModal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-xl bg-zinc-900 border border-zinc-700 p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-black text-emerald-400">GitHub 雲端直傳設定（CTB-LECIP-Audio）</span>
+        <button id="btnCloseGh" class="px-2 py-1 rounded bg-zinc-800 text-xs font-bold">關閉</button>
+      </div>
+      <p class="text-xs text-zinc-400 leading-relaxed">
+        填入具 <code class="text-zinc-200">repo</code> 權限的 GitHub Personal Access Token（僅儲存於你本機瀏覽器），上傳錄音時會自動轉成 MP3 並直接 Commit 至 <code class="text-zinc-200">kenyip0244/CTB-LECIP-Audio</code> 及更新 <code class="text-zinc-200">audio_manifest.json</code>；未填 Token 時則自動下載轉好的 MP3 供手動放入資料夾。
+      </p>
+      <input id="ghTokenInput" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-700 text-xs font-mono outline-none focus:border-emerald-500" />
+      <div class="flex justify-end gap-2">
+        <button id="btnClearGh" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-xs font-bold">清除 Token</button>
+        <button id="btnSaveGh" class="px-4 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-black">儲存設定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="adminToast" class="hidden fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl bg-black/95 border border-zinc-700 text-white text-xs font-bold shadow-2xl"></div>
+
+<script>
+const AUDIO_CDN_BASE = 'https://kenyip0244.github.io/CTB-LECIP-Audio';
+const GH_OWNER = 'kenyip0244';
+const GH_AUDIO_REPO = 'CTB-LECIP-Audio';
+
+let allRoutes = [];
+let allStops = [];
+let audioManifest = [];
+let stemMap = new Map();
+let curAudio = null;
+let pendingRowStopId = '';
+
+function esc(v) {
+  return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function toast(msg) {
+  const el = document.getElementById('adminToast');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  clearTimeout(window._t);
+  window._t = setTimeout(() => el.classList.add('hidden'), 3200);
+}
+
+function cleanJoint(raw) {
+  const s = String(raw || '').trim();
+  if (!s || !s.includes('/')) return s;
+  const parts = s.split(/\s*\/\s*/).map(p => p.trim()).filter(Boolean);
+  if (parts.length !== 2) return s;
+  const [p1, p2] = parts;
+  if (/^(G|UG|LG|M|B\d?|\d+)$/i.test(p1) && /^F$/i.test(p2)) return s;
+  if (/\/\s+/.test(s) || (p1 === p1.toUpperCase() && p2 !== p2.toUpperCase())) return p2;
+  return s;
+}
+
+function getNumStopId(rawStopId) {
+  return String(rawStopId || '').trim().replace(/^0+/, '');
+}
+
+function getAudioForStop(st) {
+  const numId = getNumStopId(st.stopId);
+  if (numId) {
+    if (stemMap.has(`${numId}_a`)) return stemMap.get(`${numId}_a`);
+    if (stemMap.has(`${numId}_b`)) return stemMap.get(`${numId}_b`);
+  }
+  return st.stopAudioFile || '';
+}
+
+function playPreview(relPath) {
+  if (curAudio) { try { curAudio.pause(); } catch (_) {} }
+  const clean = String(relPath).replace(/^\/+/, '');
+  const url = `${AUDIO_CDN_BASE}/${clean.split('/').map(encodeURIComponent).join('/')}?t=${Date.now()}`;
+  curAudio = new Audio(url);
+  curAudio.play().catch(e => toast('播放失敗：' + e.message));
+}
+
+// 瀏覽器端將 WAV/M4A/MP3 轉碼為 128kbps 單聲道 MP3（節省空間）
+async function transcodeToMp3Blob(file) {
+  if (file.name.toLowerCase().endsWith('.mp3') && file.size < 450 * 1024) {
+    return file;
+  }
+  const arrayBuf = await file.arrayBuffer();
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  const ctx = new AudioCtx();
+  const audioBuf = await ctx.decodeAudioData(arrayBuf);
+  const targetSr = 24000;
+  const offline = new OfflineAudioContext(1, Math.ceil(audioBuf.duration * targetSr), targetSr);
+  const src = offline.createBufferSource();
+  src.buffer = audioBuf;
+  src.connect(offline.destination);
+  src.start(0);
+  const rendered = await offline.startRendering();
+  const floatData = rendered.getChannelData(0);
+
+  const samples = new Int16Array(floatData.length);
+  for (let i = 0; i < floatData.length; i++) {
+    const s = Math.max(-1, Math.min(1, floatData[i]));
+    samples[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+  }
+
+  const encoder = new lamejs.Mp3Encoder(1, targetSr, 128);
+  const mp3Chunks = [];
+  const blockSize = 1152;
+  for (let i = 0; i < samples.length; i += blockSize) {
+    const chunk = samples.subarray(i, i + blockSize);
+    const buf = encoder.encodeBuffer(chunk);
+    if (buf.length > 0) mp3Chunks.push(buf);
+  }
+  const endBuf = encoder.flush();
+  if (endBuf.length > 0) mp3Chunks.push(endBuf);
+  await ctx.close();
+  return new Blob(mp3Chunks, { type: 'audio/mp3' });
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function uploadToGithubAudioRepo(targetRelPath, mp3Blob) {
+  const token = localStorage.getItem('ctb_gh_token') || '';
+  if (!token) {
+    // 無 Token 時觸發下載，方便手動放入 G:\CTB-LECIP-Audio
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(mp3Blob);
+    a.download = targetRelPath.split('/').pop();
+    a.click();
+    toast(`已轉成 MP3 並下載 ${a.download}（設定 GitHub Token 可一鍵直傳雲端）`);
+    return;
+  }
+
+  const apiBase = `https://api.github.com/repos/${GH_OWNER}/${GH_AUDIO_REPO}/contents`;
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+    'Accept': 'application/vnd.github+json',
+    'Content-Type': 'application/json'
+  };
+
+  // 1. 查詢舊檔 SHA（若覆蓋）
+  let sha = undefined;
+  const checkRes = await fetch(`${apiBase}/${targetRelPath}`, { headers });
+  if (checkRes.ok) {
+    const info = await checkRes.json();
+    sha = info.sha;
+  }
+
+  // 2. 上傳 MP3 檔
+  const b64 = await blobToBase64(mp3Blob);
+  const putRes = await fetch(`${apiBase}/${targetRelPath}`, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify({
+      message: `Upload stop audio ${targetRelPath}`,
+      content: b64,
+      sha
+    })
+  });
+  if (!putRes.ok) {
+    const err = await putRes.json().catch(() => ({}));
+    throw new Error(err.message || 'GitHub 上傳失敗');
+  }
+
+  // 3. 同步更新 audio_manifest.json
+  if (!audioManifest.includes(targetRelPath)) {
+    audioManifest.push(targetRelPath);
+    audioManifest.sort();
+    const mCheck = await fetch(`${apiBase}/audio_manifest.json`, { headers });
+    const mInfo = mCheck.ok ? await mCheck.json() : {};
+    const mB64 = btoa(unescape(encodeURIComponent(JSON.stringify(audioManifest))));
+    await fetch(`${apiBase}/audio_manifest.json`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({
+        message: `Update audio_manifest.json with ${targetRelPath}`,
+        content: mB64,
+        sha: mInfo.sha
+      })
+    });
+  }
+
+  const stem = targetRelPath.split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
+  stemMap.set(stem, targetRelPath);
+  toast(`已成功上傳 ${targetRelPath} 並更新雲端索引！`);
+}
+
+async function processAndUploadFile(file, forcedNumStopId = '') {
+  try {
+    toast(`正在處理 ${file.name}...`);
+    const mp3Blob = await transcodeToMp3Blob(file);
+    let stem = file.name.replace(/\.[^.]+$/, '').trim();
+    if (forcedNumStopId) {
+      stem = `${forcedNumStopId}_a`;
+    } else if (/^\d+$/.test(stem)) {
+      stem = `${stem.replace(/^0+/, '')}_a`;
+    }
+    const targetPath = `audio/stops/${stem}.mp3`;
+    await uploadToGithubAudioRepo(targetPath, mp3Blob);
+    renderStopsTable();
+  } catch (e) {
+    toast('處理失敗：' + e.message);
+  }
+}
+
+function renderTripOptions() {
+  const rno = document.getElementById('routeSelect').value;
+  const trips = allRoutes.filter(r => String(r.routeNo || r.route || '').toUpperCase() === rno);
+  const tripSel = document.getElementById('tripSelect');
+  tripSel.innerHTML = trips.map((t, idx) => {
+    const dest = cleanJoint(t.destTc || t.destinationTc || '');
+    const orig = cleanJoint(t.origTc || t.originTc || '');
+    const b = String(t.bound || 'O').toUpperCase();
+    return `<option value="${idx}">${esc(rno)} (${esc(b)}) · ${esc(orig)} → ${esc(dest)}</option>`;
+  }).join('');
+  renderStopsTable();
+}
+
+function renderStopsTable() {
+  const rno = document.getElementById('routeSelect').value;
+  const trips = allRoutes.filter(r => String(r.routeNo || r.route || '').toUpperCase() === rno);
+  const trip = trips[Number(document.getElementById('tripSelect').value) || 0];
+  const body = document.getElementById('stopsTableBody');
+  if (!trip) { body.innerHTML = ''; return; }
+
+  const rid = trip.routeId || `CTB-${rno}`;
+  const b = String(trip.bound || 'O').toUpperCase();
+  const pat = trip.patternId || '';
+
+  let list = allStops.filter(s => s.routeId === rid && String(s.bound || '').toUpperCase() === b && (s.patternId || '') === pat);
+  if (list.length === 0) {
+    const fallback = allStops.filter(s => s.routeId === rid && String(s.bound || '').toUpperCase() === b);
+    if (fallback.length > 0) {
+      const firstPat = fallback[0].patternId || '';
+      list = fallback.filter(x => (x.patternId || '') === firstPat);
+    }
+  }
+  list.sort((a, b) => (a.seq ?? 0) - (b.seq ?? 0));
+
+  const onlyMissing = document.getElementById('filterMissingChk').checked;
+  const matchedCnt = list.filter(s => !!getAudioForStop(s)).length;
+
+  document.getElementById('routeStatsBox').innerHTML = `
+    <div>路線 <b>${esc(rno)}</b> 共 <b>${list.length}</b> 站</div>
+    <div>已綁定站號錄音：<b class="text-emerald-400">${matchedCnt}</b> 站 ｜ 尚未錄音：<b class="text-amber-400">${list.length - matchedCnt}</b> 站</div>
+    <div>雲端唯一音檔庫總數：<b>${audioManifest.length}</b> 個 MP3</div>
+  `;
+
+  const displayList = onlyMissing ? list.filter(s => !getAudioForStop(s)) : list;
+
+  body.innerHTML = displayList.map(st => {
+    const seq = st.seq ?? '';
+    const numId = getNumStopId(st.stopId);
+    const nameTc = cleanJoint(st.nameTc || '');
+    const audioPath = getAudioForStop(st);
+    return `
+      <div class="px-4 py-3 flex flex-wrap items-center justify-between gap-2 hover:bg-zinc-800/40">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono font-black px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300">#${esc(seq)}</span>
+            <span class="text-sm font-black text-white">${esc(nameTc)}</span>
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-blue-950 text-sky-300 border border-sky-800/60">站號 ${esc(numId || st.stopId || '無')}</span>
+          </div>
+          <div class="text-[11px] font-mono mt-1 ${audioPath ? 'text-emerald-400' : 'text-amber-400'}">
+            ${audioPath ? `✓ 已綁定：${esc(audioPath)}` : `⚠ 尚未綁定（建議檔名：${esc(numId || '站號')}_a.mp3）`}
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          ${audioPath ? `<button data-play="${esc(audioPath)}" class="btn-play px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black">▶ 試聽</button>` : ''}
+          <button data-numid="${esc(numId)}" class="btn-upload px-2.5 py-1.5 rounded-lg bg-[#0068FF] hover:brightness-110 text-white text-xs font-black">上傳 / 替換</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  body.querySelectorAll('.btn-play').forEach(b => {
+    b.onclick = () => playPreview(b.dataset.play);
+  });
+  body.querySelectorAll('.btn-upload').forEach(b => {
+    b.onclick = () => {
+      pendingRowStopId = b.dataset.numid;
+      document.getElementById('rowFileInput').click();
+    };
+  });
+}
+
+async function init() {
+  const [rRes, sRes, mRes] = await Promise.all([
+    fetch('./data/routes.json'),
+    fetch('./data/stops.json'),
+    fetch(`${AUDIO_CDN_BASE}/audio_manifest.json?v=${Date.now()}`).catch(() => null)
+  ]);
+  allRoutes = await rRes.json();
+  allStops = await sRes.json();
+  if (mRes && mRes.ok) {
+    audioManifest = (await mRes.json()).map(x => String(x).replace(/\\/g, '/'));
+    for (const p of audioManifest) {
+      const stem = p.split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
+      if (stem && !stemMap.has(stem)) stemMap.set(stem, p);
+    }
+  }
+
+  const routeNos = Array.from(new Set(allRoutes.map(r => String(r.routeNo || r.route || '').toUpperCase()).filter(Boolean))).sort();
+  const sel = document.getElementById('routeSelect');
+  const renderRouteOpts = (kw = '') => {
+    const list = kw ? routeNos.filter(x => x.includes(kw.toUpperCase())) : routeNos;
+    sel.innerHTML = list.map(no => `<option value="${esc(no)}">${esc(no)}</option>`).join('');
+    if (list.includes('796X') && !kw) sel.value = '796X';
+    renderTripOptions();
+  };
+  renderRouteOpts();
+
+  document.getElementById('routeSearchInput').oninput = e => renderRouteOpts(e.target.value.trim());
+  sel.onchange = renderTripOptions;
+  document.getElementById('tripSelect').onchange = renderStopsTable;
+  document.getElementById('filterMissingChk').onchange = renderStopsTable;
+
+  document.getElementById('rowFileInput').onchange = async e => {
+    const f = e.target.files?.[0];
+    if (f) await processAndUploadFile(f, pendingRowStopId);
+    e.target.value = '';
+  };
+
+  document.getElementById('directUploadInput').onchange = async e => {
+    for (const f of Array.from(e.target.files || [])) {
+      await processAndUploadFile(f, '');
+    }
+    e.target.value = '';
+  };
+
+  // GitHub Token 彈窗
+  const ghModal = document.getElementById('ghModal');
+  document.getElementById('btnGithubConfig').onclick = () => {
+    document.getElementById('ghTokenInput').value = localStorage.getItem('ctb_gh_token') || '';
+    ghModal.classList.remove('hidden');
+  };
+  document.getElementById('btnCloseGh').onclick = () => ghModal.classList.add('hidden');
+  document.getElementById('btnSaveGh').onclick = () => {
+    localStorage.setItem('ctb_gh_token', document.getElementById('ghTokenInput').value.trim());
+    ghModal.classList.add('hidden');
+    toast('已儲存 GitHub Token');
+  };
+  document.getElementById('btnClearGh').onclick = () => {
+    localStorage.removeItem('ctb_gh_token');
+    document.getElementById('ghTokenInput').value = '';
+    toast('已清除 GitHub Token');
+  };
+}
+
+init();
+</script>
+</body>
+</html>
