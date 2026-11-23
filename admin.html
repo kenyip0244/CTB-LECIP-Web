@@ -1065,6 +1065,41 @@ async function init() {
   }
 }
 
+
+document.addEventListener('click', (e) => {
+  const sModal = document.getElementById('settingsModal');
+  if (!sModal) return;
+  if (e.target.closest('#btnSettings')) {
+    e.preventDefault();
+    document.getElementById('groqKeyInput').value = localStorage.getItem('ctb_groq_api_key') || '';
+    document.getElementById('hfKeyInput').value = localStorage.getItem('ctb_hf_api_key') || '';
+    document.getElementById('geminiKeyInput').value = localStorage.getItem('ctb_gemini_api_key') || '';
+    document.getElementById('ghTokenInput').value = localStorage.getItem('ctb_gh_token') || '';
+    sModal.classList.remove('hidden');
+  } else if (e.target.closest('#btnCloseSettings')) {
+    sModal.classList.add('hidden');
+  } else if (e.target.closest('#btnSaveKeys')) {
+    localStorage.setItem('ctb_groq_api_key', document.getElementById('groqKeyInput').value.trim());
+    localStorage.setItem('ctb_hf_api_key', document.getElementById('hfKeyInput').value.trim());
+    localStorage.setItem('ctb_gemini_api_key', document.getElementById('geminiKeyInput').value.trim());
+    localStorage.setItem('ctb_gh_token', document.getElementById('ghTokenInput').value.trim());
+    sModal.classList.add('hidden');
+    if (typeof updateCountsAndBadges === 'function') updateCountsAndBadges();
+    if (typeof toast === 'function') toast('設定已儲存');
+  } else if (e.target.closest('#btnClearKeys')) {
+    localStorage.removeItem('ctb_groq_api_key');
+    localStorage.removeItem('ctb_hf_api_key');
+    localStorage.removeItem('ctb_gemini_api_key');
+    localStorage.removeItem('ctb_gh_token');
+    document.getElementById('groqKeyInput').value = '';
+    document.getElementById('hfKeyInput').value = '';
+    document.getElementById('geminiKeyInput').value = '';
+    document.getElementById('ghTokenInput').value = '';
+    if (typeof updateCountsAndBadges === 'function') updateCountsAndBadges();
+    if (typeof toast === 'function') toast('已清除金鑰');
+  }
+});
+
 init();
 </script>
 </body>
