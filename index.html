@@ -945,11 +945,112 @@ function getWelcomeAudioFiles() {
   return ['Welcome.mp3'];
 }
 
+function getStudioCurrentTripCandidates() {
+  const names = new Set();
+  const trip = state.selectedTrip || {};
+  const rno = String(state.selectedRouteNo || trip.routeId || trip.route || '').replace(/^CTB-/i, '').trim().toUpperCase();
+  const bnd = String(trip.bound || trip.dir || 'O').trim().toUpperCase();
+  const stype = String(trip.serviceType || trip.service_type || '1').trim();
+  const tKey = `${rno}|${bnd}|${stype}`;
+
+  const customMap = state.studioTripNames || {};
+  if (customMap[tKey]?.name) names.add(String(customMap[tKey].name).trim());
+
+  [trip.tripName, trip.trip_name, trip.name, trip.label, trip.title].forEach(v => {
+    if (v && String(v).trim()) names.add(String(v).trim());
+  });
+
+  const cleanDest = (rawStr) => {
+    const s = String(rawStr || '').trim();
+    if (!s || !s.includes('/')) return s;
+    const parts = s.split(/\s*\/\s*/).map(p => p.trim()).filter(Boolean);
+    if (parts.length !== 2) return s;
+    if (/^(G|UG|LG|M|B\d?|\d+)$/i.test(parts[0]) && /^F$/i.test(parts[1])) return s;
+    if (/\/\s+/.test(s) || (parts[0] === parts[0].toUpperCase() && parts[1] !== parts[1].toUpperCase())) return parts[1];
+    return s;
+  };
+
+  let destTc = cleanDest(trip.destTc || trip.dest_tc || '');
+  const stopArr = Array.isArray(state.currentStops) ? state.currentStops : (Array.isArray(state.stops) ? state.stops : []);
+  if (!destTc && stopArr.length > 0) {
+    const lastSt = stopArr[stopArr.length - 1];
+    destTc = cleanDest(typeof getStopNameTc === 'function' ? getStopNameTc(lastSt) : (lastSt?.nameTc || ''));
+  }
+  if (rno && destTc) names.add(`${rno}-${destTc}-${stype}`);
+  if (rno) names.add(`${rno}-${bnd === 'I' ? '??' : '??'}-${stype}`);
+  return { rno, tripNames: names };
+}
+
+function resolveStudioStopAudio(st) {
+  const rules = state.studioRules;
+  if (!Array.isArray(rules) || !rules.length || !st) return null;
+  const rawId = String(st.stopId ?? st.stop ?? st.id ?? '').trim();
+  if (!rawId) return null;
+  const numId = rawId.replace(/^0+/, '') || '0';
+  const { rno, tripNames } = getStudioCurrentTripCandidates();
+
+  let bestPath = null;
+  let bestScore = 0;
+
+  for (const rule of rules) {
+    if (!rule || !rule.audioPath || !Array.isArray(rule.stopIds)) continue;
+    const stopHit = rule.stopIds.some(id => {
+      const s = String(id).trim();
+      return s === rawId || (s.replace(/^0+/, '') || '0') === numId;
+    });
+    if (!stopHit) continue;
+
+    const rSpecific = rule.routeMode === 'specific';
+    const tSpecific = rule.tripMode === 'specific';
+
+    if (rSpecific) {
+      const routes = Array.isArray(rule.routes) ? rule.routes.map(x => String(x).trim().toUpperCase()) : [];
+      if (!rno || !routes.includes(rno)) continue;
+    }
+    if (tSpecific) {
+      const tList = Array.isArray(rule.tripNames) ? rule.tripNames.map(x => String(x).trim()) : [];
+      if (!tList.some(tn => tripNames.has(tn))) continue;
+    }
+
+    const score = (tSpecific ? 4 : 0) + (rSpecific ? 2 : 0) + 1;
+    if (score > bestScore) {
+      bestScore = score;
+      bestPath = rule.audioPath;
+    }
+  }
+  return bestPath;
+}
+
+function resolveStudioWelcomeFiles() {
+  const wRules = state.studioWelcomeRules;
+  const { rno, tripNames } = getStudioCurrentTripCandidates();
+
+  if (Array.isArray(wRules) && wRules.length) {
+    for (const w of wRules) {
+      if (w?.audioPath && w.scope === 'trips' && Array.isArray(w.tripNames)) {
+        if (w.tripNames.some(tn => tripNames.has(String(tn).trim()))) return [w.audioPath];
+      }
+    }
+    for (const w of wRules) {
+      if (w?.audioPath && w.scope === 'routes' && Array.isArray(w.routes)) {
+        const routes = w.routes.map(x => String(x).trim().toUpperCase());
+        if (rno && routes.includes(rno)) return [w.audioPath];
+      }
+    }
+  }
+  if (state.studioDefaultWelcome) return [state.studioDefaultWelcome];
+  if (Array.isArray(wRules)) {
+    const def = wRules.find(w => w?.audioPath && w.scope === 'default');
+    if (def) return [def.audioPath];
+  }
+  return null;
+}
+
 function buildWelcomeSegment() {
   const rno = String(state.selectedRouteNo || '').trim().toUpperCase();
   const isFlyer = /^(A|NA)\d+/.test(rno);
   return {
-    files: getWelcomeAudioFiles(),
+    files: resolveStudioWelcomeFiles() || getWelcomeAudioFiles(),
     tc: isFlyer ? '歡迎乘搭城巴機場快線。' : '歡迎乘搭城巴。',
     en: isFlyer ? 'Welcome aboard Cityflyer.' : 'Welcome aboard Citybus.',
     sc: isFlyer ? '欢迎乘坐城巴机场快线。' : '欢迎乘坐城巴。'
@@ -958,7 +1059,7 @@ function buildWelcomeSegment() {
 
 function buildStopSegment(st) {
   const files = [];
-  const mainAudio = getEffectiveStopAudio(st);
+  const mainAudio = resolveStudioStopAudio(st) || getEffectiveStopAudio(st);
   if (mainAudio) files.push(mainAudio);
   if (st.approachAudioFile) files.push(st.approachAudioFile);
   const tcName = getStopNameTc(st);
@@ -3616,7 +3717,25 @@ async function fetchInitialLightData() {
   fetch(`./data/audio_mapping.json?v=${Date.now()}`)
     .then(r => (r.ok ? r.json() : {}))
     .then(obj => {
-      const merged = Object.assign({}, obj?.confirmed || obj || {});
+      state.studioRules = Array.isArray(obj?.rules) ? obj.rules : [];
+      state.studioWelcomeRules = Array.isArray(obj?.welcomeRules) ? obj.welcomeRules : [];
+      state.studioDefaultWelcome = typeof obj?.defaultWelcome === 'string' ? obj.defaultWelcome : '';
+      state.studioTripNames = (obj?.tripNames && typeof obj.tripNames === 'object') ? obj.tripNames : {};
+      let merged = {};
+      if (Array.isArray(obj?.rules)) {
+        for (const r of obj.rules) {
+          if (!r?.audioPath || !Array.isArray(r.stopIds)) continue;
+          if (r.routeMode === 'specific' || r.tripMode === 'specific') continue;
+          for (const rawId of r.stopIds) {
+            const sid = String(rawId || '').trim();
+            const nid = sid.replace(/^0+/, '');
+            if (sid && !merged[sid]) merged[sid] = r.audioPath;
+            if (nid && !merged[nid]) merged[nid] = r.audioPath;
+          }
+        }
+      } else {
+        merged = Object.assign({}, obj?.confirmed || obj || {});
+      }
       try {
         const localRaw = localStorage.getItem('ctb_lecip_gemini_audio_db_v1');
         if (localRaw) {
