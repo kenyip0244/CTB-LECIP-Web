@@ -601,17 +601,15 @@ function computeTripSections(stops, trip) {
 
 function getEffectiveStopAudio(st) {
   if (!st) return '';
-  // 1. 優先使用該城巴站號 (stopId) 在 HKOWS 音檔庫的唯一對應檔（例如 4567_a / 4567_b）
   if (st.stopId) {
     const numId = String(st.stopId).trim().replace(/^0+/, '');
     if (numId) {
-      const keyA = `${numId}_a`.toLowerCase();
-      if (state.audioStemMap.has(keyA)) return state.audioStemMap.get(keyA);
-      const keyB = `${numId}_b`.toLowerCase();
-      if (state.audioStemMap.has(keyB)) return state.audioStemMap.get(keyB);
+      if (state.audioStemMap.has(`id_${numId}_a`)) return state.audioStemMap.get(`id_${numId}_a`);
+      if (state.audioStemMap.has(`${numId}_a`)) return state.audioStemMap.get(`${numId}_a`);
+      if (state.audioStemMap.has(`id_${numId}_b`)) return state.audioStemMap.get(`id_${numId}_b`);
+      if (state.audioStemMap.has(`${numId}_b`)) return state.audioStemMap.get(`${numId}_b`);
     }
   }
-  // 2. 其次使用 stops.json 已確認綁定的專屬音檔
   if (st.stopAudioFile) return st.stopAudioFile;
   return '';
 }
@@ -3265,7 +3263,7 @@ function renderSettingsView(vp, bar) {
       <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">診斷模式</div>
       <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5 text-xs">
         <div class="p-3 rounded-xl border ${th.card} space-y-1.5">
-          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v54)</div>
+          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v55)</div>
           <div>App Version：<b>23.06.25</b> ｜ Config：<b>ctb_prod_v10</b></div>
           <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
           <div>站點資料庫：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
@@ -3562,6 +3560,12 @@ async function fetchInitialLightData() {
       for (const p of state.audioManifest) {
         const stem = p.split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
         if (stem && !state.audioStemMap.has(stem)) state.audioStemMap.set(stem, p);
+        const idMatch = stem.match(/^(\d+)_/);
+        if (idMatch) {
+          const numId = idMatch[1].replace(/^0+/, '') || '0';
+          const slotKey = stem.endsWith('_b') ? `id_${numId}_b` : `id_${numId}_a`;
+          if (!state.audioStemMap.has(slotKey)) state.audioStemMap.set(slotKey, p);
+        }
       }
     })
     .catch(() => {});
