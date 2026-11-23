@@ -941,8 +941,39 @@ function buildStopSegment(st) {
   };
 }
 
+function getTerminusAudioFile() {
+  const candidates = [
+    'Terminus.mp3',
+    'terminus.mp3',
+    'audio/Terminus.mp3',
+    'audio/terminus.mp3',
+    'audio/announcements/Terminus.mp3',
+    'audio/announcements/terminus.mp3'
+  ];
+  for (const c of candidates) {
+    if (state.audioManifest.includes(c)) return c;
+    const lowerHit = state.audioManifest.find(p => String(p).toLowerCase() === c.toLowerCase());
+    if (lowerHit) return lowerHit;
+  }
+  if (state.audioStemMap.has('terminus')) {
+    return state.audioStemMap.get('terminus');
+  }
+  return 'Terminus.mp3';
+}
+
+function buildTerminusSegment(st) {
+  const tcName = getStopNameTc(st);
+  const enName = getStopNameEn(st);
+  return {
+    files: [getTerminusAudioFile()],
+    tc: `本班車已到達總站 ${tcName}，多謝乘搭城巴。`,
+    en: enName ? `This bus has arrived at the terminus, ${enName}. Thank you for riding Citybus.` : 'This bus has arrived at the terminus. Thank you for riding Citybus.',
+    sc: `本班车已到达总站 ${tcName}，感谢乘坐城巴。`
+  };
+}
+
 function triggerStopAnnouncement(idx, force = false) {
-  if (state.incidentState.stage !== 'idle') return; // 事故模式下暫停報站
+  if (state.incidentState.stage !== 'idle') return;
   const st = state.tripStops[idx];
   if (!st) return;
   const modeTag = state.gpsEnabled ? 'auto' : 'manual';
@@ -950,7 +981,7 @@ function triggerStopAnnouncement(idx, force = false) {
   if (!force && state.lastAnnouncedKey === key) return;
   state.lastAnnouncedKey = key;
 
-  // 檢查是否跨入新分段收費點（八達通連動正常時發出轉分段提示音）
+  const isTerminus = idx === state.tripStops.length - 1;
   const sections = computeTripSections(state.tripStops, state.selectedTrip);
   const secInfo = sections[idx] || {};
   const segments = [];
@@ -960,7 +991,12 @@ function triggerStopAnnouncement(idx, force = false) {
     showToast(`八達通轉分段：分段 ${secInfo.sectionNo}（${fmtFare(secInfo.badgeFare)}）`);
   }
 
-  // 自動模式：第 1 站冇聲；離開第 1 站到第 2 站先播歡迎詞再播第 2 站名
+  if (isTerminus) {
+    segments.push(buildTerminusSegment(st));
+    playAnnouncementSegments(segments);
+    return;
+  }
+
   if (state.gpsEnabled) {
     if (idx === 0) {
       stopAllAudio();
@@ -976,7 +1012,6 @@ function triggerStopAnnouncement(idx, force = false) {
     return;
   }
 
-  // 手動模式：第 1 站播歡迎詞；第 2 站起播站名
   if (idx === 0) {
     playAnnouncementSegments([buildWelcomeSegment()]);
     return;
@@ -3261,7 +3296,7 @@ function renderSettingsView(vp, bar) {
       <div class="px-3 py-2 ${th.subBar} font-black text-sm text-center shrink-0">診斷模式</div>
       <div class="flex-1 overflow-y-auto no-scrollbar p-3.5 space-y-2.5 text-xs">
         <div class="p-3 rounded-xl border ${th.card} space-y-1.5">
-          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v56)</div>
+          <div class="font-black text-sm mb-1">系統與資料庫狀態 (v57)</div>
           <div>App Version：<b>23.06.25</b> ｜ Config：<b>ctb_prod_v10</b></div>
           <div>路線總班次：<b>${state.routes.length}</b>（不重複路線：<b>${state.uniqueRouteNos.length}</b>）</div>
           <div>站點資料庫：<b>${state.stopsLoaded ? '已載入' : '未下載（點入班次時按需載入）'}</b></div>
