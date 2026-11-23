@@ -412,10 +412,11 @@ async function analyzeAudioWithGemini(relPath, customBlob = null) {
   "confidence": 0.0 至 1.0 之間的數值
 }`;
 
-  const candidatesToTry = Array.from(new Set([model, 'gemini-3.8-flash', 'gemini-3.8-pro', 'gemini-flash-latest']));
+  const candidatesToTry = Array.from(new Set([model, 'gemini-3.8-flash', 'gemini-3.8-pro', 'gemini-flash-latest', 'gemini-2.5-flash']));
   let gRes = null;
   let lastErrMsg = '';
-  for (const mName of candidatesToTry) {
+  for (let i = 0; i < candidatesToTry.length; i++) {
+    const mName = candidatesToTry[i];
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(mName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
     gRes = await fetch(endpoint, {
       method: 'POST',
@@ -436,12 +437,17 @@ async function analyzeAudioWithGemini(relPath, customBlob = null) {
     if (gRes.ok) break;
     const errJson = await gRes.json().catch(() => ({}));
     lastErrMsg = errJson?.error?.message || `Gemini API 錯誤 (${gRes.status})`;
-    if (!/no longer available|not found|not supported/i.test(lastErrMsg)) {
+    const isRetryable = gRes.status === 429 || gRes.status === 503 || gRes.status === 404 ||
+      /high demand|overloaded|unavailable|no longer available|not found|not supported|quota|rate/i.test(lastErrMsg);
+    if (!isRetryable) {
       throw new Error(lastErrMsg);
     }
+    const logEl = document.getElementById('batchLogLine');
+    if (logEl) logEl.textContent = `⏳ ${mName} 繁忙，自動切換備援模型重試中...`;
+    await new Promise(r => setTimeout(r, 1500));
   }
   if (!gRes || !gRes.ok) {
-    throw new Error(lastErrMsg || '無法連線至可用的 Gemini 模型');
+    throw new Error(lastErrMsg || '所有備援模型目前均高負載，請稍後再試');
   }
 
   const gData = await gRes.json();
