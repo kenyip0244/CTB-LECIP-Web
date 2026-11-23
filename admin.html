@@ -164,6 +164,11 @@
         <label class="block text-xs font-black text-slate-800">GitHub Personal Access Token（選填，用於一鍵寫回 audio_mapping.json）</label>
         <input id="ghTokenInput" type="password" placeholder="ghp_..." class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-xs font-mono outline-none focus:border-[#059669]" />
       </div>
+      <div class="space-y-1.5 pt-2 border-t border-slate-100">
+        <label class="block text-xs font-black text-slate-800">Firebase Realtime Database URL（跨裝置實時同步）</label>
+        <input id="fbDbUrlInput" type="text" placeholder="https://你的專案-default-rtdb.firebaseio.com" class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-xs font-mono outline-none focus:border-[#0052CC]" />
+        <p class="text-[11px] text-slate-500">填寫後跨裝置修改、配對或刪除會即時同步至雲端。</p>
+      </div>
       <div class="flex justify-end gap-2 pt-2">
         <button id="btnClearKeys" class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700">清除 Token</button>
         <button id="btnSaveKeys" class="px-4 py-2 rounded-lg bg-[#0052CC] hover:bg-[#0041A3] text-white text-xs font-bold">儲存設定</button>
@@ -649,16 +654,22 @@ document.addEventListener('click', (e) => {
     e.preventDefault();
     const tEl = document.getElementById('ghTokenInput');
     if (tEl) tEl.value = localStorage.getItem('ctb_gh_token') || '';
+    const fEl = document.getElementById('fbDbUrlInput');
+    if (fEl) fEl.value = localStorage.getItem(STORAGE_FB_KEY) || '';
     sModal.classList.remove('hidden');
   } else if (e.target.closest('#btnCloseSettings') && sModal) {
     sModal.classList.add('hidden');
   } else if (e.target.closest('#btnSaveKeys') && sModal) {
     const tEl = document.getElementById('ghTokenInput');
     if (tEl) localStorage.setItem('ctb_gh_token', tEl.value.trim());
+    const fEl = document.getElementById('fbDbUrlInput');
+    if (fEl) localStorage.setItem(STORAGE_FB_KEY, fEl.value.trim());
+    startRealtimeSyncLoop();
     sModal.classList.add('hidden');
     toast('設定已儲存');
   } else if (e.target.closest('#btnClearKeys')) {
     localStorage.removeItem('ctb_gh_token');
+    localStorage.removeItem(STORAGE_FB_KEY);
     const tEl = document.getElementById('ghTokenInput');
     if (tEl) tEl.value = '';
     toast('已清除 Token');
@@ -781,6 +792,68 @@ async function init() {
   renderList();
 }
 
+
+const STORAGE_FB_KEY = 'ctb_lecip_fb_db_url';
+let _fbPollTimer = null;
+let _lastFbSyncTs = 0;
+
+function getFbDbUrl() {
+  return (localStorage.getItem(STORAGE_FB_KEY) || '').trim().replace(/\/+$/, '');
+}
+
+async function pushDbToCloudRealtime() {
+  const baseUrl = getFbDbUrl();
+  if (!baseUrl) return;
+  try {
+    const payload = {
+      updatedAt: Date.now(),
+      audioDb
+    };
+    await fetch(`${baseUrl}/ctb_audio_admin_v1.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    _lastFbSyncTs = payload.updatedAt;
+  } catch (_) {}
+}
+
+async function pullDbFromCloudRealtime(showToastIfUpdated = false) {
+  const baseUrl = getFbDbUrl();
+  if (!baseUrl) return;
+  try {
+    const res = await fetch(`${baseUrl}/ctb_audio_admin_v1.json?t=${Date.now()}`);
+    if (!res.ok) return;
+    const remote = await res.json();
+    if (!remote || typeof remote !== 'object') return;
+    const rTs = Number(remote.updatedAt || 0);
+    if (rTs > _lastFbSyncTs && remote.audioDb && typeof remote.audioDb === 'object') {
+      _lastFbSyncTs = rTs;
+      audioDb = remote.audioDb;
+      try { localStorage.setItem(STORAGE_DB_KEY, JSON.stringify(audioDb)); } catch (_) {}
+      renderList();
+      if (showToastIfUpdated) toast('已從雲端同步最新跨裝置變更');
+    }
+  } catch (_) {}
+}
+
+function startRealtimeSyncLoop() {
+  if (_fbPollTimer) clearInterval(_fbPollTimer);
+  pullDbFromCloudRealtime(false);
+  _fbPollTimer = setInterval(() => {
+    if (document.visibilityState === 'visible') {
+      pullDbFromCloudRealtime(true);
+    }
+  }, 4000);
+}
+
+const _origSaveLocalDb = saveLocalDb;
+saveLocalDb = function() {
+  _origSaveLocalDb();
+  pushDbToCloudRealtime();
+};
+
+startRealtimeSyncLoop();
 init();
 </script>
 </body>
