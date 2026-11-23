@@ -882,7 +882,7 @@ async function playSpecialAnnouncementByItem(item) {
   if (state.currentTab === 'announce') renderMain();
   showToast(`播放特別訊息 #${code}`);
 
-  const candidate = item.audioFile || `audio/announcements/${code}.mp3`;
+  const candidate = item.audioFile || `audio/announcements/${code}.wav`;
   const completed = await playAnnouncementSegments([{
     files: [candidate],
     tc: item.ttsTc || item.titleTc,
@@ -977,8 +977,8 @@ function getTerminusAudioFile() {
     'terminus.mp3',
     'audio/Terminus.mp3',
     'audio/terminus.mp3',
-    'audio/announcements/Terminus.mp3',
-    'audio/announcements/terminus.mp3'
+    'audio/announcements/Terminus.wav',
+    'audio/announcements/terminus.wav'
   ];
   for (const c of candidates) {
     if (state.audioManifest.includes(c)) return c;
