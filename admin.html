@@ -234,6 +234,10 @@
   <div id="adminToast" class="hidden fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-[#111827] text-white text-xs font-bold shadow-xl max-w-sm"></div>
 
 <script>
+
+window.addEventListener('error', (ev) => {
+  console.warn('[Admin Guard]', ev.message || ev.error);
+});
 const AUDIO_CDN_BASE = 'https://kenyip0244.github.io/CTB-LECIP-Audio';
 const GH_OWNER = 'kenyip0244';
 const GH_WEB_REPO = 'CTB-LECIP-Web';
@@ -1031,13 +1035,7 @@ async function init() {
   document.getElementById('newAudioUploadInput').onchange = async e => { await handleNewAudioFiles(e.target.files); e.target.value = ''; };
 
   const sModal = document.getElementById('settingsModal');
-  document.getElementById('btnSettings').onclick = () => {
-    document.getElementById('hfKeyInput').value = localStorage.getItem('ctb_hf_api_key') || '';
-        document.getElementById('groqKeyInput').value = localStorage.getItem('ctb_groq_api_key') || '';
-    document.getElementById('geminiKeyInput').value = localStorage.getItem('ctb_gemini_api_key') || '';
-    document.getElementById('ghTokenInput').value = localStorage.getItem('ctb_gh_token') || '';
-    sModal.classList.remove('hidden');
-  };
+  const _btnSet = document.getElementById('btnSettings'); if (_btnSet) _btnSet.onclick = openSettingsModalSafe;
   document.getElementById('btnCloseSettings').onclick = () => sModal.classList.add('hidden');
   document.getElementById('btnSaveKeys').onclick = () => {
     localStorage.setItem('ctb_hf_api_key', document.getElementById('hfKeyInput').value.trim());
@@ -1095,6 +1093,54 @@ document.addEventListener('click', (e) => {
     document.getElementById('hfKeyInput').value = '';
     document.getElementById('geminiKeyInput').value = '';
     document.getElementById('ghTokenInput').value = '';
+    if (typeof updateCountsAndBadges === 'function') updateCountsAndBadges();
+    if (typeof toast === 'function') toast('已清除金鑰');
+  }
+});
+
+
+function openSettingsModalSafe() {
+  const sModal = document.getElementById('settingsModal');
+  if (!sModal) return;
+  const gEl = document.getElementById('groqKeyInput');
+  const hEl = document.getElementById('hfKeyInput');
+  const mEl = document.getElementById('geminiKeyInput');
+  const tEl = document.getElementById('ghTokenInput');
+  if (gEl) gEl.value = localStorage.getItem('ctb_groq_api_key') || '';
+  if (hEl) hEl.value = localStorage.getItem('ctb_hf_api_key') || '';
+  if (mEl) mEl.value = localStorage.getItem('ctb_gemini_api_key') || '';
+  if (tEl) tEl.value = localStorage.getItem('ctb_gh_token') || '';
+  sModal.classList.remove('hidden');
+}
+
+document.addEventListener('click', (e) => {
+  const sModal = document.getElementById('settingsModal');
+  if (e.target.closest('#btnSettings')) {
+    e.preventDefault();
+    openSettingsModalSafe();
+  } else if (e.target.closest('#btnCloseSettings') && sModal) {
+    sModal.classList.add('hidden');
+  } else if (e.target.closest('#btnSaveKeys') && sModal) {
+    const gEl = document.getElementById('groqKeyInput');
+    const hEl = document.getElementById('hfKeyInput');
+    const mEl = document.getElementById('geminiKeyInput');
+    const tEl = document.getElementById('ghTokenInput');
+    if (gEl) localStorage.setItem('ctb_groq_api_key', gEl.value.trim());
+    if (hEl) localStorage.setItem('ctb_hf_api_key', hEl.value.trim());
+    if (mEl) localStorage.setItem('ctb_gemini_api_key', mEl.value.trim());
+    if (tEl) localStorage.setItem('ctb_gh_token', tEl.value.trim());
+    sModal.classList.add('hidden');
+    if (typeof updateCountsAndBadges === 'function') updateCountsAndBadges();
+    if (typeof toast === 'function') toast('設定已儲存');
+  } else if (e.target.closest('#btnClearKeys')) {
+    localStorage.removeItem('ctb_groq_api_key');
+    localStorage.removeItem('ctb_hf_api_key');
+    localStorage.removeItem('ctb_gemini_api_key');
+    localStorage.removeItem('ctb_gh_token');
+    ['groqKeyInput', 'hfKeyInput', 'geminiKeyInput', 'ghTokenInput'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
     if (typeof updateCountsAndBadges === 'function') updateCountsAndBadges();
     if (typeof toast === 'function') toast('已清除金鑰');
   }
