@@ -312,9 +312,11 @@ function getRecord(path) {
       type: 'stop',
       matchedStopId: '',
       matchScore: 0,
+      scope: 'single',
       candidates: []
     };
   }
+  if (!audioDb[path].scope) audioDb[path].scope = 'single';
   return audioDb[path];
 }
 
@@ -475,6 +477,10 @@ async function analyzeAudioWithGemini(relPath, customBlob = null) {
     rec.matchedStopId = topMatch.stopId;
     rec.matchScore = topMatch.score;
     rec.status = 'ai_matched';
+    const matchedObj = stopById.get(topMatch.stopId);
+    // 若聽出的文字包含具體副站名／道路，預設為「只限此方向」；否則預設為「來回同名共用」
+    const hasSpecificSub = matchedObj?.subTc && normText(heardTc).includes(normText(matchedObj.subTc));
+    rec.scope = hasSpecificSub ? 'single' : 'bidirectional';
   } else if (rec.type === 'welcome' || rec.type === 'special') {
     rec.matchedStopId = '';
     rec.matchScore = Math.round((Number(parsed.confidence) || 0.7) * 100);
@@ -602,7 +608,7 @@ function renderList() {
       const cs = stopById.get(c.stopId);
       if (!cs) return '';
       const rts = cs.routes.slice(0, 5).join(', ');
-      return `<option value="${esc(cs.stopId)}" ${cs.stopId === rec.matchedStopId ? 'selected' : ''}>${esc(cs.tc)} (${esc(cs.numId)}) · ${c.score}% ${rts ? '[' + esc(rts) + ']' : ''}</option>`;
+      return `<option value="${esc(cs.stopId)}" ${cs.stopId === rec.matchedStopId ? 'selected' : ''}>${esc(cs.tc)}${cs.subTc ? ' [' + esc(cs.subTc) + ']' : ''} (#${esc(cs.numId)}) · ${c.score}% ${rts ? '[' + esc(rts) + ']' : ''}</option>`;
     }).join('');
 
     return `
@@ -620,9 +626,10 @@ function renderList() {
             </div>
 
             ${st ? `
-              <div class="text-xs text-slate-600">
+              <div class="text-xs text-slate-600 flex flex-wrap items-center gap-x-2 gap-y-1">
+                ${st.subTc ? `<span class="px-1.5 py-0.5 rounded bg-blue-50 text-[#0052CC] font-bold">副站名：${esc(st.subTc)}</span>` : ''}
                 <span class="font-bold">${esc(st.en)}</span>
-                ${st.routes.length ? `<span class="ml-2 text-[11px] text-slate-400">途經路線：${esc(st.routes.slice(0, 8).join(' / '))}</span>` : ''}
+                ${st.routes.length ? `<span class="text-[11px] text-slate-400">途經：${esc(st.routes.slice(0, 8).join(' / '))}</span>` : ''}
               </div>
             ` : ''}
 
@@ -671,13 +678,29 @@ function renderList() {
           </div>
         </div>
 
-        <!-- 若 Gemini 找到多個同名／相似候選車站，提供快捷切換 -->
-        ${currentTab === 'ai_matched' && (rec.candidates || []).length > 1 ? `
-          <div class="flex items-center gap-2 pt-1">
-            <span class="text-[11px] font-bold text-slate-500 shrink-0">切換候選站：</span>
-            <select data-candsel="${esc(path)}" class="cand-select flex-1 max-w-md px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-xs font-bold">
-              ${candOpts}
-            </select>
+        <!-- 範圍設定（來回共用 vs 只限此方向）＋ 候選車站切換（含副站名區分） -->
+        ${(currentTab === 'ai_matched' || currentTab === 'confirmed') && rec.matchedStopId ? `
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-100">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] font-bold text-slate-500">套用範圍：</span>
+              <div class="inline-flex rounded-lg bg-slate-100 p-0.5 border border-slate-200 text-[11px] font-bold">
+                <button data-scope-path="${esc(path)}" data-scope-val="bidirectional" class="scope-btn px-2.5 py-1 rounded-md ${rec.scope === 'bidirectional' ? 'bg-[#0052CC] text-white' : 'text-slate-600 hover:text-black'}">
+                  來回同名共用
+                </button>
+                <button data-scope-path="${esc(path)}" data-scope-val="single" class="scope-btn px-2.5 py-1 rounded-md ${rec.scope !== 'bidirectional' ? 'bg-[#111827] text-white' : 'text-slate-600 hover:text-black'}">
+                  只限此方向車站
+                </button>
+              </div>
+            </div>
+
+            ${(rec.candidates || []).length > 1 ? `
+              <div class="flex items-center gap-1.5 flex-1 min-w-[220px] max-w-md">
+                <span class="text-[11px] font-bold text-slate-500 shrink-0">改選候選：</span>
+                <select data-candsel="${esc(path)}" class="cand-select flex-1 px-2 py-1 rounded-lg bg-white border border-slate-300 text-xs font-bold">
+                  ${candOpts}
+                </select>
+              </div>
+            ` : ''}
           </div>
         ` : ''}
       </div>
@@ -728,6 +751,16 @@ function renderList() {
       const rec = getRecord(sel.dataset.candsel);
       rec.matchedStopId = sel.value;
       saveLocalDb();
+      renderList();
+    };
+  });
+
+  body.querySelectorAll('.scope-btn').forEach(b => {
+    b.onclick = () => {
+      const rec = getRecord(b.dataset.scopePath);
+      rec.scope = b.dataset.scopeVal;
+      saveLocalDb();
+      toast(rec.scope === 'bidirectional' ? '已設為：來回同名車站共用同一錄音' : '已設為：只限此方向單一車站使用');
       renderList();
     };
   });
@@ -811,7 +844,7 @@ function renderPickerResults() {
   const box = document.getElementById('pickerResults');
   const hits = uniqueStops.filter(st => {
     if (!kw) return true;
-    return st.tc.toLowerCase().includes(kw) ||
+    return st.tc.toLowerCase().includes(kw) || (st.subTc && st.subTc.toLowerCase().includes(kw)) ||
            st.en.toLowerCase().includes(kw) ||
            st.numId.includes(kw) ||
            st.routes.some(r => r.toLowerCase().includes(kw));
@@ -825,7 +858,7 @@ function renderPickerResults() {
   box.innerHTML = hits.map(st => `
     <button data-sid="${esc(st.stopId)}" class="pick-stop-row w-full px-4 py-2.5 text-left hover:bg-blue-50 flex items-center justify-between gap-2">
       <div class="min-w-0">
-        <div class="text-sm font-black text-[#111827] truncate">${esc(st.tc)} <span class="text-xs font-bold text-[#0052CC]">#${esc(st.numId)}</span></div>
+        <div class="text-sm font-black text-[#111827] truncate">${esc(st.tc)} ${st.subTc ? `<span class="text-xs font-bold text-amber-700">[${esc(st.subTc)}]</span>` : ''} <span class="text-xs font-bold text-[#0052CC]">#${esc(st.numId)}</span></div>
         <div class="text-xs text-slate-500 truncate">${esc(st.en)}</div>
         ${st.routes.length ? `<div class="text-[11px] text-slate-400 truncate">途經：${esc(st.routes.slice(0, 8).join(' / '))}</div>` : ''}
       </div>
@@ -870,8 +903,8 @@ function buildConfirmedMappingObject() {
       confirmed[rawId] = path;
       if (numId) confirmed[numId] = path;
 
-      // 自動套用至所有來回同名車站
-      const sameNameList = stObj?.normTc ? (nameToStops.get(stObj.normTc) || []) : [];
+      const isBidir = rec.scope === 'bidirectional';
+      const sameNameList = (isBidir && stObj?.normTc) ? (nameToStops.get(stObj.normTc) || []) : [];
       for (const peer of sameNameList) {
         if (!confirmed[peer.stopId]) confirmed[peer.stopId] = path;
         if (peer.numId && !confirmed[peer.numId]) confirmed[peer.numId] = path;
@@ -879,7 +912,8 @@ function buildConfirmedMappingObject() {
 
       details[path] = {
         stopId: rawId,
-        sharedStopIds: sameNameList.map(x => x.stopId),
+        scope: isBidir ? 'bidirectional' : 'single',
+        sharedStopIds: isBidir ? sameNameList.map(x => x.stopId) : [rawId],
         transcript: rec.transcript || '',
         heardTc: sharedTc,
         heardEn: stObj?.en || rec.heardEn || ''
@@ -1060,12 +1094,17 @@ async function init() {
     if (!stopMapTemp.has(sid)) {
       const tc = cleanJoint(s.nameTc || '');
       const en = cleanJoint(s.nameEn || '');
+      const subTc = cleanJoint(s.roadTc || s.locationTc || s.subTc || '');
+      const fullTc = subTc && normText(subTc) !== normText(tc) ? `${tc} ${subTc}` : tc;
       stopMapTemp.set(sid, {
         stopId: sid,
         numId,
         tc,
+        subTc,
+        fullTc,
         en,
         normTc: normText(tc),
+        normFullTc: normText(fullTc),
         normEn: normText(en),
         routesSet: new Set()
       });
@@ -1077,8 +1116,11 @@ async function init() {
     stopId: v.stopId,
     numId: v.numId,
     tc: v.tc,
+    subTc: v.subTc,
+    fullTc: v.fullTc,
     en: v.en,
     normTc: v.normTc,
+    normFullTc: v.normFullTc,
     normEn: v.normEn,
     routes: Array.from(v.routesSet).sort()
   }));
@@ -1102,6 +1144,7 @@ async function init() {
           type: 'stop',
           matchedStopId: info.stopId || '',
           matchScore: Number(info.matchScore) || (info.stopId ? 95 : 0),
+              scope: info.scope || 'single',
           candidates: Array.isArray(info.candidates) ? info.candidates : []
         };
       }
