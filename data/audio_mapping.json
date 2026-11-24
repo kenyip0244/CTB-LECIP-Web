@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "updatedAt": "2026-11-24T13:21:38.902Z",
+  "updatedAt": "2026-11-24T15:11:35.905Z",
   "confirmed": {
     "2": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1312_a.mp3",
     "3": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1226_a.mp3",
@@ -27,6 +27,7 @@
     "40": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1338_a.mp3",
     "43": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1224_a.mp3",
     "46": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1311_A.mp3",
+    "48": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1371_A.mp3",
     "49": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1245_a.mp3",
     "50": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1246_a.mp3",
     "51": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1368_a.mp3",
@@ -99,6 +100,7 @@
     "182": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1197_A.mp3",
     "183": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1198_a.mp3",
     "185": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1200_a.mp3",
+    "187": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1377_a.mp3",
     "188": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1306_a.mp3",
     "190": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1309_A.mp3",
     "220": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1335_A.mp3",
@@ -206,6 +208,8 @@
     "554": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1352_A.mp3",
     "555": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1360_A.mp3",
     "556": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1361_A.mp3",
+    "557": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1375_A.mp3",
+    "562": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1376_A.mp3",
     "563": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1350_A.mp3",
     "564": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1351_A.mp3",
     "565": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1352_A.mp3",
@@ -243,6 +247,7 @@
     "646": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1160_A.mp3",
     "647": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1031_A.mp3",
     "657": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1285_A.mp3",
+    "661": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1374_A.mp3",
     "673": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1064_A.mp3",
     "674": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1017_A.mp3",
     "675": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1050_A.mp3",
@@ -268,6 +273,8 @@
     "902": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1210_A.mp3",
     "903": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1295_a.mp3",
     "904": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1257_A.mp3",
+    "912": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1378_A.mp3",
+    "914": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1369_A.mp3",
     "915": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1311_A.mp3",
     "981": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1058_A.mp3",
     "1024": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1798_A.mp3",
@@ -294,6 +301,7 @@
     "1289": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1398_a.mp3",
     "1305": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1256_A.mp3",
     "1306": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1257_A.mp3",
+    "1307": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1380_a.mp3",
     "1334": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1363_A.mp3",
     "1366": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1598_A.mp3",
     "1389": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1698_A.mp3",
@@ -312,13 +320,16 @@
     "1499": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1028_A.mp3",
     "1510": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1126_A.mp3",
     "1513": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1289_A.mp3",
+    "1546": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1382_a.mp3",
     "1549": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1222_A.mp3",
     "1551": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1225_a.mp3",
     "1552": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/2580_A.mp3",
     "1557": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/2780_A.mp3",
     "1559": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1332_a.mp3",
     "1560": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1336_a.mp3",
+    "1563": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1371_A.mp3",
     "1565": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1344_a.mp3",
+    "1568": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1383_a.mp3",
     "1574": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1178_A.mp3",
     "1581": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1038_A.mp3",
     "3001": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1298_a.mp3",
@@ -362,6 +373,7 @@
     "7120": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1093_A.mp3",
     "7121": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1098_A.mp3",
     "7122": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1093_A.mp3",
+    "7125": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1369_A.mp3",
     "7130": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1270_A.mp3",
     "7131": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1252_A.mp3",
     "7133": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1252_A.mp3",
@@ -387,6 +399,8 @@
     "9198": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1238_A.mp3",
     "9199": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1238_A.mp3",
     "9425": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/3112_A.mp3",
+    "10239": "audio/stops/Lantau BBI.mp3",
+    "10240": "audio/stops/Lantau BBI.mp3",
     "10241": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1195_A.mp3",
     "10298": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1092_a.mp3",
     "10303": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1092_a.mp3",
@@ -417,6 +431,8 @@
     "13083": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1274_a.mp3",
     "13120": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1028_A.mp3",
     "13228": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1500_A.mp3",
+    "13309": "audio/stops/Expo.mp3",
+    "13345": "audio/stops/HZMBHKport.mp3",
     "10000052": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1504_A.mp3",
     "10000060": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1027_A.mp3",
     "10000106": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1205_a.mp3",
@@ -2285,22 +2301,6 @@
       "scope": "single",
       "heardTc": "西寧閣",
       "heardEn": "Serene Court",
-      "note": "",
-      "updatedBy": "Ken"
-    },
-    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1166_a.mp3": {
-      "stopId": "641",
-      "stopIds": [
-        "641",
-        "645"
-      ],
-      "routeMode": "all",
-      "routes": [],
-      "tripMode": "all",
-      "tripNames": [],
-      "scope": "multi",
-      "heardTc": "港島西廢物轉運站",
-      "heardEn": "Island West Transfer Station",
       "note": "",
       "updatedBy": "Ken"
     },
@@ -5069,6 +5069,158 @@
       "note": "",
       "updatedBy": "Ken"
     },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1369_A.mp3": {
+      "stopId": "914",
+      "stopIds": [
+        "914",
+        "7125"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "富怡花園",
+      "heardEn": "Cheerful Garden",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1371_A.mp3": {
+      "stopId": "48",
+      "stopIds": [
+        "48",
+        "1563"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "張振興伉儷書院",
+      "heardEn": "Chong Gene Hang College",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1377_a.mp3": {
+      "stopId": "187",
+      "stopIds": [
+        "187"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "香港抗戰及海防博物館",
+      "heardEn": "Hong Kong Museum of the War of Resistance and Coastal Defence",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1374_A.mp3": {
+      "stopId": "661",
+      "stopIds": [
+        "661"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "永興街",
+      "heardEn": "Wing Hing Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1375_A.mp3": {
+      "stopId": "557",
+      "stopIds": [
+        "557"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "太寧街",
+      "heardEn": "Tai Ning Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1376_A.mp3": {
+      "stopId": "562",
+      "stopIds": [
+        "562"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "東欣苑",
+      "heardEn": "Tung Yan Court",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1378_A.mp3": {
+      "stopId": "912",
+      "stopIds": [
+        "912"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "太古城雅蓮閣",
+      "heardEn": "Lotus Mansion Taikoo Shing",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1383_a.mp3": {
+      "stopId": "1568",
+      "stopIds": [
+        "1568"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "培僑小學",
+      "heardEn": "Pui Kiu Primary School",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1380_a.mp3": {
+      "stopId": "1307",
+      "stopIds": [
+        "1307"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "南康街",
+      "heardEn": "Nam Hong Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1382_a.mp3": {
+      "stopId": "1546",
+      "stopIds": [
+        "1546"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "小西灣 (藍灣半島)",
+      "heardEn": "Siu Sai Wan (Island Resort)",
+      "note": "",
+      "updatedBy": "Ken"
+    },
     "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1398_a.mp3": {
       "stopId": "1289",
       "stopIds": [
@@ -6010,6 +6162,52 @@
       "scope": "single",
       "heardTc": "翠怡花園",
       "heardEn": "Greenfield Garden",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Expo.mp3": {
+      "stopId": "13309",
+      "stopIds": [
+        "13309"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "機場博覽館",
+      "heardEn": "AsiaWorld-Expo",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/HZMBHKport.mp3": {
+      "stopId": "13345",
+      "stopIds": [
+        "13345"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "港珠澳大橋香港口岸",
+      "heardEn": "Hong Kong-Zhuhai-Macao Bridge Hong Kong Port",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Lantau BBI.mp3": {
+      "stopId": "10239",
+      "stopIds": [
+        "10239",
+        "10240"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "青嶼幹線巴士轉乘站",
+      "heardEn": "Lantau Link Bus-Bus Interchange",
       "note": "",
       "updatedBy": "Ken"
     }
@@ -7630,20 +7828,6 @@
       "tripNames": [],
       "note": "",
       "updatedAt": "2026-11-24T12:09:56.039Z",
-      "updatedBy": "Ken"
-    },
-    {
-      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1166_a.mp3",
-      "stopIds": [
-        "641",
-        "645"
-      ],
-      "routeMode": "all",
-      "routes": [],
-      "tripMode": "all",
-      "tripNames": [],
-      "note": "",
-      "updatedAt": "2026-11-24T12:28:12.959Z",
       "updatedBy": "Ken"
     },
     {
@@ -10060,6 +10244,138 @@
       "updatedBy": "Ken"
     },
     {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1369_A.mp3",
+      "stopIds": [
+        "914",
+        "7125"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T14:33:10.470Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1371_A.mp3",
+      "stopIds": [
+        "48",
+        "1563"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T14:33:55.388Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1377_a.mp3",
+      "stopIds": [
+        "187"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T14:35:17.489Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1374_A.mp3",
+      "stopIds": [
+        "661"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T14:34:17.854Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1375_A.mp3",
+      "stopIds": [
+        "557"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T14:34:29.906Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1376_A.mp3",
+      "stopIds": [
+        "562"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T14:34:59.430Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1378_A.mp3",
+      "stopIds": [
+        "912"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T14:35:50.861Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1383_a.mp3",
+      "stopIds": [
+        "1568"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T14:36:41.645Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1380_a.mp3",
+      "stopIds": [
+        "1307"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T14:36:09.002Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1382_a.mp3",
+      "stopIds": [
+        "1546"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T14:36:29.840Z",
+      "updatedBy": "Ken"
+    },
+    {
       "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1398_a.mp3",
       "stopIds": [
         "1289",
@@ -10882,6 +11198,46 @@
       "note": "",
       "updatedAt": "2026-11-24T10:14:49.078Z",
       "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Expo.mp3",
+      "stopIds": [
+        "13309"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T15:09:51.887Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/HZMBHKport.mp3",
+      "stopIds": [
+        "13345"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T14:41:12.115Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Lantau BBI.mp3",
+      "stopIds": [
+        "10239",
+        "10240"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T14:32:40.662Z",
+      "updatedBy": "Ken"
     }
   ],
   "defaultWelcome": "",
@@ -11190,7 +11546,166 @@
       "note": "",
       "updatedAt": "2026-11-24T10:10:06.099Z",
       "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/A10_LLS.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "A10-鴨脷洲 (利樂街)-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-24T14:24:39.499Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/A11_NPF.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "A11-北角碼頭-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-24T15:06:26.368Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/A12_ISR.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "A12-小西灣 (藍灣半島)-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-24T15:11:33.990Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/A22_LT.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "A22-藍田站-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-24T15:01:21.587Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/A25_KT.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "A25-啟德 - Airside-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-24T14:44:59.019Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/A26_YAT.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "A26-油塘-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-24T15:08:52.928Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/A28_LHS.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "A28-日出康城-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-24T14:39:36.402Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/A29_TKO.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "A29-寶琳站-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-24T14:47:57.995Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/CTB 72A TO SW_01.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "72A-深灣-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-24T14:54:47.684Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/CTFR welcome(To Air.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "A10-機場 (地面運輸中心)-1",
+        "A11-機場 (地面運輸中心)-1",
+        "A17-機場 (地面運輸中心)-1",
+        "A20-機場 (地面運輸中心)-1",
+        "A21-機場 (地面運輸中心)-1",
+        "A22-機場 (地面運輸中心)-1",
+        "A25-機場 (地面運輸中心)-1",
+        "A26-機場 (地面運輸中心)-1",
+        "A29-機場 (地面運輸中心)-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-24T14:28:02.281Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/CTFR+Cathay.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "A28X-機場 (地面運輸中心)-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-24T14:52:50.854Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/CTFR_HZMB-AIR.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "A17-機場 (地面運輸中心)-1",
+        "A23-機場 (地面運輸中心)-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-24T14:59:00.283Z",
+      "updatedBy": "Ken"
     }
   ],
-  "tripNames": {}
+  "specialBroadcasts": [],
+  "tripNames": {
+    "A28|O|1": {
+      "bound": "O",
+      "defaultName": "A28-日出康城-1",
+      "deleted": true,
+      "destTc": "日出康城",
+      "name": "A28-日出康城-1",
+      "routeId": "A28",
+      "serviceType": "1",
+      "tripKey": "A28|O|1",
+      "updatedAt": "2026-11-24T14:29:08.241Z",
+      "updatedBy": "Ken",
+      "tripLabel": "",
+      "origTc": "機場 (地面運輸中心)",
+      "fullFare": 44,
+      "isManual": false
+    }
+  }
 }
