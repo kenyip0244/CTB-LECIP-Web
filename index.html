@@ -1773,6 +1773,26 @@ function renderInFrameDiagnostic(vp, statusText) {
   `;
 }
 
+function findStudioTripRecordForWeb(trip) {
+  if (!trip) return null;
+  if (trip._studioTripRec) return trip._studioTripRec;
+  const map = state.studioTripNames;
+  if (!map || typeof map !== 'object') return null;
+  const rno = getRouteNo(trip);
+  const bnd = getBound(trip);
+  const svc = String(trip?.serviceType || trip?.service_type || '1').trim();
+  const tryKeys = [trip.tripKey, trip.patternId, `${rno}|${bnd}|${svc}`, `${rno}_${bnd}_${svc}`].filter(Boolean);
+  for (const k of tryKeys) {
+    if (map[k] && typeof map[k] === 'object') return map[k];
+  }
+  return Object.values(map).find(v =>
+    v && !v.isManual &&
+    String(v.routeId || '').trim().toUpperCase() === rno &&
+    String(v.bound || '').trim().toUpperCase() === bnd &&
+    String(v.serviceType || '1').trim() === svc
+  ) || null;
+}
+
 async function ensureStopsLoaded(trip) {
   if (!state.stopsLoaded) {
     const vp = document.getElementById('mainViewport');
@@ -1784,8 +1804,14 @@ async function ensureStopsLoaded(trip) {
 
     state.audioByStopName.clear();
     state.audioByBaseName.clear();
+    state.apiStopById = new Map();
 
     for (const s of arr) {
+      const sid = String(s.stopId || '').trim();
+      const nid = sid.replace(/^0+/, '');
+      if (sid && !state.apiStopById.has(sid)) state.apiStopById.set(sid, s);
+      if (nid && !state.apiStopById.has(nid)) state.apiStopById.set(nid, s);
+
       const k1 = `${s.routeId || ''}|${String(s.bound || '').toUpperCase()}|${s.patternId || ''}`;
       if (!state.stopsByTrip.has(k1)) state.stopsByTrip.set(k1, []);
       state.stopsByTrip.get(k1).push(s);
@@ -1805,6 +1831,35 @@ async function ensureStopsLoaded(trip) {
     for (const list of state.stopsByTrip.values()) list.sort((a, b) => (a.seq ?? 0) - (b.seq ?? 0));
 
     state.stopsLoaded = true;
+  }
+
+  // 若 Studio 有自訂／修改此班次嘅車站與分段收費，直接由 API 車站庫組裝
+  const sRec = findStudioTripRecordForWeb(trip);
+  if (sRec && Array.isArray(sRec.customStops)) {
+    const rIdFull = trip.routeId || `CTB-${getRouteNo(trip)}`;
+    const bnd = getBound(trip);
+    const pat = trip.patternId || sRec.tripKey || '';
+    return sRec.customStops.map((item, idx) => {
+      const sid = String(item.stopId || '').trim();
+      const nid = sid.replace(/^0+/, '');
+      const base = state.apiStopById?.get(sid) || state.apiStopById?.get(nid) || item.apiStopMeta || {};
+      return {
+        ...base,
+        routeId: rIdFull,
+        bound: bnd,
+        patternId: pat,
+        seq: idx + 1,
+        stopId: sid,
+        nameTc: base.nameTc || item.apiStopMeta?.nameTc || sid,
+        subNameTc: base.subNameTc || base.subTc || item.apiStopMeta?.subTc || '',
+        nameEn: base.nameEn || item.apiStopMeta?.nameEn || '',
+        nameSc: base.nameSc || item.apiStopMeta?.nameSc || '',
+        lat: base.lat ?? item.apiStopMeta?.lat ?? null,
+        lng: base.lng ?? item.apiStopMeta?.lng ?? null,
+        sectionFare: (item.sectionFare != null && item.sectionFare !== '') ? Number(item.sectionFare) : null,
+        section: (item.section != null && item.section !== '') ? Number(item.section) : null
+      };
+    });
   }
 
   const keyExact = `${trip.routeId || ''}|${getBound(trip)}|${trip.patternId || ''}`;
@@ -2516,6 +2571,13 @@ function renderBoundList(vp, bar) {
 }
 
 function getStudioTripLabel(t, globalIdx) {
+  if (t && t._studioTripRec) {
+    const r = t._studioTripRec;
+    if (typeof r.tripLabel === 'string' && r.tripLabel.trim()) return r.tripLabel.trim();
+    if (r.tripType === 'normal') return '正常路線';
+    if (r.tripType === 'express') return '特快班次';
+    if (r.tripType === 'special_via') return r.viaText ? `特別班次經${r.viaText}` : '特別班次';
+  }
   const map = state.studioTripNames;
   if (!map || typeof map !== 'object') return '';
   const rno = getRouteNo(t);
@@ -3925,10 +3987,74 @@ async function fetchInitialLightData() {
   ]);
   const routes = await rRes.json();
   const anns = await aRes.json();
-  state.routes = Array.isArray(routes) ? routes : [];
+  state.baseRoutes = Array.isArray(routes) ? routes : [];
+  state.routes = state.baseRoutes.slice();
   state.announcements = Array.isArray(anns) ? anns : [];
   const set = new Set(state.routes.map(getRouteNo).filter(Boolean));
   state.uniqueRouteNos = Array.from(set).sort(compareRouteNo);
+
+  function applyStudioTripsToWebRoutes() {
+    const map = state.studioTripNames;
+    if (!map || typeof map !== 'object') return;
+    const base = Array.isArray(state.baseRoutes) ? state.baseRoutes : [];
+    const nextRoutes = [];
+    const matchedKeys = new Set();
+
+    for (const orig of base) {
+      const rno = getRouteNo(orig);
+      const bnd = getBound(orig);
+      const svc = String(orig?.serviceType || orig?.service_type || '1').trim();
+      const k = `${rno}|${bnd}|${svc}`;
+      const rec = map[k];
+      if (rec && rec.deleted) {
+        matchedKeys.add(k);
+        continue;
+      }
+      if (rec && !rec.isManual) {
+        matchedKeys.add(k);
+        const cloned = { ...orig, _studioTripRec: rec };
+        if (rec.fullFare != null && Number.isFinite(Number(rec.fullFare))) cloned.fullFare = Number(rec.fullFare);
+        if (rec.destTc && Array.isArray(rec.customStops) && rec.customStops.length) {
+          cloned.destTc = rec.destTc;
+          cloned.endStopNameTc = rec.destTc;
+        }
+        nextRoutes.push(cloned);
+      } else {
+        nextRoutes.push(orig);
+      }
+    }
+
+    for (const [k, rec] of Object.entries(map)) {
+      if (!rec || rec.deleted || matchedKeys.has(k)) continue;
+      if (!rec.isManual) continue;
+      const rno = String(rec.routeId || '').trim().toUpperCase();
+      if (!rno) continue;
+      const bnd = String(rec.bound || 'O').trim().toUpperCase();
+      nextRoutes.push({
+        routeId: `CTB-${rno}`,
+        bound: bnd,
+        companyCode: 'CTB',
+        externalRouteNo: rno,
+        displayTc: rno,
+        displayEn: rno,
+        patternId: rec.tripKey || k,
+        patternNameTc: rec.tripLabel || rec.name || '自訂班次',
+        destTc: rec.destTc || (bnd === 'I' ? '回程' : '去程'),
+        startStopNameTc: rec.origTc || '',
+        endStopNameTc: rec.destTc || '',
+        fullFare: (rec.fullFare != null && Number.isFinite(Number(rec.fullFare))) ? Number(rec.fullFare) : null,
+        tripKey: rec.tripKey || k,
+        _studioManual: true,
+        _studioTripRec: rec
+      });
+    }
+
+    state.routes = nextRoutes;
+    state.uniqueRouteNos = Array.from(new Set(state.routes.map(getRouteNo).filter(Boolean))).sort(compareRouteNo);
+    if (state.currentTab === 'route' && ['route', 'bound', 'trip'].includes(state.routeStage)) {
+      renderMain();
+    }
+  }
 
   // 載入已確認的站號音檔對照表（雲端 data/audio_mapping.json + 本機 admin.html 即時確認快取）
   fetch(`./data/audio_mapping.json?v=${Date.now()}`)
@@ -3938,7 +4064,7 @@ async function fetchInitialLightData() {
       state.studioWelcomeRules = Array.isArray(obj?.welcomeRules) ? obj.welcomeRules : [];
       state.studioDefaultWelcome = typeof obj?.defaultWelcome === 'string' ? obj.defaultWelcome : '';
       state.studioTripNames = (obj?.tripNames && typeof obj.tripNames === 'object') ? obj.tripNames : {};
-      if (state.currentTab === 'route' && state.routeStage === 'trip') renderMain();
+      if (typeof applyStudioTripsToWebRoutes === 'function') applyStudioTripsToWebRoutes();
       let merged = {};
       if (Array.isArray(obj?.rules)) {
         for (const r of obj.rules) {
