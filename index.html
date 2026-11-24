@@ -915,7 +915,16 @@ async function playSingleSegment(relPaths, fallbackTc, fallbackEn, fallbackSc, s
   }
 }
 
+let _activeAnnCount = 0;
 async function playAnnouncementSegments(segments) {
+  _activeAnnCount++;
+  try {
+    return await _playAnnouncementSegmentsCore(segments);
+  } finally {
+    _activeAnnCount = Math.max(0, _activeAnnCount - 1);
+  }
+}
+async function _playAnnouncementSegmentsCore(segments) {
   stopAllAudio();
   const seqToken = audioPlaySeqId;
   for (const seg of (segments || [])) {
@@ -1179,6 +1188,131 @@ function buildTerminusSegment(st) {
   };
 }
 
+function getAfterStopSpecialSegments(st) {
+  const list = state.studioSpecialBroadcasts;
+  if (!Array.isArray(list) || !list.length || !st) return [];
+  const rawId = String(st.stopId ?? st.stop ?? st.id ?? '').trim();
+  if (!rawId) return [];
+  const numId = rawId.replace(/^0+/, '') || '0';
+  const { rno, tripNames } = getStudioCurrentTripCandidates();
+
+  const out = [];
+  for (const item of list) {
+    if (!item || (item.kind || 'after_stop') !== 'after_stop' || !item.audioPath) continue;
+    if (!Array.isArray(item.stopIds) || !item.stopIds.length) continue;
+    const stopHit = item.stopIds.some(id => {
+      const s = String(id).trim();
+      return s === rawId || (s.replace(/^0+/, '') || '0') === numId;
+    });
+    if (!stopHit) continue;
+
+    const rMode = item.routeMode || 'all';
+    const rList = Array.isArray(item.routes) ? item.routes.map(x => String(x).trim().toUpperCase()).filter(Boolean) : [];
+    if (rMode === 'specific' && (!rno || !rList.includes(rno))) continue;
+    if (rMode === 'exclude' && rno && rList.includes(rno)) continue;
+
+    if (item.tripMode === 'specific') {
+      const tList = Array.isArray(item.tripNames) ? item.tripNames.map(x => String(x).trim()).filter(Boolean) : [];
+      if (!tList.length || !tList.some(tn => tripNames.has(tn))) continue;
+    }
+    out.push({ files: [item.audioPath], tc: '', en: '', sc: '' });
+  }
+  return out;
+}
+
+function playSpecialBroadcastSafely(audioPath, toastText = '') {
+  if (!audioPath) return;
+  const tryPlay = (attempt = 0) => {
+    if (state.incidentState && state.incidentState.stage !== 'idle') return;
+    if (state.routeStage !== 'stops') return;
+    if (_activeAnnCount > 0) {
+      if (attempt < 15) setTimeout(() => tryPlay(attempt + 1), 1500);
+      return;
+    }
+    if (toastText) showToast(toastText);
+    playAnnouncementSegments([{ files: [audioPath], tc: '', en: '', sc: '' }]);
+  };
+  tryPlay(0);
+}
+
+function checkLocationSpecialBroadcasts(lat, lng) {
+  if (state.routeStage !== 'stops') return;
+  if (state.incidentState && state.incidentState.stage !== 'idle') return;
+  const list = state.studioSpecialBroadcasts;
+  if (!Array.isArray(list) || !list.length) return;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+  const rno = String(state.selectedRouteNo || '').trim().toUpperCase();
+  if (!state._locTrigMap || typeof state._locTrigMap !== 'object') state._locTrigMap = {};
+
+  for (const item of list) {
+    if (!item || item.kind !== 'location' || !item.audioPath) continue;
+    const la = Number(item.lat);
+    const ln = Number(item.lng);
+    if (!Number.isFinite(la) || !Number.isFinite(ln)) continue;
+
+    const exList = Array.isArray(item.excludeRoutes) ? item.excludeRoutes.map(x => String(x).trim().toUpperCase()).filter(Boolean) : [];
+    if (rno && exList.includes(rno)) continue;
+
+    const radius = Number(item.radiusM) > 0 ? Number(item.radiusM) : 80;
+    const dist = calcDistanceMeters(lat, lng, la, ln);
+    const key = item.audioPath;
+
+    if (dist <= radius) {
+      if (!state._locTrigMap[key]) {
+        state._locTrigMap[key] = true;
+        const label = item.locationName || item.audioPath.split('/').pop();
+        playSpecialBroadcastSafely(item.audioPath, `地點特別廣播：${label}`);
+      }
+    } else if (dist > radius + 120) {
+      state._locTrigMap[key] = false;
+    }
+  }
+}
+
+function startRandomBroadcastTicker() {
+  if (state._randomBroadcastTimer) return;
+  const INTERVAL_MS = 5 * 60 * 1000; // 每隔 5 分鐘自動抽播一次
+  state._randomBroadcastTimer = setInterval(() => {
+    if (state.routeStage !== 'stops') {
+      state.lastRandomBroadcastAt = 0;
+      return;
+    }
+    if (state.incidentState && state.incidentState.stage !== 'idle') return;
+    const list = state.studioSpecialBroadcasts;
+    if (!Array.isArray(list) || !list.length) return;
+
+    const now = Date.now();
+    if (!state.lastRandomBroadcastAt) {
+      state.lastRandomBroadcastAt = now;
+      return;
+    }
+    if (now - state.lastRandomBroadcastAt < INTERVAL_MS) return;
+    if (_activeAnnCount > 0) return; // 正播放車站報站，待下個 15 秒檢查補播
+
+    const rno = String(state.selectedRouteNo || '').trim().toUpperCase();
+    const pool = list.filter(item => {
+      if (!item || item.kind !== 'random_all' || !item.audioPath) return false;
+      const exList = Array.isArray(item.excludeRoutes) ? item.excludeRoutes.map(x => String(x).trim().toUpperCase()).filter(Boolean) : [];
+      if (rno && exList.includes(rno)) return false;
+      return true;
+    });
+    if (!pool.length) return;
+
+    const candidates = pool.length > 1
+      ? pool.filter(x => x.audioPath !== state.lastRandomBroadcastPath)
+      : pool;
+    const pick = candidates[Math.floor(Math.random() * candidates.length)] || pool[0];
+    if (!pick) return;
+
+    state.lastRandomBroadcastAt = now;
+    state.lastRandomBroadcastPath = pick.audioPath;
+    const fn = pick.note || pick.audioPath.split('/').pop();
+    showToast(`全線自動廣播：${fn}`);
+    playAnnouncementSegments([{ files: [pick.audioPath], tc: '', en: '', sc: '' }]);
+  }, 15000);
+}
+
 function triggerStopAnnouncement(idx, force = false) {
   if (state.incidentState.stage !== 'idle') return;
   const st = state.tripStops[idx];
@@ -1199,7 +1333,7 @@ function triggerStopAnnouncement(idx, force = false) {
   }
 
   if (isTerminus) {
-    segments.push(buildTerminusSegment(st));
+    segments.push(buildTerminusSegment(st), ...getAfterStopSpecialSegments(st));
     const playPromise = playAnnouncementSegments(segments);
     const snapNonce = _audioStopNonce;
     const snapRouteNo = state.selectedRouteNo;
@@ -1221,20 +1355,20 @@ function triggerStopAnnouncement(idx, force = false) {
       return;
     }
     if (idx === 1) {
-      segments.push(buildWelcomeSegment(), buildStopSegment(st));
+      segments.push(buildWelcomeSegment(), buildStopSegment(st), ...getAfterStopSpecialSegments(st));
       playAnnouncementSegments(segments);
       return;
     }
-    segments.push(buildStopSegment(st));
+    segments.push(buildStopSegment(st), ...getAfterStopSpecialSegments(st));
     playAnnouncementSegments(segments);
     return;
   }
 
   if (idx === 0) {
-    playAnnouncementSegments([buildWelcomeSegment()]);
+    playAnnouncementSegments([buildWelcomeSegment(), ...getAfterStopSpecialSegments(st)]);
     return;
   }
-  segments.push(buildStopSegment(st));
+  segments.push(buildStopSegment(st), ...getAfterStopSpecialSegments(st));
   playAnnouncementSegments(segments);
 }
 
@@ -1643,6 +1777,7 @@ function startGpsTracking() {
       setVehicleStoppedState(kmh < 3, kmh, false);
 
       if (state.incidentState.stage !== 'idle') return; // 事故模式下暫停自動報站
+      checkLocationSpecialBroadcasts(latitude, longitude);
 
       if (state.routeStage === 'stops' && state.tripStops.length > 0) {
         const curIdx = state.currentStopIdx;
@@ -2771,6 +2906,8 @@ function renderStartStopList(vp, bar) {
     state.gpsArrivedCur = false;
     state.gpsMinDistToCur = Infinity;
     state.lastAnnouncedKey = '';
+    state._locTrigMap = {};
+    state.lastRandomBroadcastAt = Date.now();
     state.routeStage = 'stops';
     if (state.gpsEnabled) startGpsTracking();
     renderAll();
@@ -4073,6 +4210,8 @@ async function fetchInitialLightData() {
       state.studioWelcomeRules = Array.isArray(obj?.welcomeRules) ? obj.welcomeRules : [];
       state.studioDefaultWelcome = typeof obj?.defaultWelcome === 'string' ? obj.defaultWelcome : '';
       state.studioTripNames = (obj?.tripNames && typeof obj.tripNames === 'object') ? obj.tripNames : {};
+      state.studioSpecialBroadcasts = Array.isArray(obj?.specialBroadcasts) ? obj.specialBroadcasts : [];
+      startRandomBroadcastTicker();
       if (typeof applyStudioTripsToWebRoutes === 'function') applyStudioTripsToWebRoutes();
       let merged = {};
       if (Array.isArray(obj?.rules)) {
