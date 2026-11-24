@@ -2515,6 +2515,64 @@ function renderBoundList(vp, bar) {
   document.getElementById('botBack').onclick = () => { state.routeStage = 'route'; state.pageOffset = 0; renderAll(); };
 }
 
+function getStudioTripLabel(t, globalIdx) {
+  const map = state.studioTripNames;
+  if (!map || typeof map !== 'object') return '';
+  const rno = getRouteNo(t);
+  const bound = getBound(t);
+  const seqStr = String((globalIdx ?? 0) + 1);
+  const svcStr = String(t?.serviceType || t?.service_type || seqStr).trim();
+  const destTc = getDestTc(t);
+  const destEn = getDestEn(t);
+  const baseTcSeq = `${rno}-${destTc || '班次'}-${seqStr}`;
+  const baseTcSvc = `${rno}-${destTc || '班次'}-${svcStr}`;
+
+  const tryKeys = [
+    t?.tripKey, t?.tripId, t?.id,
+    `${rno}|${bound}|${svcStr}`, `${rno}_${bound}_${svcStr}`, `${rno}-${bound}-${svcStr}`,
+    `${rno}|${bound}|${seqStr}`, `${rno}_${bound}_${seqStr}`, `${rno}-${bound}-${seqStr}`,
+    `CTB-${rno}|${bound}|${svcStr}`
+  ].filter(Boolean);
+
+  let rec = null;
+  for (const k of tryKeys) {
+    if (map[k] && typeof map[k] === 'object') { rec = map[k]; break; }
+  }
+
+  if (!rec) {
+    const vals = Object.values(map);
+    rec = vals.find(v => v && (v.defaultName === baseTcSeq || v.name === baseTcSeq || v.defaultName === baseTcSvc || v.name === baseTcSvc));
+    if (!rec) {
+      rec = vals.find(v =>
+        v &&
+        String(v.routeId || '').trim().toUpperCase() === rno &&
+        String(v.bound || '').trim().toUpperCase() === bound &&
+        String(v.serviceType || '1').trim() === svcStr
+      );
+    }
+    if (!rec && destTc) {
+      const nDest = normStopName(destTc);
+      rec = vals.find(v =>
+        v &&
+        String(v.routeId || '').trim().toUpperCase() === rno &&
+        normStopName(v.destTc || '') === nDest &&
+        String(v.serviceType || '1').trim() === seqStr
+      );
+    }
+  }
+
+  if (!rec) return '';
+  if (typeof rec.tripLabel === 'string' && rec.tripLabel.trim()) return rec.tripLabel.trim();
+  if (rec.tripType === 'normal') return '正常路線';
+  if (rec.tripType === 'express') return '特快班次';
+  if (rec.tripType === 'special_via') return rec.viaText ? `特別班次經${rec.viaText}` : '特別班次';
+  if (rec.name && rec.defaultName && rec.name !== rec.defaultName) {
+    const pfx = `${rno}-${destTc || destEn || ''}-`;
+    return rec.name.startsWith(pfx) ? rec.name.slice(pfx.length).trim() : rec.name.trim();
+  }
+  return '';
+}
+
 function renderTripList(vp, bar) {
   const th = themeClasses();
   vp.className = th.vp;
@@ -2533,11 +2591,13 @@ function renderTripList(vp, bar) {
         const globalIdx = state.pageOffset * PAGE_SIZE + idx;
         const dest = state.lang === 'en' ? (getDestEn(t) || getDestTc(t)) : (getDestTc(t) || getDestEn(t));
         const remark = getRealTripRemark(t);
+        const studioLabel = getStudioTripLabel(t, globalIdx);
         return `
           <button data-tidx="${globalIdx}" class="pick-trip-btn flex-1 px-4 py-3 flex items-center justify-between ${th.row} text-left">
             <div class="min-w-0 pr-2">
               <div class="text-lg font-black truncate">${esc(state.selectedRouteNo)}-${esc(dest || '班次')}-${globalIdx + 1}</div>
-              ${remark ? `<div class="text-xs font-bold ${th.muted} truncate mt-0.5">${esc(remark)}</div>` : ''}
+              ${studioLabel ? `<div class="text-sm font-black ${th.dark ? 'text-[#fff000]' : 'text-[#0068FF]'} truncate mt-0.5">${esc(studioLabel)}</div>` : ''}
+              ${remark && remark !== studioLabel ? `<div class="text-xs font-bold ${th.muted} truncate mt-0.5">${esc(remark)}</div>` : ''}
             </div>
             <span class="${th.muted} text-xl font-bold">›</span>
           </button>
@@ -3878,6 +3938,7 @@ async function fetchInitialLightData() {
       state.studioWelcomeRules = Array.isArray(obj?.welcomeRules) ? obj.welcomeRules : [];
       state.studioDefaultWelcome = typeof obj?.defaultWelcome === 'string' ? obj.defaultWelcome : '';
       state.studioTripNames = (obj?.tripNames && typeof obj.tripNames === 'object') ? obj.tripNames : {};
+      if (state.currentTab === 'route' && state.routeStage === 'trip') renderMain();
       let merged = {};
       if (Array.isArray(obj?.rules)) {
         for (const r of obj.rules) {
