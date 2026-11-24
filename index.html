@@ -1023,18 +1023,12 @@ function resolveStudioStopAudio(st) {
 
 function resolveStudioWelcomeFiles() {
   const wRules = state.studioWelcomeRules;
-  const { rno, tripNames } = getStudioCurrentTripCandidates();
+  const { tripNames } = getStudioCurrentTripCandidates();
 
   if (Array.isArray(wRules) && wRules.length) {
     for (const w of wRules) {
-      if (w?.audioPath && w.scope === 'trips' && Array.isArray(w.tripNames)) {
+      if (w?.audioPath && w.scope !== 'default' && Array.isArray(w.tripNames)) {
         if (w.tripNames.some(tn => tripNames.has(String(tn).trim()))) return [w.audioPath];
-      }
-    }
-    for (const w of wRules) {
-      if (w?.audioPath && w.scope === 'routes' && Array.isArray(w.routes)) {
-        const routes = w.routes.map(x => String(x).trim().toUpperCase());
-        if (rno && routes.includes(rno)) return [w.audioPath];
       }
     }
   }
