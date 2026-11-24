@@ -1329,7 +1329,6 @@ function triggerStopAnnouncement(idx, force = false) {
 
   if (idx > 0 && secInfo.badgeFare != null && state.octopusMode === 0) {
     segments.push({ files: ['./assets/check_fare.mp3'], tc: '請檢查八達通收費', en: '', sc: '' });
-    showToast(`八達通轉分段：分段 ${secInfo.sectionNo}（${fmtFare(secInfo.badgeFare)}）`);
   }
 
   if (isTerminus) {
