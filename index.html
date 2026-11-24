@@ -2591,13 +2591,13 @@ function renderTripList(vp, bar) {
         const globalIdx = state.pageOffset * PAGE_SIZE + idx;
         const dest = state.lang === 'en' ? (getDestEn(t) || getDestTc(t)) : (getDestTc(t) || getDestEn(t));
         const remark = getRealTripRemark(t);
-        const studioLabel = getStudioTripLabel(t, globalIdx);
+        const studioLabel = (typeof getStudioTripLabel === 'function') ? getStudioTripLabel(t, globalIdx) : '';
+        const defaultName = `${state.selectedRouteNo}-${dest || '班次'}-${globalIdx + 1}`;
+        const displayName = studioLabel || remark || defaultName;
         return `
           <button data-tidx="${globalIdx}" class="pick-trip-btn flex-1 px-4 py-3 flex items-center justify-between ${th.row} text-left">
             <div class="min-w-0 pr-2">
-              <div class="text-lg font-black truncate">${esc(state.selectedRouteNo)}-${esc(dest || '班次')}-${globalIdx + 1}</div>
-              ${studioLabel ? `<div class="text-sm font-black ${th.dark ? 'text-[#fff000]' : 'text-[#0068FF]'} truncate mt-0.5">${esc(studioLabel)}</div>` : ''}
-              ${remark && remark !== studioLabel ? `<div class="text-xs font-bold ${th.muted} truncate mt-0.5">${esc(remark)}</div>` : ''}
+              <div class="text-lg font-black truncate">${esc(displayName)}</div>
             </div>
             <span class="${th.muted} text-xl font-bold">›</span>
           </button>

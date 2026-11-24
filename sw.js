@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'ctb-lecip-web-v83';
+﻿const CACHE_NAME = 'ctb-lecip-web-v84';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
