@@ -779,6 +779,7 @@ function playAlertBeep(isDanger = false) {
 // ============ 音檔播放與 Google TTS 序列引擎 ============
 let _audioStopNonce = 0;
 function stopAllAudio() {
+  if (typeof stopBootLecipTestAudio === 'function') stopBootLecipTestAudio();
   _audioStopNonce++;
   audioPlaySeqId++;
   state.playingAnnCode = '';
@@ -4291,6 +4292,193 @@ async function fetchInitialLightData() {
     })
     .catch(() => {});
 }
+
+// === BOOT LECIP_TEST START ===
+let _bootTestAudio = null;
+let _bootTestUnlockCleanup = null;
+
+function stopBootLecipTestAudio() {
+  if (typeof _bootTestUnlockCleanup === 'function') {
+    try { _bootTestUnlockCleanup(); } catch (_) {}
+    _bootTestUnlockCleanup = null;
+  }
+  if (_bootTestAudio) {
+    try {
+      _bootTestAudio.onended = null;
+      _bootTestAudio.onerror = null;
+      _bootTestAudio.pause();
+      _bootTestAudio.currentTime = 0;
+    } catch (_) {}
+    _bootTestAudio = null;
+  }
+}
+
+function resolveBootLecipTestUrls(extraRelPaths = []) {
+  const cdnBase = (typeof AUDIO_CDN_BASE !== 'undefined' && AUDIO_CDN_BASE)
+    ? String(AUDIO_CDN_BASE).replace(/\/+$/, '')
+    : 'https://kenyip0244.github.io/CTB-LECIP-Audio';
+  const rawList = [
+    ...["CDN::audio/announcements/LECIP_test (9-5).mp3", "CDN::audio/announcements/LECIP_test.mp3"],
+    ...extraRelPaths,
+    './assets/LECIP_test.mp3',
+    './assets/LECIP_test.wav',
+    './assets/LECIP_test.m4a',
+    './assets/LECIP_test.ogg',
+    './LECIP_test.mp3',
+    './LECIP_test.wav',
+    'CDN::LECIP_test.mp3',
+    'CDN::LECIP_test.wav',
+    'CDN::audio/LECIP_test.mp3',
+    'CDN::audio/LECIP_test.wav'
+  ];
+
+  // 從已載入的 audioManifest 尋找檔名含 LECIP_test 的音檔
+  if (Array.isArray(state?.audioManifest)) {
+    for (const item of state.audioManifest) {
+      if (typeof item === 'string' && /lecip_test/i.test(item)) {
+        rawList.unshift('CDN::' + item.replace(/^\/+/, ''));
+      }
+    }
+  }
+
+  const urls = [];
+  const seen = new Set();
+  for (const entry of rawList) {
+    if (!entry || typeof entry !== 'string') continue;
+    let url = entry;
+    if (entry.startsWith('CDN::')) {
+      const rel = entry.slice(5).replace(/^\/+/, '');
+      url = (typeof buildAudioUrl === 'function')
+        ? buildAudioUrl(rel)
+        : `${cdnBase}/${rel.split('/').map(encodeURIComponent).join('/')}`;
+    }
+    if (!seen.has(url)) {
+      seen.add(url);
+      urls.push(url);
+    }
+  }
+  return urls;
+}
+
+async function playBootLecipTestAudio() {
+  stopBootLecipTestAudio();
+  let urls = resolveBootLecipTestUrls();
+  let fetchedManifest = false;
+
+  const tryAt = async (idx) => {
+    if (idx >= urls.length) {
+      if (!fetchedManifest) {
+        fetchedManifest = true;
+        try {
+          const cdnBase = (typeof AUDIO_CDN_BASE !== 'undefined' && AUDIO_CDN_BASE)
+            ? String(AUDIO_CDN_BASE).replace(/\/+$/, '')
+            : 'https://kenyip0244.github.io/CTB-LECIP-Audio';
+          const r = await fetch(`${cdnBase}/audio_manifest.json?v=${Date.now()}`);
+          if (r.ok) {
+            const arr = await r.json();
+            if (Array.isArray(arr)) {
+              const hits = arr
+                .filter(p => typeof p === 'string' && /lecip_test/i.test(p))
+                .map(p => 'CDN::' + p.replace(/^\/+/, ''));
+              if (hits.length) {
+                const prevLen = urls.length;
+                const extra = resolveBootLecipTestUrls(hits).filter(u => !urls.includes(u));
+                if (extra.length) {
+                  urls = urls.concat(extra);
+                  tryAt(prevLen);
+                  return;
+                }
+              }
+            }
+          }
+        } catch (_) {}
+      }
+      return;
+    }
+
+    const audio = new Audio(urls[idx]);
+    audio.preload = 'auto';
+    audio.volume = (typeof state?.volume === 'number' && Number.isFinite(state.volume)) ? state.volume : 1;
+    _bootTestAudio = audio;
+
+    let movedNext = false;
+    const goNext = () => {
+      if (movedNext || _bootTestAudio !== audio) return;
+      movedNext = true;
+      tryAt(idx + 1);
+    };
+
+    audio.onerror = goNext;
+    audio.onended = () => {
+      if (_bootTestAudio === audio) _bootTestAudio = null;
+    };
+
+    try {
+      await audio.play();
+    } catch (err) {
+      if (_bootTestAudio !== audio) return;
+      const isAutoplayBlock = err && (
+        err.name === 'NotAllowedError' ||
+        /user didn't interact|not allowed|autoplay/i.test(String(err.message || ''))
+      );
+      if (isAutoplayBlock) {
+        // 瀏覽器阻擋自動播放時，等待首次觸碰畫面即刻補播
+        const onFirstGesture = () => {
+          if (typeof _bootTestUnlockCleanup === 'function') {
+            _bootTestUnlockCleanup();
+            _bootTestUnlockCleanup = null;
+          }
+          if (_bootTestAudio === audio) {
+            tryAt(idx);
+          }
+        };
+        window.addEventListener('pointerdown', onFirstGesture, { capture: true, once: true });
+        window.addEventListener('keydown', onFirstGesture, { capture: true, once: true });
+        _bootTestUnlockCleanup = () => {
+          window.removeEventListener('pointerdown', onFirstGesture, { capture: true });
+          window.removeEventListener('keydown', onFirstGesture, { capture: true });
+        };
+      } else {
+        goNext();
+      }
+    }
+  };
+
+  tryAt(0);
+}
+
+(function initBootLecipTestWatcher() {
+  const attach = () => {
+    const overlay = document.getElementById('lecipBootOverlay');
+    if (!overlay || overlay.dataset.lecipTestBound === '1') return;
+    overlay.dataset.lecipTestBound = '1';
+
+    const isClosed = () =>
+      overlay.classList.contains('hidden') ||
+      overlay.classList.contains('opacity-0') ||
+      overlay.style.display === 'none';
+
+    let wasOpen = !isClosed();
+
+    const obs = new MutationObserver(() => {
+      const closed = isClosed();
+      if (wasOpen && closed) {
+        wasOpen = false;
+        playBootLecipTestAudio();
+      } else if (!closed) {
+        wasOpen = true;
+      }
+    });
+    obs.observe(overlay, { attributes: true, attributeFilter: ['class', 'style'] });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attach, { once: true });
+  } else {
+    attach();
+  }
+})();
+// === BOOT LECIP_TEST END ===
 
 function runBootSequence(isReplay = false) {
   const overlay = document.getElementById('lecipBootOverlay');
