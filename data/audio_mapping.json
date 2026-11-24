@@ -1,1 +1,2209 @@
-﻿{"version":1,"confirmed":{}}
+{
+  "version": 5,
+  "updatedAt": "2026-11-24T09:12:40.964Z",
+  "confirmed": {
+    "21": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1025_A.mp3",
+    "22": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1054_A.mp3",
+    "23": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1034_A.mp3",
+    "24": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1046_A.mp3",
+    "26": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1035_A.mp3",
+    "27": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1047_A.mp3",
+    "28": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1030_A.mp3",
+    "124": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1057_A.mp3",
+    "125": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1027_A.mp3",
+    "127": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1037_A.mp3",
+    "128": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1025_A.mp3",
+    "163": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1037_A.mp3",
+    "244": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1041_a.mp3",
+    "246": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1017_A.mp3",
+    "247": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1019_a.mp3",
+    "248": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1015_A.mp3",
+    "249": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1021_A.mp3",
+    "255": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1072_a.mp3",
+    "256": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1073_a.mp3",
+    "257": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1053_A.mp3",
+    "261": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1042_A.mp3",
+    "264": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1001_A.mp3",
+    "265": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1011_A.mp3",
+    "266": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1064_A.mp3",
+    "268": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1011_A.mp3",
+    "320": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1046_A.mp3",
+    "324": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1065_A.mp3",
+    "325": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1014_A.mp3",
+    "353": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1062_A.mp3",
+    "354": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1014_A.mp3",
+    "355": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1064_A.mp3",
+    "356": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1065_A.mp3",
+    "377": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1006_A.mp3",
+    "378": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1007_A.mp3",
+    "380": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1014_A.mp3",
+    "381": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1012_A.mp3",
+    "384": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1060_a.mp3",
+    "385": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1061_A.mp3",
+    "388": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1025_A.mp3",
+    "392": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1003_A.mp3",
+    "393": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1005_A.mp3",
+    "471": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1009_A.mp3",
+    "472": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1010_A.mp3",
+    "473": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1015_A.mp3",
+    "474": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1016_A.mp3",
+    "506": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1035_A.mp3",
+    "508": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1064_A.mp3",
+    "589": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1050_A.mp3",
+    "609": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1077_A.mp3",
+    "624": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1067_A.mp3",
+    "625": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1014_A.mp3",
+    "626": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1069_A.mp3",
+    "627": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1060_a.mp3",
+    "629": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1003_A.mp3",
+    "637": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1002_A.mp3",
+    "647": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1031_A.mp3",
+    "673": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1064_A.mp3",
+    "674": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1017_A.mp3",
+    "675": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1050_A.mp3",
+    "778": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1053_A.mp3",
+    "886": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1055_A.mp3",
+    "981": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1058_A.mp3",
+    "1195": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1029_A.mp3",
+    "1441": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1032_A.mp3",
+    "1499": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1028_A.mp3",
+    "1581": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1038_A.mp3",
+    "3024": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1040_a.mp3",
+    "3025": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1004_A.mp3",
+    "3030": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1047_A.mp3",
+    "3196": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1062_A.mp3",
+    "8001": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1046_A.mp3",
+    "8002": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1034_A.mp3",
+    "8003": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1024_A.mp3",
+    "8004": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1046_A.mp3",
+    "8006": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1036_A.mp3",
+    "8007": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1057_A.mp3",
+    "8008": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1045_A.mp3",
+    "8019": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1022_A.mp3",
+    "8050": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1074_A.mp3",
+    "12469": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1038_A.mp3",
+    "12570": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1043_A.mp3",
+    "13120": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1028_A.mp3",
+    "10000060": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1027_A.mp3",
+    "10000173": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1057_A.mp3"
+  },
+  "details": {
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1043_A.mp3": {
+      "stopId": "12570",
+      "stopIds": [
+        "12570"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "禧利街",
+      "heardEn": "Hillier Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1040_a.mp3": {
+      "stopId": "3024",
+      "stopIds": [
+        "3024"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "西港城",
+      "heardEn": "Western Market",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1041_a.mp3": {
+      "stopId": "244",
+      "stopIds": [
+        "244"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "香港公園",
+      "heardEn": "Hong Kong Park",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1042_A.mp3": {
+      "stopId": "261",
+      "stopIds": [
+        "261"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "蘭桂坊",
+      "heardEn": "Lan Kwai Fong",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1047_A.mp3": {
+      "stopId": "27",
+      "stopIds": [
+        "27",
+        "3030"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "德忌利士街",
+      "heardEn": "Douglas Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1045_A.mp3": {
+      "stopId": "8008",
+      "stopIds": [
+        "8008"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "永和街",
+      "heardEn": "Wing Wo Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1046_A.mp3": {
+      "stopId": "24",
+      "stopIds": [
+        "24",
+        "320",
+        "8001",
+        "8004"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "中環街市",
+      "heardEn": "Central Market",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1049_A.mp3": {
+      "stopId": "27",
+      "stopIds": [
+        "27"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "德忌利士街",
+      "heardEn": "Douglas Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1053_A.mp3": {
+      "stopId": "778",
+      "stopIds": [
+        "778",
+        "257"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "匯豐總行大廈",
+      "heardEn": "HSBC Main Building",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1050_A.mp3": {
+      "stopId": "589",
+      "stopIds": [
+        "589",
+        "675"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "歷山大廈",
+      "heardEn": "Alexandra House",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1057_A.mp3": {
+      "stopId": "124",
+      "stopIds": [
+        "124",
+        "8007",
+        "10000173"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "永吉街",
+      "heardEn": "Wing Kut Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1054_A.mp3": {
+      "stopId": "22",
+      "stopIds": [
+        "22"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "置地廣場",
+      "heardEn": "The Landmark",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1055_A.mp3": {
+      "stopId": "886",
+      "stopIds": [
+        "886"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "利源東街",
+      "heardEn": "Li Yuen Street East",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1058_A.mp3": {
+      "stopId": "981",
+      "stopIds": [
+        "981"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "文華里",
+      "heardEn": "Man Wa Lane",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1060_a.mp3": {
+      "stopId": "384",
+      "stopIds": [
+        "384",
+        "627"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "山道",
+      "heardEn": "Hill Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1061_A.mp3": {
+      "stopId": "385",
+      "stopIds": [
+        "385"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "嘉安街",
+      "heardEn": "Ka On Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1061_B.mp3": {
+      "stopId": "385",
+      "stopIds": [
+        "385"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "A12",
+        "NA12"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "嘉安街",
+      "heardEn": "Ka On Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1062_A.mp3": {
+      "stopId": "353",
+      "stopIds": [
+        "353",
+        "3196"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "西區警署",
+      "heardEn": "Western Police Station",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1067_A.mp3": {
+      "stopId": "624",
+      "stopIds": [
+        "624"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "高陞街",
+      "heardEn": "Ko Shing Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1064_A.mp3": {
+      "stopId": "266",
+      "stopIds": [
+        "266",
+        "355",
+        "508",
+        "673"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "東邊街",
+      "heardEn": "Eastern Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1065_A.mp3": {
+      "stopId": "324",
+      "stopIds": [
+        "324",
+        "356"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "修打蘭街",
+      "heardEn": "Sutherland Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1069_A.mp3": {
+      "stopId": "626",
+      "stopIds": [
+        "626"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "水街",
+      "heardEn": "Water Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1073_a.mp3": {
+      "stopId": "256",
+      "stopIds": [
+        "256"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "聖約翰座堂",
+      "heardEn": "St. John's Cathedral",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1072_a.mp3": {
+      "stopId": "255",
+      "stopIds": [
+        "255"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "香港動植物公園",
+      "heardEn": "HK Zoological & Botanical Garden",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1077_A.mp3": {
+      "stopId": "609",
+      "stopIds": [
+        "609"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "聖若瑟書院",
+      "heardEn": "St. Joseph's College",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1074_A.mp3": {
+      "stopId": "8050",
+      "stopIds": [
+        "8050"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "金鐘 - 海富中心",
+      "heardEn": "Admiralty - Admiralty Centre",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1076_A.mp3": {
+      "stopId": "589",
+      "stopIds": [
+        "589",
+        "675"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "歷山大廈",
+      "heardEn": "Alexandra House",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1076_B.mp3": {
+      "stopId": "675",
+      "stopIds": [
+        "675"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "歷山大廈",
+      "heardEn": "Alexandra House",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1003_A.mp3": {
+      "stopId": "392",
+      "stopIds": [
+        "392",
+        "629"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "山市街",
+      "heardEn": "Sands Street",
+      "note": "",
+      "updatedBy": ""
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1001_A.mp3": {
+      "stopId": "264",
+      "stopIds": [
+        "264"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "中央廣場",
+      "heardEn": "The Centrium",
+      "note": "",
+      "updatedBy": ""
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1002_A.mp3": {
+      "stopId": "637",
+      "stopIds": [
+        "637"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "西寶城",
+      "heardEn": "The Westwood",
+      "note": "",
+      "updatedBy": ""
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1007_A.mp3": {
+      "stopId": "378",
+      "stopIds": [
+        "378"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "寧養台",
+      "heardEn": "Ning Yeung Terrace",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1004_A.mp3": {
+      "stopId": "3025",
+      "stopIds": [
+        "3025"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "北街",
+      "heardEn": "North Street",
+      "note": "",
+      "updatedBy": ""
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1004_B.mp3": {
+      "stopId": "3025",
+      "stopIds": [
+        "3025"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "北街",
+      "heardEn": "North Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1005_A.mp3": {
+      "stopId": "393",
+      "stopIds": [
+        "393"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "聯邦新樓",
+      "heardEn": "Luen Bong Apartment",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1005_B.mp3": {
+      "stopId": "393",
+      "stopIds": [
+        "393"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "聯邦新樓",
+      "heardEn": "Luen Bong Apartment",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1006_A.mp3": {
+      "stopId": "377",
+      "stopIds": [
+        "377"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "英皇書院",
+      "heardEn": "King's College",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1008_A.mp3": {
+      "stopId": "266",
+      "stopIds": [
+        "266",
+        "355",
+        "508",
+        "673"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "東邊街",
+      "heardEn": "Eastern Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1009_A.mp3": {
+      "stopId": "471",
+      "stopIds": [
+        "471"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "高街",
+      "heardEn": "High Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1010_A.mp3": {
+      "stopId": "472",
+      "stopIds": [
+        "472"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "醫院道",
+      "heardEn": "Hospital Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1011_A.mp3": {
+      "stopId": "265",
+      "stopIds": [
+        "265",
+        "268"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "豫苑",
+      "heardEn": "Euston Court",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1012_A.mp3": {
+      "stopId": "381",
+      "stopIds": [
+        "381"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "香港大學東閘",
+      "heardEn": "HKU East Gate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1017_A.mp3": {
+      "stopId": "246",
+      "stopIds": [
+        "246",
+        "674"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "明愛中心",
+      "heardEn": "Caritas Centre",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1014_A.mp3": {
+      "stopId": "325",
+      "stopIds": [
+        "325",
+        "354",
+        "625",
+        "380"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "正街",
+      "heardEn": "Centre Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1015_A.mp3": {
+      "stopId": "248",
+      "stopIds": [
+        "248",
+        "473"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "樓梯街",
+      "heardEn": "Ladder Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1016_A.mp3": {
+      "stopId": "474",
+      "stopIds": [
+        "474"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "鴨巴甸街",
+      "heardEn": "Aberdeen Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1019_a.mp3": {
+      "stopId": "247",
+      "stopIds": [
+        "247"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "孫中山紀念館",
+      "heardEn": "Dr Sun Yat-sen Museum",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1023_A.mp3": {
+      "stopId": "354",
+      "stopIds": [
+        "354"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "正街",
+      "heardEn": "Centre Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1020_A.mp3": {
+      "stopId": "248",
+      "stopIds": [
+        "248"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "樓梯街",
+      "heardEn": "Ladder Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1021_A.mp3": {
+      "stopId": "249",
+      "stopIds": [
+        "249"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "西摩道",
+      "heardEn": "Seymour Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1022_A.mp3": {
+      "stopId": "8019",
+      "stopIds": [
+        "8019"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "爹核士街",
+      "heardEn": "Davis Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1027_A.mp3": {
+      "stopId": "125",
+      "stopIds": [
+        "125",
+        "10000060"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "中環 (港澳碼頭)",
+      "heardEn": "Central (Macao Ferry)",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1024_A.mp3": {
+      "stopId": "8003",
+      "stopIds": [
+        "8003"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "遮打大廈",
+      "heardEn": "Chater House",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1025_A.mp3": {
+      "stopId": "21",
+      "stopIds": [
+        "21",
+        "388",
+        "128"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "皇后像廣場",
+      "heardEn": "Statue Square",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1028_A.mp3": {
+      "stopId": "1499",
+      "stopIds": [
+        "1499",
+        "13120"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "港澳碼頭",
+      "heardEn": "Macao Ferry",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1028_B.mp3": {
+      "stopId": "13120",
+      "stopIds": [
+        "13120"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "A11"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "港澳碼頭",
+      "heardEn": "Macao Ferry",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1029_A.mp3": {
+      "stopId": "1195",
+      "stopIds": [
+        "1195"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "海港政府大樓",
+      "heardEn": "Harbour Building",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1029_B.mp3": {
+      "stopId": "1195",
+      "stopIds": [
+        "1195"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "A11"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "海港政府大樓",
+      "heardEn": "Harbour Building",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1033_A.mp3": {
+      "stopId": "128",
+      "stopIds": [
+        "128"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "皇后像廣場",
+      "heardEn": "Statue Square",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1030_A.mp3": {
+      "stopId": "28",
+      "stopIds": [
+        "28"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "怡和大廈",
+      "heardEn": "Jardine House",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1030_C.mp3": {
+      "stopId": "28",
+      "stopIds": [
+        "28"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "怡和大廈",
+      "heardEn": "Jardine House",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1030_D.mp3": {
+      "stopId": "28",
+      "stopIds": [
+        "28"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "A11"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "怡和大廈",
+      "heardEn": "Jardine House",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1031_A.mp3": {
+      "stopId": "647",
+      "stopIds": [
+        "647"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "大會堂",
+      "heardEn": "City Hall",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1031_B.mp3": {
+      "stopId": "647",
+      "stopIds": [
+        "647"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "大會堂",
+      "heardEn": "City Hall",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1032_A.mp3": {
+      "stopId": "1441",
+      "stopIds": [
+        "1441"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "中環 (交易廣場)",
+      "heardEn": "Central (Exchange Square)",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1032_D.mp3": {
+      "stopId": "1441",
+      "stopIds": [
+        "1441"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "中環 (交易廣場)",
+      "heardEn": "Central (Exchange Square)",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1037_A.mp3": {
+      "stopId": "127",
+      "stopIds": [
+        "127",
+        "163"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "林士街",
+      "heardEn": "Rumsey Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1034_A.mp3": {
+      "stopId": "23",
+      "stopIds": [
+        "23",
+        "8002"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "砵典乍街",
+      "heardEn": "Pottinger Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1035_A.mp3": {
+      "stopId": "26",
+      "stopIds": [
+        "26",
+        "506"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "恒生銀行總行大廈",
+      "heardEn": "Hang Seng Bank Headquarters",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1036_A.mp3": {
+      "stopId": "8006",
+      "stopIds": [
+        "8006"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "租庇利街",
+      "heardEn": "Jubilee Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1038_A.mp3": {
+      "stopId": "1581",
+      "stopIds": [
+        "1581",
+        "12469"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "永安中心",
+      "heardEn": "Wing On Centre",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1039_A.mp3": {
+      "stopId": "12570",
+      "stopIds": [
+        "12570"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "禧利街",
+      "heardEn": "Hillier Street",
+      "note": "",
+      "updatedBy": "Ken"
+    }
+  },
+  "rules": [
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1043_A.mp3",
+      "stopIds": [
+        "12570"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:40:59.592Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1040_a.mp3",
+      "stopIds": [
+        "3024"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:40:03.636Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1041_a.mp3",
+      "stopIds": [
+        "244"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:40:19.792Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1042_A.mp3",
+      "stopIds": [
+        "261"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:40:37.571Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1047_A.mp3",
+      "stopIds": [
+        "27",
+        "3030"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:42:08.511Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1045_A.mp3",
+      "stopIds": [
+        "8008"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:41:21.470Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1046_A.mp3",
+      "stopIds": [
+        "24",
+        "320",
+        "8001",
+        "8004"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:41:47.328Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1049_A.mp3",
+      "stopIds": [
+        "27"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:43:52.152Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1053_A.mp3",
+      "stopIds": [
+        "778",
+        "257"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:44:43.946Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1050_A.mp3",
+      "stopIds": [
+        "589",
+        "675"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:44:07.033Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1057_A.mp3",
+      "stopIds": [
+        "124",
+        "8007",
+        "10000173"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:45:41.700Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1054_A.mp3",
+      "stopIds": [
+        "22"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:45:00.610Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1055_A.mp3",
+      "stopIds": [
+        "886"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:45:15.182Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1058_A.mp3",
+      "stopIds": [
+        "981"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:45:54.943Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1060_a.mp3",
+      "stopIds": [
+        "384",
+        "627"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:49:40.270Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1061_A.mp3",
+      "stopIds": [
+        "385"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:49:59.497Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1061_B.mp3",
+      "stopIds": [
+        "385"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "A12",
+        "NA12"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:50:32.256Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1062_A.mp3",
+      "stopIds": [
+        "353",
+        "3196"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:50:53.152Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1067_A.mp3",
+      "stopIds": [
+        "624"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:53:04.149Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1064_A.mp3",
+      "stopIds": [
+        "266",
+        "355",
+        "508",
+        "673"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:51:31.296Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1065_A.mp3",
+      "stopIds": [
+        "324",
+        "356"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:52:35.907Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1069_A.mp3",
+      "stopIds": [
+        "626"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:53:30.918Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1073_a.mp3",
+      "stopIds": [
+        "256"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:54:45.171Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1072_a.mp3",
+      "stopIds": [
+        "255"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:54:22.806Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1077_A.mp3",
+      "stopIds": [
+        "609"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T08:50:04.812Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1074_A.mp3",
+      "stopIds": [
+        "8050"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T08:48:48.362Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1076_A.mp3",
+      "stopIds": [
+        "589",
+        "675"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T08:49:26.489Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1076_B.mp3",
+      "stopIds": [
+        "675"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T08:49:40.465Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1003_A.mp3",
+      "stopIds": [
+        "392",
+        "629"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T14:53:22.464Z",
+      "updatedBy": ""
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1001_A.mp3",
+      "stopIds": [
+        "264"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T14:40:41.789Z",
+      "updatedBy": ""
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1002_A.mp3",
+      "stopIds": [
+        "637"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T14:40:58.166Z",
+      "updatedBy": ""
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1007_A.mp3",
+      "stopIds": [
+        "378"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:12:43.023Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1004_A.mp3",
+      "stopIds": [
+        "3025"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T14:53:43.921Z",
+      "updatedBy": ""
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1004_B.mp3",
+      "stopIds": [
+        "3025"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:11:53.444Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1005_A.mp3",
+      "stopIds": [
+        "393"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:12:06.443Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1005_B.mp3",
+      "stopIds": [
+        "393"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:12:18.249Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1006_A.mp3",
+      "stopIds": [
+        "377"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:12:31.862Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1008_A.mp3",
+      "stopIds": [
+        "266",
+        "355",
+        "508",
+        "673"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:12:58.208Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1009_A.mp3",
+      "stopIds": [
+        "471"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:13:14.369Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1010_A.mp3",
+      "stopIds": [
+        "472"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:13:27.111Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1011_A.mp3",
+      "stopIds": [
+        "265",
+        "268"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:13:50.831Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1012_A.mp3",
+      "stopIds": [
+        "381"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:14:00.323Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1017_A.mp3",
+      "stopIds": [
+        "246",
+        "674"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:14:57.997Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1014_A.mp3",
+      "stopIds": [
+        "325",
+        "354",
+        "625",
+        "380"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:14:25.941Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1015_A.mp3",
+      "stopIds": [
+        "248",
+        "473"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:14:36.077Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1016_A.mp3",
+      "stopIds": [
+        "474"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:14:48.053Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1019_a.mp3",
+      "stopIds": [
+        "247"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:15:49.223Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1023_A.mp3",
+      "stopIds": [
+        "354"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:17:19.265Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1020_A.mp3",
+      "stopIds": [
+        "248"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:16:42.073Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1021_A.mp3",
+      "stopIds": [
+        "249"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:16:52.061Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1022_A.mp3",
+      "stopIds": [
+        "8019"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:17:03.286Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1027_A.mp3",
+      "stopIds": [
+        "125",
+        "10000060"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:18:23.244Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1024_A.mp3",
+      "stopIds": [
+        "8003"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:17:29.367Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1025_A.mp3",
+      "stopIds": [
+        "21",
+        "388",
+        "128"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:17:52.475Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1028_A.mp3",
+      "stopIds": [
+        "1499",
+        "13120"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:18:40.693Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1028_B.mp3",
+      "stopIds": [
+        "13120"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "A11"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:19:57.019Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1029_A.mp3",
+      "stopIds": [
+        "1195"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:20:09.315Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1029_B.mp3",
+      "stopIds": [
+        "1195"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "A11"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:20:35.350Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1033_A.mp3",
+      "stopIds": [
+        "128"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:26:22.308Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1030_A.mp3",
+      "stopIds": [
+        "28"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:29:11.900Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1030_C.mp3",
+      "stopIds": [
+        "28"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:30:08.027Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1030_D.mp3",
+      "stopIds": [
+        "28"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "A11"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:30:40.227Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1031_A.mp3",
+      "stopIds": [
+        "647"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:30:56.583Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1031_B.mp3",
+      "stopIds": [
+        "647"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:31:33.106Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1032_A.mp3",
+      "stopIds": [
+        "1441"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T15:31:42.941Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1032_D.mp3",
+      "stopIds": [
+        "1441"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:25:51.908Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1037_A.mp3",
+      "stopIds": [
+        "127",
+        "163"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:38:27.002Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1034_A.mp3",
+      "stopIds": [
+        "23",
+        "8002"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:26:42.758Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1035_A.mp3",
+      "stopIds": [
+        "26",
+        "506"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:27:05.969Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1036_A.mp3",
+      "stopIds": [
+        "8006"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:30:08.140Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1038_A.mp3",
+      "stopIds": [
+        "1581",
+        "12469"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:38:43.550Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1039_A.mp3",
+      "stopIds": [
+        "12570"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-23T23:39:49.692Z",
+      "updatedBy": "Ken"
+    }
+  ],
+  "defaultWelcome": "",
+  "welcomeRules": [
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/102_BUS.mp3",
+      "scope": "routes",
+      "routes": [
+        "102"
+      ],
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-24T09:06:40.426Z",
+      "updatedBy": "Ken"
+    }
+  ],
+  "tripNames": {}
+}
