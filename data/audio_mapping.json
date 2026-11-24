@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "updatedAt": "2026-11-24T15:36:02.064Z",
+  "updatedAt": "2026-11-24T15:36:28.453Z",
   "confirmed": {
     "2": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1312_a.mp3",
     "3": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1226_a.mp3",
@@ -11955,10 +11955,11 @@
         "A22-機場 (地面運輸中心)-1",
         "A25-機場 (地面運輸中心)-1",
         "A26-機場 (地面運輸中心)-1",
-        "A29-機場 (地面運輸中心)-1"
+        "A29-機場 (地面運輸中心)-1",
+        "A28-去程-2"
       ],
       "note": "",
-      "updatedAt": "2026-11-24T14:28:02.281Z",
+      "updatedAt": "2026-11-24T15:36:27.220Z",
       "updatedBy": "Ken"
     },
     {
