@@ -1021,13 +1021,15 @@ function getWelcomeAudioFiles() {
 function getStudioCurrentTripCandidates() {
   const names = new Set();
   const trip = state.selectedTrip || {};
-  const rno = String(state.selectedRouteNo || trip.routeId || trip.route || '').replace(/^CTB-/i, '').trim().toUpperCase();
+  const rno = String(state.selectedRouteNo || trip.externalRouteNo || trip.routeId || trip.route || '').replace(/^CTB-/i, '').trim().toUpperCase();
   const bnd = String(trip.bound || trip.dir || 'O').trim().toUpperCase();
   const stype = String(trip.serviceType || trip.service_type || '1').trim();
-  const tKey = `${rno}|${bnd}|${stype}`;
+  const tKey = trip.tripKey || `${rno}|${bnd}|${stype}`;
 
   const customMap = state.studioTripNames || {};
-  if (customMap[tKey]?.name) names.add(String(customMap[tKey].name).trim());
+  const cRec = trip._studioTripRec || customMap[tKey];
+  if (cRec?.name) names.add(String(cRec.name).trim());
+  if (cRec?.defaultName) names.add(String(cRec.defaultName).trim());
 
   [trip.tripName, trip.trip_name, trip.name, trip.label, trip.title].forEach(v => {
     if (v && String(v).trim()) names.add(String(v).trim());
@@ -1043,14 +1045,17 @@ function getStudioCurrentTripCandidates() {
     return s;
   };
 
-  let destTc = cleanDest(trip.destTc || trip.dest_tc || '');
-  const stopArr = Array.isArray(state.currentStops) ? state.currentStops : (Array.isArray(state.stops) ? state.stops : []);
+  let destTc = cleanDest(trip.destTc || trip.dest_tc || trip.endStopNameTc || '');
+  const stopArr = Array.isArray(state.tripStops) ? state.tripStops : (Array.isArray(state.currentStops) ? state.currentStops : (Array.isArray(state.stops) ? state.stops : []));
   if (!destTc && stopArr.length > 0) {
     const lastSt = stopArr[stopArr.length - 1];
     destTc = cleanDest(typeof getStopNameTc === 'function' ? getStopNameTc(lastSt) : (lastSt?.nameTc || ''));
   }
-  if (rno && destTc) names.add(`${rno}-${destTc}-${stype}`);
-  if (rno) names.add(`${rno}-${bnd === 'I' ? '??' : '??'}-${stype}`);
+  if (rno && destTc) {
+    names.add(`${rno}-${destTc}-${stype}`);
+    if (state.selectedTripSeq) names.add(`${rno}-${destTc}-${state.selectedTripSeq}`);
+  }
+  if (rno) names.add(`${rno}-${bnd === 'I' ? '回程' : '去程'}-${stype}`);
   return { rno, tripNames: names };
 }
 
@@ -1064,6 +1069,7 @@ function resolveStudioStopAudio(st) {
 
   let bestPath = null;
   let bestScore = 0;
+  let bestTs = -1;
 
   for (const rule of rules) {
     if (!rule || !rule.audioPath || !Array.isArray(rule.stopIds)) continue;
@@ -1077,17 +1083,20 @@ function resolveStudioStopAudio(st) {
     const tSpecific = rule.tripMode === 'specific';
 
     if (rSpecific) {
-      const routes = Array.isArray(rule.routes) ? rule.routes.map(x => String(x).trim().toUpperCase()) : [];
-      if (!rno || !routes.includes(rno)) continue;
+      const routes = Array.isArray(rule.routes) ? rule.routes.map(x => String(x).trim().toUpperCase()).filter(Boolean) : [];
+      if (!rno || !routes.length || !routes.includes(rno)) continue;
     }
     if (tSpecific) {
-      const tList = Array.isArray(rule.tripNames) ? rule.tripNames.map(x => String(x).trim()) : [];
-      if (!tList.some(tn => tripNames.has(tn))) continue;
+      const tList = Array.isArray(rule.tripNames) ? rule.tripNames.map(x => String(x).trim()).filter(Boolean) : [];
+      if (!tList.length || !tList.some(tn => tripNames.has(tn))) continue;
     }
 
+    // 嚴格優先權：指定班次(4) + 只限指定路線(2) + 所有途經路線(1)；同級則取最新更新
     const score = (tSpecific ? 4 : 0) + (rSpecific ? 2 : 0) + 1;
-    if (score > bestScore) {
+    const ts = Date.parse(rule.updatedAt || '') || 0;
+    if (score > bestScore || (score === bestScore && ts >= bestTs)) {
       bestScore = score;
+      bestTs = ts;
       bestPath = rule.audioPath;
     }
   }
@@ -4067,7 +4076,8 @@ async function fetchInitialLightData() {
       if (typeof applyStudioTripsToWebRoutes === 'function') applyStudioTripsToWebRoutes();
       let merged = {};
       if (Array.isArray(obj?.rules)) {
-        for (const r of obj.rules) {
+        const sortedRules = [...obj.rules].sort((a, b) => (Date.parse(b?.updatedAt || '') || 0) - (Date.parse(a?.updatedAt || '') || 0));
+        for (const r of sortedRules) {
           if (!r?.audioPath || !Array.isArray(r.stopIds)) continue;
           if (r.routeMode === 'specific' || r.tripMode === 'specific') continue;
           for (const rawId of r.stopIds) {
