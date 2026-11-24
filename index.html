@@ -36,6 +36,77 @@
       transform: scale(0.97);
     }
   </style>
+<style id="lecip-ui-tweak">
+/* 頂部分頁列與底部四掣列加高（以 ID 鎖定避免被 JS 覆寫） */
+#topNavBar {
+  min-height: 74px !important;
+  height: 74px !important;
+}
+#topNavBar > .tab-btn {
+  min-height: 74px !important;
+  height: 74px !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+#bottomBar {
+  min-height: 74px !important;
+  height: 74px !important;
+  padding: 5px !important;
+}
+#bottomBar > button,
+#bottomBar > div,
+#bottomBar > a {
+  min-height: 62px !important;
+  height: 100% !important;
+  border-radius: 10px !important;
+}
+
+/* 深色模式完全對齊實機附圖配色 */
+#screenBox.lecip-night {
+  background: #3e3d39 !important;
+}
+#screenBox.lecip-night #topHeader {
+  background: #000000 !important;
+  border-bottom-color: #000000 !important;
+}
+#screenBox.lecip-night #topNavBar {
+  background: #000000 !important;
+  border-bottom: none !important;
+  padding-top: 2px !important;
+}
+#screenBox.lecip-night #topNavBar .tab-btn {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-radius: 0 !important;
+}
+#screenBox.lecip-night #topNavBar .tab-btn[data-active="1"] {
+  background: #d8ddff !important;
+  color: #000000 !important;
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px !important;
+}
+#screenBox.lecip-night #topNavBar .tab-btn[data-active="1"] svg {
+  color: #000000 !important;
+}
+#screenBox.lecip-night #topNavBar .tab-btn[data-tab="incident"] svg {
+  color: #dc2626 !important;
+}
+#screenBox.lecip-night #bottomBar {
+  background: #000000 !important;
+  border-top-color: #000000 !important;
+}
+#screenBox.lecip-night #bottomBar button[disabled],
+#screenBox.lecip-night #bottomBar .bg-zinc-600,
+#screenBox.lecip-night #bottomBar .bg-zinc-700 {
+  background-color: #7d7d7d !important;
+  color: #ffffff !important;
+}
+#screenBox.lecip-night #bottomBar .bg-\[\#0068FF\],
+#screenBox.lecip-night #bottomBar .bg-\[\#0074f0\] {
+  background-color: #0072ff !important;
+  color: #ffffff !important;
+}
+</style>
 </head>
 <body class="h-full w-full flex items-center justify-center sm:p-3">
 
@@ -706,7 +777,9 @@ function playAlertBeep(isDanger = false) {
 }
 
 // ============ 音檔播放與 Google TTS 序列引擎 ============
+let _audioStopNonce = 0;
 function stopAllAudio() {
+  _audioStopNonce++;
   audioPlaySeqId++;
   state.playingAnnCode = '';
   if (currentAudio) {
@@ -1118,7 +1191,18 @@ function triggerStopAnnouncement(idx, force = false) {
 
   if (isTerminus) {
     segments.push(buildTerminusSegment(st));
-    playAnnouncementSegments(segments);
+    const playPromise = playAnnouncementSegments(segments);
+    const snapNonce = _audioStopNonce;
+    const snapRouteNo = state.selectedRouteNo;
+    const snapTrip = state.selectedTrip;
+    const snapIdx = idx;
+    Promise.resolve(playPromise).then(() => {
+      if (_audioStopNonce !== snapNonce) return;
+      if (state.currentTab !== 'route' || state.routeStage !== 'stops') return;
+      if (state.incidentState.stage !== 'idle') return;
+      if (state.selectedRouteNo !== snapRouteNo || state.selectedTrip !== snapTrip || state.currentStopIdx !== snapIdx) return;
+      autoJumpToReturnStartStop();
+    });
     return;
   }
 
@@ -1143,6 +1227,76 @@ function triggerStopAnnouncement(idx, force = false) {
   }
   segments.push(buildStopSegment(st));
   playAnnouncementSegments(segments);
+}
+
+function findReturnTripForCurrent() {
+  const curTrip = state.selectedTrip;
+  const rno = state.selectedRouteNo || getRouteNo(curTrip);
+  if (!rno || !curTrip) return null;
+
+  const curBound = getBound(curTrip);
+  const curDestKey = getDestGroupKey(curTrip);
+  const curOrigTc = getOrigTc(curTrip);
+  const sameRoute = (state.routes || []).filter(r => getRouteNo(r) === rno);
+  if (sameRoute.length < 2) return null;
+
+  let cands = sameRoute.filter(r => getBound(r) !== curBound && getDestGroupKey(r) !== curDestKey);
+  if (!cands.length) cands = sameRoute.filter(r => getDestGroupKey(r) !== curDestKey);
+  if (!cands.length) cands = sameRoute.filter(r => getBound(r) !== curBound);
+  if (!cands.length) return null;
+
+  cands.sort((a, b) => {
+    const aMatchOrig = curOrigTc && getDestTc(a) === curOrigTc ? 0 : 1;
+    const bMatchOrig = curOrigTc && getDestTc(b) === curOrigTc ? 0 : 1;
+    if (aMatchOrig !== bMatchOrig) return aMatchOrig - bMatchOrig;
+    const aSvc = String(a?.serviceType || a?.service_type || '1') === '1' ? 0 : 1;
+    const bSvc = String(b?.serviceType || b?.service_type || '1') === '1' ? 0 : 1;
+    return aSvc - bSvc;
+  });
+  return cands[0];
+}
+
+async function autoJumpToReturnStartStop() {
+  const returnTrip = findReturnTripForCurrent();
+  if (!returnTrip) {
+    showToast('已抵達總站（此路線無回程班次）');
+    return;
+  }
+  if (typeof stopGpsTracking === 'function') stopGpsTracking();
+
+  const rno = getRouteNo(returnTrip) || state.selectedRouteNo;
+  const bound = getBound(returnTrip);
+  state.selectedRouteNo = rno;
+  state.selectedBound = getDestGroupKey(returnTrip);
+  state.selectedTrip = returnTrip;
+  state.selectedTripSeq = 1;
+  state.pageOffset = 0;
+  state.stopsPage = 0;
+  state.currentStopIdx = 0;
+  state.lastAnnouncedKey = '';
+  state.tripStops = [];
+
+  try {
+    const loaded = await ensureStopsLoaded(returnTrip);
+    if (Array.isArray(loaded) && loaded.length) {
+      state.tripStops = loaded;
+    }
+  } catch (_) {}
+
+  if (!state.tripStops.length) {
+    const tId = returnTrip.tripId || returnTrip.id || returnTrip.routeId || '';
+    const byTrip = tId ? state.stopsByTrip?.get(tId) : null;
+    const byRB = state.stopsByRouteBound?.get(`${rno}|${bound}`) || state.stopsByRouteBound?.get(`${rno}_${bound}`);
+    if (Array.isArray(byTrip) && byTrip.length) state.tripStops = byTrip;
+    else if (Array.isArray(byRB) && byRB.length) state.tripStops = byRB;
+  }
+
+  state.routeStage = 'start_stop';
+  renderAll();
+  const destLabel = state.lang === 'en'
+    ? (getDestEn(returnTrip) || getDestTc(returnTrip))
+    : (getDestTc(returnTrip) || getDestEn(returnTrip));
+  showToast(`已抵達總站，自動轉入回程（往 ${destLabel || '回程'}）`);
 }
 
 // ============ 智駕全城 (Clever Driving) 引擎（下方紅／黃警告卡片＋Greenroad 聲效） ============
@@ -1789,20 +1943,26 @@ function renderTabs() {
       btn.className = 'tab-btn relative flex flex-col items-center justify-center py-1.5 gap-0.5 text-white hover:text-zinc-200';
     }
   });
+
+  const sb = document.getElementById('screenBox');
+  if (sb) sb.classList.toggle('lecip-night', isNight());
+  document.querySelectorAll('#topNavBar .tab-btn').forEach(btn => {
+    btn.dataset.active = (btn.dataset.tab === state.currentTab) ? '1' : '0';
+  });
 }
 
 function themeClasses() {
   const dark = isNight();
   return {
     dark,
-    vp: dark ? 'flex-1 flex flex-col overflow-hidden bg-[#141923] text-white' : 'flex-1 flex flex-col overflow-hidden bg-white text-zinc-900',
-    subBar: dark ? 'bg-[#1b2230] border-b border-zinc-700 text-zinc-100' : 'bg-zinc-100 border-b border-zinc-300 text-zinc-900',
-    divider: dark ? 'divide-zinc-800' : 'divide-zinc-300',
-    row: dark ? 'bg-[#141923] active:bg-zinc-800 text-white' : 'bg-white active:bg-blue-50 text-zinc-900',
-    emptyRow: dark ? 'bg-[#10141c]' : 'bg-zinc-50',
-    muted: dark ? 'text-zinc-400' : 'text-zinc-500',
-    card: dark ? 'bg-[#1b2230] border-zinc-700 text-zinc-100' : 'bg-zinc-50 border-zinc-200 text-zinc-800',
-    botBar: dark ? 'grid grid-cols-4 gap-1.5 p-1.5 bg-[#0d1118] border-t border-zinc-800 shrink-0' : 'grid grid-cols-4 gap-1.5 p-1.5 bg-zinc-200 border-t border-zinc-300 shrink-0'
+    vp: dark ? 'flex-1 flex flex-col overflow-hidden bg-[#3e3d39] text-white' : 'flex-1 flex flex-col overflow-hidden bg-white text-zinc-900',
+    subBar: dark ? 'bg-[#d8ddff] border-b border-[#7a7a76] text-black' : 'bg-[#d8ddff] border-b border-zinc-400 text-black',
+    divider: dark ? 'divide-[#7a7a76]' : 'divide-zinc-300',
+    row: dark ? 'bg-[#3e3d39] active:bg-[#4f4e49] text-white' : 'bg-white active:bg-blue-50 text-zinc-900',
+    emptyRow: dark ? 'bg-[#3e3d39]' : 'bg-zinc-50',
+    muted: dark ? 'text-zinc-300' : 'text-zinc-500',
+    card: dark ? 'bg-[#3e3d39] border-[#7a7a76] text-zinc-100' : 'bg-zinc-50 border-zinc-200 text-zinc-800',
+    botBar: dark ? 'grid grid-cols-4 gap-1.5 p-1.5 bg-black border-t border-black shrink-0 lecip-tall-bottom-bar' : 'grid grid-cols-4 gap-1.5 p-1.5 bg-zinc-200 border-t border-zinc-300 shrink-0 lecip-tall-bottom-bar'
   };
 }
 
@@ -2084,7 +2244,7 @@ function bindLecipInlineKeypad(container, onDigit, onLongPressDigit) {
 
 function renderRouteList(vp, bar) {
   const th = themeClasses();
-  vp.className = th.dark ? 'flex-1 flex flex-col overflow-hidden bg-[#3b3a36] text-white' : 'flex-1 flex flex-col overflow-hidden bg-white text-black';
+  vp.className = th.dark ? 'flex-1 flex flex-col overflow-hidden bg-[#3e3d39] text-white' : 'flex-1 flex flex-col overflow-hidden bg-white text-black';
 
   const filtered = state.searchQuery
     ? state.uniqueRouteNos.filter(no => no.startsWith(state.searchQuery) || no.includes(state.searchQuery))
@@ -2104,18 +2264,17 @@ function renderRouteList(vp, bar) {
   const slice = filtered.slice(state.pageOffset * visibleRows, (state.pageOffset + 1) * visibleRows);
   const activeSpec = hasLetterBar ? LECIP_KEYPAD_SPEC.find(x => x.digit === state.routeLetterKey) : null;
 
-  const rowBg = th.dark ? 'bg-[#3b3a36] active:bg-[#4b4944] text-white border-[#52504a]' : 'bg-white active:bg-blue-50 text-zinc-900 border-zinc-400';
-  const emptyBg = th.dark ? 'bg-[#3b3a36] border-[#52504a]' : 'bg-white border-zinc-400';
-  const inputBg = th.dark ? 'bg-[#3b3a36] text-white border-zinc-400' : 'bg-white text-black border-zinc-500';
-  const letterBg = th.dark ? 'bg-[#3b3a36] border-[#52504a]' : 'bg-white border-zinc-400';
+  const rowBg = th.dark ? 'bg-[#3e3d39] active:bg-[#4f4e49] text-white border-[#7a7a76]' : 'bg-white active:bg-blue-50 text-zinc-900 border-zinc-400';
+  const emptyBg = th.dark ? 'bg-[#3e3d39] border-[#7a7a76]' : 'bg-white border-zinc-400';
+  const inputBg = th.dark ? 'bg-[#3e3d39] text-white border-[#9a9994]' : 'bg-white text-black border-zinc-500';
+  const letterBg = th.dark ? 'bg-[#3e3d39] border-[#7a7a76]' : 'bg-white border-zinc-400';
 
   vp.innerHTML = `
     <!-- 淺紫藍「輸入路線」實機輸入列 -->
-    <div class="px-2.5 py-1.5 bg-[#d4dcff] text-black border-b border-zinc-500 flex items-center gap-2 shrink-0">
+    <div class="px-2.5 py-1.5 bg-[#d8ddff] text-black border-b border-[#7a7a76] flex items-center gap-2 shrink-0">
       <div class="font-black text-[15px] leading-tight shrink-0 min-w-[66px]">${state.lang === 'en' ? 'Route' : '輸入路線'}</div>
       <button id="routeInputField" class="flex-1 h-10 rounded-xl border ${inputBg} px-3 flex items-center justify-between text-left active:opacity-90">
         <span class="text-2xl font-black tracking-wider leading-none">${esc(state.searchQuery)}${state.routeKbOpen ? '<span class="inline-block w-[2px] h-6 bg-current align-middle ml-0.5 animate-pulse"></span>' : ''}</span>
-        ${!state.routeKbOpen ? `<span class="text-[11px] font-bold opacity-60">${state.pageOffset + 1}/${totalPages}</span>` : ''}
       </button>
       <button id="btnRouteBackspace" title="退格（長按全部清除）" class="w-12 h-10 rounded-xl bg-[#0074f0] active:brightness-90 text-white flex items-center justify-center shrink-0 shadow-sm">
         <svg class="w-7 h-7" viewBox="0 0 28 22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -2431,26 +2590,30 @@ function renderStartStopList(vp, bar) {
   const slice = state.tripStops.slice(state.pageOffset * PAGE_SIZE, (state.pageOffset + 1) * PAGE_SIZE);
 
   vp.innerHTML = `
-    <div class="flex items-center justify-between px-3 py-2 ${th.subBar} shrink-0">
-      <span class="font-black text-sm">${esc(state.selectedRouteNo)} · 選擇開始站位</span>
-      <span class="text-xs font-bold ${th.muted}">${state.pageOffset + 1} / ${totalPages} (共 ${state.tripStops.length} 站)</span>
+    <div class="flex items-center justify-between px-3 py-2.5 ${th.subBar} shrink-0">
+      <span class="font-black text-base text-black">${esc(state.selectedRouteNo)} · 選擇開始站位</span>
+      <span class="text-xs font-bold text-zinc-700">${state.pageOffset + 1} / ${totalPages} (共 ${state.tripStops.length} 站)</span>
     </div>
     <div class="flex-1 flex flex-col divide-y ${th.divider} overflow-y-auto no-scrollbar">
       ${slice.length === 0 ? `
         <div class="flex-1 flex items-center justify-center ${th.muted} text-sm font-bold">此班次暫無站點資料</div>
       ` : slice.map((st, idx) => {
         const sIdx = state.pageOffset * PAGE_SIZE + idx;
-        const hasAudio = !!getEffectiveStopAudio(st);
+        const isFirstStop = sIdx === 0;
         const sub = getStopSub(st);
-        const secInfo = sections[sIdx] || {};
+        const rowCls = isFirstStop
+          ? 'bg-[#fff000] active:bg-[#e6d800] text-black'
+          : th.row;
+        const subCls = isFirstStop ? 'text-zinc-800' : th.muted;
+        const arrowCls = isFirstStop ? 'text-zinc-600' : (th.dark ? 'text-[#8c8c88]' : th.muted);
         return `
-          <button data-sidx="${sIdx}" class="pick-start-btn flex-1 px-4 py-2.5 flex items-center justify-between ${th.row} text-left">
+          <button data-sidx="${sIdx}" class="pick-start-btn flex-1 px-4 py-2.5 flex items-center justify-between ${rowCls} text-left">
             <div class="min-w-0 pr-2">
               <div class="text-lg font-black truncate">${sIdx + 1}. ${esc(state.lang === 'en' ? (getStopNameEn(st) || getStopNameTc(st)) : getStopNameTc(st))}</div>
-              ${sub ? `<div class="text-xs font-bold ${th.muted} truncate">${esc(sub)}</div>` : ''}
+              ${sub ? `<div class="text-xs font-bold ${subCls} truncate">${esc(sub)}</div>` : ''}
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
-              <span class="${th.muted} text-xl font-bold">›</span>
+              <span class="${arrowCls} text-2xl font-black">›</span>
             </div>
           </button>
         `;
@@ -2462,10 +2625,10 @@ function renderStartStopList(vp, bar) {
   const canPrev = state.pageOffset > 0;
   const canNext = state.pageOffset < totalPages - 1;
   bar.innerHTML = `
-    <button id="botBack" class="h-11 rounded-lg bg-[#d92b1c] text-white font-black text-xl flex items-center justify-center active:brightness-90">‹</button>
-    <button id="botPrev" class="h-11 rounded-lg ${canPrev ? 'bg-[#0068FF] text-white' : 'bg-zinc-600 text-zinc-300'} font-black text-xl flex items-center justify-center">↑</button>
-    <button id="botNext" class="h-11 rounded-lg ${canNext ? 'bg-[#0068FF] text-white' : 'bg-zinc-600 text-zinc-300'} font-black text-xl flex items-center justify-center">↓</button>
-    <button id="botQuickStart" class="h-11 rounded-lg bg-emerald-600 text-white font-black text-xs flex items-center justify-center">第1站開出</button>
+    <button id="botBack" class="h-11 rounded-lg bg-[#0072ff] text-white font-black text-2xl flex items-center justify-center active:brightness-90">‹</button>
+    <button id="botPrev" class="h-11 rounded-lg ${canPrev ? 'bg-[#0072ff] text-white' : 'bg-[#7d7d7d] text-white'} font-black text-2xl flex items-center justify-center">↑</button>
+    <button id="botNext" class="h-11 rounded-lg ${canNext ? 'bg-[#0072ff] text-white' : 'bg-[#7d7d7d] text-white'} font-black text-2xl flex items-center justify-center">↓</button>
+    <button id="botQuickStart" title="第1站開出" class="h-11 rounded-lg bg-[#0072ff] text-white font-black text-2xl tracking-[0.2em] flex items-center justify-center active:brightness-90">•••</button>
   `;
 
   const enterStops = startIdx => {
@@ -2908,7 +3071,7 @@ function scheduleInlineAnnAutoPlay() {
 
 function renderAnnounceView(vp, bar) {
   const th = themeClasses();
-  vp.className = th.dark ? 'flex-1 flex flex-col overflow-hidden bg-[#3b3a36] text-white' : 'flex-1 flex flex-col overflow-hidden bg-white text-black';
+  vp.className = th.dark ? 'flex-1 flex flex-col overflow-hidden bg-[#3e3d39] text-white' : 'flex-1 flex flex-col overflow-hidden bg-white text-black';
 
   const filtered = state.annInputCode
     ? state.announcements.filter(a => {
