@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "updatedAt": "2026-11-25T14:17:03.238Z",
+  "updatedAt": "2026-11-25T14:26:07.685Z",
   "confirmed": {
     "2": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1312_a.mp3",
     "3": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1226_a.mp3",
@@ -581,6 +581,7 @@
     "4025": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1588_A.mp3",
     "4027": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1545_A.mp3",
     "4034": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1555_a.mp3",
+    "4047": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1775_B.mp3",
     "4048": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1552_A.mp3",
     "4049": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1567_B.mp3",
     "4051": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1544_A.mp3",
@@ -727,7 +728,9 @@
     "9054": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1552_A.mp3",
     "9055": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1551_a.mp3",
     "9070": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1585_A.mp3",
+    "9071": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1775_B.mp3",
     "9073": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1585_A.mp3",
+    "9075": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1775_B.mp3",
     "9076": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1774_A.mp3",
     "9077": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1555_a.mp3",
     "9080": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1514_A.mp3",
@@ -828,6 +831,7 @@
     "10000106": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1205_a.mp3",
     "10000107": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1205_a.mp3",
     "10000121": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1338_a.mp3",
+    "10000144": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1776_A.mp3",
     "10000148": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1508_A.mp3",
     "10000173": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1057_A.mp3",
     "10000186": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1503_A.mp3",
@@ -10792,6 +10796,58 @@
       "note": "",
       "updatedBy": "Ken"
     },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1775_B.mp3": {
+      "stopId": "4047",
+      "stopIds": [
+        "4047",
+        "9075",
+        "9071"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "NA20",
+        "A21"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "旺角中心",
+      "heardEn": "Argyle Centre",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1775_a.mp3": {
+      "stopId": "4047",
+      "stopIds": [
+        "4047",
+        "9075",
+        "9071"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "旺角中心",
+      "heardEn": "Argyle Centre",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1776_A.mp3": {
+      "stopId": "10000144",
+      "stopIds": [
+        "10000144"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "彩雲邨",
+      "heardEn": "Choi Wan Estate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
     "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1780_A.mp3": {
       "stopId": "8257",
       "stopIds": [
@@ -20239,6 +20295,52 @@
       "updatedBy": "Ken"
     },
     {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1775_B.mp3",
+      "stopIds": [
+        "4047",
+        "9075",
+        "9071"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "NA20",
+        "A21"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:19:11.518Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1775_a.mp3",
+      "stopIds": [
+        "4047",
+        "9075",
+        "9071"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:19:28.398Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1776_A.mp3",
+      "stopIds": [
+        "10000144"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:19:48.802Z",
+      "updatedBy": "Ken"
+    },
+    {
       "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1780_A.mp3",
       "stopIds": [
         "8257"
@@ -21435,6 +21537,106 @@
   ],
   "specialBroadcasts": [],
   "tripNames": {
+    "973|O|SP-1000236-1": {
+      "bound": "O",
+      "defaultName": "973-赤柱村-2",
+      "deleted": false,
+      "destTc": "赤柱村",
+      "fullFare": 18.1,
+      "isManual": false,
+      "labelCleared": false,
+      "name": "973-赤柱村-2",
+      "origTc": "尖沙咀(麼地道)",
+      "patternId": "SP-1000236-1",
+      "routeId": "973",
+      "serviceType": "1",
+      "tripKey": "973|O|SP-1000236-1",
+      "tripLabel": "星期六、日及假日班次，經西九文化區及海洋公園",
+      "tripType": "custom",
+      "updatedAt": "2026-11-25T14:23:07.065Z",
+      "updatedBy": "Ken",
+      "viaText": ""
+    },
+    "973|O|SP-1667-1": {
+      "bound": "O",
+      "defaultName": "973-赤柱村-3",
+      "deleted": false,
+      "destTc": "赤柱村",
+      "fullFare": 18.1,
+      "isManual": false,
+      "labelCleared": false,
+      "name": "973-赤柱村-3",
+      "origTc": "尖沙咀(麼地道)",
+      "patternId": "SP-1667-1",
+      "routeId": "973",
+      "serviceType": "1",
+      "tripKey": "973|O|SP-1667-1",
+      "tripLabel": "星期六、日及假日路線，經西九文化區",
+      "tripType": "custom",
+      "updatedAt": "2026-11-25T14:23:17.605Z",
+      "updatedBy": "Ken",
+      "viaText": ""
+    },
+    "973|I|1": {
+      "bound": "I",
+      "defaultName": "973-尖沙咀 (麼地道)-2",
+      "deleted": false,
+      "destTc": "尖沙咀 (麼地道)",
+      "fullFare": 18.1,
+      "isManual": false,
+      "labelCleared": false,
+      "name": "973-尖沙咀 (麼地道)-2",
+      "origTc": "赤柱村",
+      "patternId": "",
+      "routeId": "973",
+      "serviceType": "1",
+      "tripKey": "973|I|1",
+      "tripLabel": "星期六、日及假日班次，經西九文化區及海洋公園",
+      "tripType": "custom",
+      "updatedAt": "2026-11-25T14:22:19.040Z",
+      "updatedBy": "Ken",
+      "viaText": ""
+    },
+    "973|I|SP-1000236-2": {
+      "bound": "I",
+      "defaultName": "973-尖沙咀 (麼地道)-3",
+      "deleted": false,
+      "destTc": "尖沙咀 (麼地道)",
+      "fullFare": 18.1,
+      "isManual": false,
+      "labelCleared": false,
+      "name": "973-尖沙咀 (麼地道)-3",
+      "origTc": "赤柱村",
+      "patternId": "SP-1000236-2",
+      "routeId": "973",
+      "serviceType": "1",
+      "tripKey": "973|I|SP-1000236-2",
+      "tripLabel": "星期六、日及假日路線，經西九文化區",
+      "tripType": "custom",
+      "updatedAt": "2026-11-25T14:22:40.751Z",
+      "updatedBy": "Ken",
+      "viaText": ""
+    },
+    "973|I|SP-1667-2": {
+      "bound": "I",
+      "defaultName": "973-尖沙咀 (麼地道)-4",
+      "deleted": false,
+      "destTc": "尖沙咀 (麼地道)",
+      "fullFare": 18.1,
+      "isManual": false,
+      "labelCleared": false,
+      "name": "973-尖沙咀 (麼地道)-4",
+      "origTc": "赤柱村",
+      "patternId": "SP-1667-2",
+      "routeId": "973",
+      "serviceType": "1",
+      "tripKey": "973|I|SP-1667-2",
+      "tripLabel": "早上班次經深灣",
+      "tripType": "custom",
+      "updatedAt": "2026-11-25T14:22:52.064Z",
+      "updatedBy": "Ken",
+      "viaText": ""
+    },
     "A17|O|1": {
       "bound": "O",
       "defaultName": "A17-機場 (地面運輸中心)-1",
@@ -21525,14 +21727,264 @@
       "updatedBy": "成員-9psp",
       "viaText": ""
     },
+    "A12|O|1": {
+      "bound": "O",
+      "customStops": [
+        {
+          "seq": 1,
+          "stopId": "1546",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 2,
+          "stopId": "46",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 3,
+          "stopId": "10000307",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 4,
+          "stopId": "3",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 5,
+          "stopId": "4",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 6,
+          "stopId": "5",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 7,
+          "stopId": "6",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 8,
+          "stopId": "7",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 9,
+          "stopId": "8",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 10,
+          "stopId": "1553",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 11,
+          "stopId": "10",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 12,
+          "stopId": "11",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 13,
+          "stopId": "12",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 14,
+          "stopId": "13",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 15,
+          "stopId": "100",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 16,
+          "stopId": "101",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 17,
+          "stopId": "102",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 18,
+          "stopId": "173",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 19,
+          "stopId": "103",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 20,
+          "stopId": "104",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 21,
+          "stopId": "105",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 22,
+          "stopId": "106",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 23,
+          "stopId": "107",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 24,
+          "stopId": "108",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 25,
+          "stopId": "109",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 26,
+          "stopId": "110",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 27,
+          "stopId": "111",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 28,
+          "stopId": "112",
+          "sectionFare": 47.1,
+          "section": 1
+        },
+        {
+          "seq": 29,
+          "stopId": "8016",
+          "sectionFare": 41.9,
+          "section": 2
+        },
+        {
+          "seq": 30,
+          "stopId": "8015",
+          "sectionFare": 41.9,
+          "section": 2
+        },
+        {
+          "seq": 31,
+          "stopId": "921",
+          "sectionFare": 34.6,
+          "section": 3
+        },
+        {
+          "seq": 32,
+          "stopId": "10239",
+          "sectionFare": 17.8,
+          "section": 4
+        },
+        {
+          "seq": 33,
+          "stopId": "950",
+          "sectionFare": 4.2,
+          "section": 5
+        },
+        {
+          "seq": 34,
+          "stopId": "13328",
+          "sectionFare": 4.2,
+          "section": 5
+        },
+        {
+          "seq": 35,
+          "stopId": "12072",
+          "sectionFare": 4.2,
+          "section": 5
+        },
+        {
+          "seq": 36,
+          "stopId": "10000401",
+          "sectionFare": 4.2,
+          "section": 5
+        },
+        {
+          "seq": 37,
+          "stopId": "13346",
+          "sectionFare": 4.2,
+          "section": 5
+        },
+        {
+          "seq": 38,
+          "stopId": "929",
+          "sectionFare": 4.2,
+          "section": 5
+        }
+      ],
+      "defaultName": "A12-港珠澳大橋旅檢大樓-1",
+      "deleted": false,
+      "destTc": "機場 (地面運輸中心)",
+      "fullFare": 47.1,
+      "isManual": false,
+      "labelCleared": false,
+      "name": "A12-港珠澳大橋旅檢大樓-1",
+      "origTc": "小西灣 (藍灣半島)",
+      "patternId": "",
+      "routeId": "A12",
+      "serviceType": "1",
+      "tripKey": "A12|O|1",
+      "tripLabel": "星期一至五晨早班次，經西環、國泰城和民航處總部",
+      "tripType": "custom",
+      "updatedAt": "2026-11-25T14:25:42.551Z",
+      "updatedBy": "Ken",
+      "viaText": ""
+    },
     "A12|I|1": {
       "bound": "I",
-      "defaultName": "A12-小西灣 (藍灣半島)-1",
+      "defaultName": "A12-小西灣 (藍灣半島)-2",
       "deleted": false,
       "destTc": "小西灣 (藍灣半島)",
       "fullFare": 47.1,
       "isManual": false,
-      "name": "A12-小西灣 (藍灣半島)-1",
+      "name": "A12-小西灣 (藍灣半島)-2",
       "origTc": "機場 (地面運輸中心)",
       "routeId": "A12",
       "serviceType": "1",
@@ -21590,519 +22042,19 @@
       "tripKey": "A28|O|1",
       "updatedAt": "2026-11-24T14:29:08.241Z",
       "updatedBy": "Ken",
-      "tripLabel": "",
+      "tripLabel": "正常路線",
       "origTc": "機場 (地面運輸中心)",
       "fullFare": 44,
       "isManual": false
     },
-    "A28|O|cuqoyo": {
-      "bound": "O",
-      "customStops": [
-        {
-          "seq": 1,
-          "stopId": "3329",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.295872872091,
-            "lng": 114.26836001053,
-            "nameEn": "LOHAS Park",
-            "nameSc": "日出康城",
-            "nameTc": "日出康城",
-            "numId": "3329",
-            "stopId": "3329",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 2,
-          "stopId": "2919",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.297406192091,
-            "lng": 114.27252052053,
-            "nameEn": "The Beaumount, Wan Po Road",
-            "nameSc": "峻滢, 环保大道",
-            "nameTc": "峻瀅, 環保大道",
-            "numId": "2919",
-            "stopId": "2919",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 3,
-          "stopId": "2928",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.294212732091,
-            "lng": 114.27339453053,
-            "nameEn": "Le Prestige LOHAS Park, Wan Po Road",
-            "nameSc": "日出康城领都, 环保大道",
-            "nameTc": "日出康城領都, 環保大道",
-            "numId": "2928",
-            "stopId": "2928",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 4,
-          "stopId": "2929",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.296755222091,
-            "lng": 114.27266472053,
-            "nameEn": "The Capitol LOHAS Park, Wan Po Road",
-            "nameSc": "日出康城首都, 环保大道",
-            "nameTc": "日出康城首都, 環保大道",
-            "numId": "2929",
-            "stopId": "2929",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 5,
-          "stopId": "2930",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.303469562091,
-            "lng": 114.27138882053,
-            "nameEn": "Shaw Studios, Wan Po Road",
-            "nameSc": "邵氏影城, 环保大道",
-            "nameTc": "邵氏影城, 環保大道",
-            "numId": "2930",
-            "stopId": "2930",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 6,
-          "stopId": "2931",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.308858532091,
-            "lng": 114.26646605053,
-            "nameEn": "Oscar By The Sea",
-            "nameSc": "清水湾半岛",
-            "nameTc": "清水灣半島",
-            "numId": "2931",
-            "stopId": "2931",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 7,
-          "stopId": "1818",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.307711102091,
-            "lng": 114.26217901053,
-            "nameEn": "Bauhinia Garden, Po Yap Road",
-            "nameSc": "宝盈花园, 宝邑路",
-            "nameTc": "寶盈花園, 寶邑路",
-            "numId": "1818",
-            "stopId": "1818",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 8,
-          "stopId": "2918",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.308567362091,
-            "lng": 114.26004574053,
-            "nameEn": "Tseung Kwan O Station",
-            "nameSc": "将军澳站",
-            "nameTc": "將軍澳站",
-            "numId": "2918",
-            "stopId": "2918",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 9,
-          "stopId": "2917",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.304894682091,
-            "lng": 114.25161911053,
-            "nameEn": "Tiu Keng Leng Station",
-            "nameSc": "调景岭站",
-            "nameTc": "調景嶺站",
-            "numId": "2917",
-            "stopId": "2917",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 10,
-          "stopId": "1728",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.311288322091,
-            "lng": 114.26075763053,
-            "nameEn": "Sheung Chi House Sheung Tak Estate, Tong Ming Street",
-            "nameSc": "尚德邨尚智楼, 唐明街",
-            "nameTc": "尚德邨尚智樓, 唐明街",
-            "numId": "1728",
-            "stopId": "1728",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 11,
-          "stopId": "1684",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.323019892091,
-            "lng": 114.25351646053,
-            "nameEn": "Serenity Place, Po Hong Road",
-            "nameSc": "怡心园, 宝康路",
-            "nameTc": "怡心園, 寶康路",
-            "numId": "1684",
-            "stopId": "1684",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 12,
-          "stopId": "3825",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.325122152091,
-            "lng": 114.25142769053,
-            "nameEn": "Po Tsui Park, Po Hong Road",
-            "nameSc": "宝翠公园, 宝康路",
-            "nameTc": "寶翠公園, 寶康路",
-            "numId": "3825",
-            "stopId": "3825",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 13,
-          "stopId": "1675",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.321397042091,
-            "lng": 114.25026554053,
-            "nameEn": "Tsui Lam Estate, Po Lam Road North",
-            "nameSc": "翠林邨, 宝琳北路",
-            "nameTc": "翠林邨, 寶琳北路",
-            "numId": "1675",
-            "stopId": "1675",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 14,
-          "stopId": "2699",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.318120232091,
-            "lng": 114.25435204053,
-            "nameEn": "Hong Sing Garden, Po Lam Road North",
-            "nameSc": "康盛花园, 宝琳北路",
-            "nameTc": "康盛花園, 寶琳北路",
-            "numId": "2699",
-            "stopId": "2699",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 15,
-          "stopId": "2700",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.320301632091,
-            "lng": 114.24448187053,
-            "nameEn": "Ma Yau Tong Village, Po Lam Road",
-            "nameSc": "马游塘村, 宝琳路",
-            "nameTc": "馬游塘村, 寶琳路",
-            "numId": "2700",
-            "stopId": "2700",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 16,
-          "stopId": "2701",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.318232052091,
-            "lng": 114.23766574053,
-            "nameEn": "Po Tat Estate, Po Lam Road",
-            "nameSc": "宝达邨, 宝琳路",
-            "nameTc": "寶達邨, 寶琳路",
-            "numId": "2701",
-            "stopId": "2701",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 17,
-          "stopId": "3494",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.318880012091,
-            "lng": 114.23614059053,
-            "nameEn": "Yan Tat House On Tat Estate, On Sau Road",
-            "nameSc": "安达邨仁达楼, 安秀道",
-            "nameTc": "安達邨仁達樓, 安秀道",
-            "numId": "3494",
-            "stopId": "3494",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 18,
-          "stopId": "3495",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.321890802091,
-            "lng": 114.23262755053,
-            "nameEn": "Oi Tat House On Tat Estate, On Sau Road",
-            "nameSc": "安达邨爱达楼, 安秀道",
-            "nameTc": "安達邨愛達樓, 安秀道",
-            "numId": "3495",
-            "stopId": "3495",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 19,
-          "stopId": "3496",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.324279672091,
-            "lng": 114.23077054053,
-            "nameEn": "Kam Tai House On Tai Estate, On Sau Road",
-            "nameSc": "安泰邨锦泰楼, 安秀道",
-            "nameTc": "安泰邨錦泰樓, 安秀道",
-            "numId": "3496",
-            "stopId": "3496",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 20,
-          "stopId": "1779",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.332335452091,
-            "lng": 114.21519595053,
-            "nameEn": "Pak Hung House Choi Wan Estate, New Clear Water Bay Road",
-            "nameSc": "彩云邨白虹楼, 新清水湾道",
-            "nameTc": "彩雲邨白虹樓, 新清水灣道",
-            "numId": "1779",
-            "stopId": "1779",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 21,
-          "stopId": "1654",
-          "sectionFare": 44,
-          "section": 1,
-          "apiStopMeta": {
-            "lat": 22.334128192091,
-            "lng": 114.21002009053,
-            "nameEn": "Ping Shek Estate",
-            "nameSc": "坪石邨",
-            "nameTc": "坪石邨",
-            "numId": "1654",
-            "stopId": "1654",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 22,
-          "stopId": "1525",
-          "sectionFare": 40.8,
-          "section": 2,
-          "apiStopMeta": {
-            "lat": 22.335290892091,
-            "lng": 114.20761701053,
-            "nameEn": "Tan Fung House Choi Hung Estate, Lung Cheung Road",
-            "nameSc": "彩虹邨丹凤楼, 龙翔道",
-            "nameTc": "彩虹邨丹鳳樓, 龍翔道",
-            "numId": "1525",
-            "stopId": "1525",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 23,
-          "stopId": "1695",
-          "sectionFare": 40.8,
-          "section": 2,
-          "apiStopMeta": {
-            "lat": 22.339272392091,
-            "lng": 114.20228739053,
-            "nameEn": "Diamond Hill Station, Lung Cheung Road",
-            "nameSc": "钻石山站, 龙翔道",
-            "nameTc": "鑽石山站, 龍翔道",
-            "numId": "1695",
-            "stopId": "1695",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 24,
-          "stopId": "1690",
-          "sectionFare": 40.8,
-          "section": 2,
-          "apiStopMeta": {
-            "lat": 22.341586742091,
-            "lng": 114.19546107053,
-            "nameEn": "Shatin Pass Road, Lung Cheung Road",
-            "nameSc": "沙田坳道, 龙翔道",
-            "nameTc": "沙田坳道, 龍翔道",
-            "numId": "1690",
-            "stopId": "1690",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 25,
-          "stopId": "1725",
-          "sectionFare": 40.8,
-          "section": 2,
-          "apiStopMeta": {
-            "lat": 22.341581972091,
-            "lng": 114.16679537053,
-            "nameEn": "Beacon Heights, Lung Cheung Road",
-            "nameSc": "毕架山花园, 龙翔道",
-            "nameTc": "畢架山花園, 龍翔道",
-            "numId": "1725",
-            "stopId": "1725",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 26,
-          "stopId": "1853",
-          "sectionFare": 17.8,
-          "section": 3,
-          "apiStopMeta": {
-            "lat": 22.338232802091,
-            "lng": 114.04196854053,
-            "nameEn": "Lantau Link Bus-Bus Interchange",
-            "nameSc": "青屿干线巴士转乘站",
-            "nameTc": "青嶼幹線巴士轉乘站",
-            "numId": "1853",
-            "stopId": "1853",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 27,
-          "stopId": "2714",
-          "sectionFare": 17.8,
-          "section": 3,
-          "apiStopMeta": {
-            "lat": 22.316169222091,
-            "lng": 113.93594877053,
-            "nameEn": "Airport (Terminal 1)",
-            "nameSc": "机场 (1 号客运大楼)",
-            "nameTc": "機場 (1 號客運大樓)",
-            "numId": "2714",
-            "stopId": "2714",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 28,
-          "stopId": "2715",
-          "sectionFare": 17.8,
-          "section": 3,
-          "apiStopMeta": {
-            "lat": 22.315642132091,
-            "lng": 113.93779318053,
-            "nameEn": "Airport (Terminal 2)",
-            "nameSc": "机场 (2 号客运大楼)",
-            "nameTc": "機場 (2 號客運大樓)",
-            "numId": "2715",
-            "stopId": "2715",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 29,
-          "stopId": "3550",
-          "sectionFare": 17.8,
-          "section": 3,
-          "apiStopMeta": {
-            "lat": 22.317023822091,
-            "lng": 113.95084021053,
-            "nameEn": "HZMB Passenger Clearance Building",
-            "nameSc": "港珠澳大桥旅检大楼",
-            "nameTc": "港珠澳大橋旅檢大樓",
-            "numId": "3550",
-            "stopId": "3550",
-            "subTc": ""
-          }
-        },
-        {
-          "seq": 30,
-          "stopId": "1837",
-          "sectionFare": 17.8,
-          "section": 3,
-          "apiStopMeta": {
-            "lat": 22.314155382091,
-            "lng": 113.93690708053,
-            "nameEn": "Airport (Ground Transportation Centre)",
-            "nameSc": "机场 (地面运输中心)",
-            "nameTc": "機場 (地面運輸中心)",
-            "numId": "1837",
-            "stopId": "1837",
-            "subTc": ""
-          }
-        }
-      ],
-      "defaultName": "A28-去程-2",
-      "deleted": false,
-      "destTc": "機場 (地面運輸中心)",
-      "fullFare": 44,
-      "isManual": true,
-      "name": "A28-去程-2",
-      "origTc": "日出康城",
-      "routeId": "A28",
-      "serviceType": "cuqoyo",
-      "tripKey": "A28|O|cuqoyo",
-      "tripLabel": "正常路線",
-      "tripType": "normal",
-      "updatedAt": "2026-11-24T15:34:54.902Z",
-      "updatedBy": "Ken",
-      "viaText": ""
-    },
     "A28|I|1": {
       "bound": "I",
-      "defaultName": "A28-日出康城-1",
+      "defaultName": "A28-日出康城-2",
       "deleted": false,
       "destTc": "日出康城",
       "fullFare": 44,
       "isManual": false,
-      "name": "A28-日出康城-1",
+      "name": "A28-日出康城-2",
       "origTc": "機場 (地面運輸中心)",
       "routeId": "A28",
       "serviceType": "1",
