@@ -2092,7 +2092,10 @@ function renderTopStatus() {
   const trBadge = document.getElementById('trainingTopBadge');
   if (trBadge) trBadge.classList.toggle('hidden', !state.trainingMode);
   const incBadge = document.getElementById('incidentTopBadge');
-  if (incBadge) incBadge.classList.toggle('hidden', !inIncident);
+  if (incBadge) {
+    incBadge.textContent = '事故模式已開啟';
+    incBadge.classList.toggle('hidden', !inIncident);
+  }
 
   // 車長電子名牌（手動輸入 5 位數員工編號時改以黃色顯示）
   const drvEl = document.getElementById('btnDriverBadge');
@@ -3816,89 +3819,139 @@ function renderMessageView(vp, bar) {
 }
 
 // ============ 三段式紅頂「事故」功能（停車 ≥3s 安全鎖 -> 完成過客／繼續行程 -> 完成處理） ============
+function getIncidentBroadcastSegment(type) {
+  const t = String(type || '');
+  if (t.includes('故障')) {
+    return {
+      files: [],
+      tc: '各位乘客請注意，因機件故障，本班車暫時未能繼續行駛，請遵從車長指示，不便之處，敬請見諒。',
+      en: 'Attention passengers, due to a mechanical fault, this bus is unable to continue its journey. Please follow the bus captain instructions. We apologize for the inconvenience.',
+      sc: '各位乘客请注意，因机件故障，本班车暂时未能继续行驶，请遵从车长指示。'
+    };
+  }
+  if (t.includes('交通意外')) {
+    return {
+      files: [],
+      tc: '各位乘客請注意，因發生交通意外，本班車暫時停止行駛，請保持鎮定並遵從車長指示，不便之處，敬請見諒。',
+      en: 'Attention passengers, due to a traffic accident, this bus service is temporarily suspended. Please remain calm and follow the bus captain instructions.',
+      sc: '各位乘客请注意，因发生交通意外，本班车暂时停止行驶，请保持镇定并遵从车长指示。'
+    };
+  }
+  if (t.includes('乘客')) {
+    return {
+      files: [],
+      tc: '各位乘客請注意，因車上發生乘客事件，本班車暫時停駛處理，請保持鎮定並遵從車長指示，不便之處，敬請見諒。',
+      en: 'Attention passengers, due to a passenger incident on board, this bus is temporarily stopped. Please remain calm and follow the bus captain instructions.',
+      sc: '各位乘客请注意，因车上发生乘客事件，本班车暂时停驶处理，请保持镇定并遵从车长指示。'
+    };
+  }
+  return {
+    files: [],
+    tc: '各位乘客請注意，因發生突發事故，本班車暫時停止行駛，請遵從車長指示，不便之處，敬請見諒。',
+    en: 'Attention passengers, due to an unexpected incident, this bus service is temporarily suspended. Please follow the bus captain instructions.',
+    sc: '各位乘客请注意，因发生突发事故，本班车暂时停止行驶，请遵从车长指示。'
+  };
+}
+
 function renderIncidentView(vp, bar) {
   const th = themeClasses();
-  vp.className = th.vp;
   const inc = state.incidentState;
+  const blackBarCls = 'grid grid-cols-4 gap-1.5 p-1.5 bg-black border-t border-black shrink-0';
+  const pageBg = th.dark
+    ? 'flex-1 flex flex-col overflow-hidden bg-[#1b2029] text-white'
+    : 'flex-1 flex flex-col overflow-hidden bg-[#e5e7eb] text-[#111827]';
+  const panelBg = th.dark
+    ? 'bg-[#141923] border-zinc-700 text-zinc-100'
+    : 'bg-white border-zinc-300 text-[#111827]';
 
-  // 階段二：事故進行中（紅頂、暫停自動報站、電子牌暫停載客）
+  // 步驟 2：事故進行中（顯示所選事故類別、5 項車長處理指引、完成過客 / 繼續行程）
   if (inc.stage === 'active') {
+    vp.className = pageBg;
     vp.innerHTML = `
-      <div class="px-3 py-2 bg-red-700 text-white font-black text-sm flex items-center justify-between shrink-0">
-        <span>⚠ 事故模式進行中</span>
-        <span class="font-mono text-xs">${esc(inc.startTime)}</span>
+      <div class="px-3.5 py-2.5 bg-[#dc2626] text-white flex items-center justify-between gap-2 shrink-0 shadow-sm">
+        <span class="text-base font-black tracking-wide truncate">${esc(inc.type)}</span>
+        <span class="font-mono text-xs font-bold opacity-90 shrink-0">${esc(inc.startTime)}</span>
       </div>
-      <div class="flex-1 flex flex-col justify-between p-4">
-        <div class="space-y-3">
-          <div class="p-3.5 rounded-xl bg-red-600/15 border-2 border-red-600">
-            <div class="text-xs font-black text-red-500">已啟動事故類別</div>
-            <div class="text-2xl font-black mt-0.5">${esc(inc.type)}</div>
-            <div class="text-xs font-bold ${th.muted} mt-2 space-y-1">
-              <div>• 已回報位置並中止預計抵站時間</div>
-              <div>• 自動報站已暫停，電子牌轉為「暫停載客」</div>
-              <div>• 請按程序致電控制中心，依督導人員指示操作</div>
-            </div>
-          </div>
 
-          <div class="grid grid-cols-1 gap-3 pt-1">
-            <button id="btnIncTransfer" class="h-14 rounded-xl bg-amber-500 active:brightness-90 text-black font-black text-lg shadow">
+      <div class="flex-1 overflow-y-auto no-scrollbar px-3.5 py-3 flex flex-col justify-between gap-3">
+        <div class="p-3.5 rounded-xl border ${panelBg} space-y-2 shadow-sm">
+          <div class="text-sm font-black">車長依照下列步驟處理：</div>
+          <ol class="text-[13px] font-bold leading-snug space-y-1.5 list-decimal pl-5">
+            <li>安全情況下停車</li>
+            <li>了解車上乘客狀況（有否受傷、受傷情況）</li>
+            <li>致電控制中心（新巴：<span class="font-mono font-black text-[#0074f0]">21362323</span>／城一：<span class="font-mono font-black text-[#0074f0]">21362422</span>／城二：<span class="font-mono font-black text-[#0074f0]">21362432</span>）</li>
+            <li>報上員工編號、車號、路線、方向、事故位置、事故項目、乘客狀況及數量、車輛損毀情況</li>
+            <li>依照控制中心發出的指示處理</li>
+          </ol>
+        </div>
+
+        <div class="space-y-2 shrink-0">
+          <div class="grid grid-cols-2 gap-2.5">
+            <button id="btnIncTransfer" class="h-14 rounded-xl bg-[#0074f0] active:brightness-90 text-white font-black text-lg shadow">
               完成過客
             </button>
-            <button id="btnIncResume" class="h-14 rounded-xl bg-emerald-600 active:brightness-90 text-white font-black text-lg shadow">
+            <button id="btnIncResume" class="h-14 rounded-xl bg-[#16a34a] active:brightness-90 text-white font-black text-lg shadow">
               繼續行程
             </button>
           </div>
+          <div class="text-[11px] font-bold ${th.muted} text-center">如遇任何緊急情況，應先行報警並安頓乘客</div>
         </div>
-        <div class="text-[11px] font-bold ${th.muted} text-center">如遇緊急情況，請先報警及安頓乘客</div>
       </div>
     `;
+    bar.className = blackBarCls;
     bar.innerHTML = `
-      <button id="botIncReplay" class="col-span-4 h-11 rounded-lg bg-red-700 text-white font-black text-sm">重播事故車廂廣播</button>
+      <button id="botIncReplay" class="col-span-4 h-11 rounded-lg bg-[#b91c1c] active:brightness-90 text-white font-black text-sm">重播事故車廂廣播</button>
     `;
     document.getElementById('btnIncTransfer').onclick = () => {
       state.incidentState.stage = 'transferred';
       renderAll();
-      showToast('已完成過客，電子牌維持「暫停載客」');
+      showToast('已完成過客，電子牌已轉為「暫停載客」');
     };
     document.getElementById('btnIncResume').onclick = () => {
       state.incidentState = { stage: 'idle', type: '', startTime: '' };
       state.currentTab = 'route';
       renderAll();
-      showToast('已結束事故模式，繼續餘下行程');
+      showToast('已結束事故模式，返回正常報站程序');
     };
     document.getElementById('botIncReplay').onclick = () => {
-      playAnnouncementSegments([{
-        files: [],
-        tc: '各位乘客請注意，因發生突發事故，本班車暫時停止行駛，不便之處，敬請見諒。',
-        en: 'Attention passengers, due to an incident, this bus service is temporarily suspended. We apologize for the inconvenience.',
-        sc: '各位乘客请注意，因发生突发事故，本班车暂时停止行驶。'
-      }]);
+      playAnnouncementSegments([getIncidentBroadcastSegment(inc.type)]);
     };
     return;
   }
 
-  // 階段三：已完成過客，待巴士離開現場按「完成處理」
+  // 步驟 3：已完成過客 → 等候處理（督察/工程人員到場、控制中心電話、離開現場按「完成處理」）
   if (inc.stage === 'transferred') {
+    vp.className = pageBg;
     vp.innerHTML = `
-      <div class="px-3 py-2 bg-red-700 text-white font-black text-sm flex items-center justify-between shrink-0">
-        <span>⚠ 事故模式 · 已完成過客</span>
-        <span class="font-mono text-xs">${esc(inc.startTime)}</span>
+      <div class="px-3.5 py-2.5 bg-[#dc2626] text-white flex items-center justify-between gap-2 shrink-0 shadow-sm">
+        <span class="text-base font-black tracking-wide">等候處理</span>
+        <span class="font-mono text-xs font-bold opacity-90 shrink-0">${esc(inc.type)}</span>
       </div>
-      <div class="flex-1 flex flex-col justify-center p-4 space-y-4">
-        <div class="p-4 rounded-xl border-2 border-amber-500 bg-amber-500/10 space-y-2 text-center">
-          <div class="text-lg font-black">${esc(inc.type)}（已過客）</div>
-          <div class="text-xs font-bold ${th.muted} leading-relaxed">
-            電子路線牌已轉為「暫停載客」。<br/>
-            當巴士準備離開現場時，請按下「完成處理」，系統將中途中止車程並自動記錄於電子站長紙。
+
+      <div class="flex-1 overflow-y-auto no-scrollbar px-4 py-4 flex flex-col justify-between gap-4">
+        <div class="p-4 rounded-xl border ${panelBg} space-y-3.5 shadow-sm">
+          <div class="text-sm font-black leading-relaxed">
+            請耐心等待督察／工程人員到場處理，如有需要，可致電控制中心尋求進一步協助
+          </div>
+          <div class="p-3 rounded-lg ${th.dark ? 'bg-[#1f2937] text-zinc-100' : 'bg-zinc-100 text-zinc-900'} space-y-1.5 text-sm font-black font-mono">
+            <div class="flex items-center justify-between"><span>新巴：</span><span class="text-[#0074f0]">21362323</span></div>
+            <div class="flex items-center justify-between"><span>城一：</span><span class="text-[#0074f0]">21362422</span></div>
+            <div class="flex items-center justify-between"><span>城二：</span><span class="text-[#0074f0]">21362432</span></div>
+          </div>
+          <div class="text-[11px] font-bold ${th.muted} leading-relaxed">
+            電子路線牌已轉為「暫停載客」。巴士離開現場時請按下「完成處理」，車程將中途中止並自動記錄於電子站長紙。
           </div>
         </div>
-        <button id="btnIncFinish" class="h-16 rounded-xl bg-red-600 active:brightness-90 text-white font-black text-xl shadow-lg">
+
+        <button id="btnIncFinish" class="h-14 rounded-xl bg-[#0074f0] active:brightness-90 text-white font-black text-xl shadow-lg shrink-0">
           完成處理
         </button>
       </div>
     `;
+    bar.className = blackBarCls;
     bar.innerHTML = `
-      <button id="botIncBackStep2" class="col-span-4 h-11 rounded-lg bg-zinc-700 text-white font-black text-sm">返回上一步</button>
+      <button id="botIncBackStep2" class="h-11 rounded-lg bg-[#0074f0] active:brightness-90 text-white font-black text-3xl flex items-center justify-center">‹</button>
+      <button id="botIncReplay" class="col-span-3 h-11 rounded-lg bg-[#b91c1c] active:brightness-90 text-white font-black text-sm">重播事故車廂廣播</button>
     `;
     document.getElementById('btnIncFinish').onclick = () => {
       state.incidents.unshift({
@@ -3910,76 +3963,96 @@ function renderIncidentView(vp, bar) {
       state.incidentState = { stage: 'idle', type: '', startTime: '' };
       stopAllAudio();
       stopGpsTracking();
+      state.etaMap = {};
       state.routeStage = 'route';
       state.currentTab = 'route';
       renderAll();
-      showToast('已完成事故處理並記錄於電子站長紙');
+      showToast('車程已中途中止，並自動記錄於電子站長紙');
     };
     document.getElementById('botIncBackStep2').onclick = () => {
       state.incidentState.stage = 'active';
       renderAll();
     };
+    document.getElementById('botIncReplay').onclick = () => {
+      playAnnouncementSegments([getIncidentBroadcastSegment(inc.type)]);
+    };
     return;
   }
 
-  // 階段一：停車 ≥3 秒安全鎖檢查 + 選擇事故類別
+  // 步驟 1 前置安全鎖：必須於安全位置停車達 3 秒或以上
   if (!state.isStopped3s) {
+    vp.className = th.vp;
     vp.innerHTML = `
-      <div class="px-3 py-2 ${th.subBar} font-black text-sm shrink-0">事故功能</div>
+      <div class="px-3 py-2.5 ${th.subBar} font-black text-sm text-center shrink-0">選擇事故項目</div>
       <div class="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-3">
         <div class="w-14 h-14 rounded-full bg-red-600/20 text-red-500 flex items-center justify-center text-3xl font-black">!</div>
         <div class="text-base font-black">行車期間停用「事故」功能</div>
         <div class="text-xs font-bold ${th.muted} leading-relaxed">
-          為保障駕駛安全，必須於安全位置停下達 3 秒或以上才可使用事故功能。<br/>
+          為保障駕駛安全，此功能只能在巴士停下達 3 秒或以上時才能使用。<br/>
           （電腦測試可點右上角 [123] 切換回停車狀態）
         </div>
       </div>
     `;
+    bar.className = blackBarCls;
     bar.innerHTML = `
-      <button id="botBackRoute" class="col-span-4 h-11 rounded-lg bg-[#0068FF] text-white font-black text-sm">返回路線</button>
+      <button id="botBackRoute" class="h-11 rounded-lg bg-[#0074f0] active:brightness-90 text-white font-black text-3xl flex items-center justify-center">‹</button>
     `;
     document.getElementById('botBackRoute').onclick = () => { state.currentTab = 'route'; renderAll(); };
     return;
   }
 
-  const types = ['車輛故障', '交通意外', '乘客不適', '交通擠塞', '臨時改道', '道路封閉'];
+  // 步驟 1：選擇事故項目（實機 4 項：1.巴士故障 / 2.發生交通意外 / 3.乘客事件 / 4.其他事故）
+  const incidentItems = [
+    { no: '1', label: '巴士故障' },
+    { no: '2', label: '發生交通意外' },
+    { no: '3', label: '乘客事件' },
+    { no: '4', label: '其他事故' }
+  ];
+  vp.className = th.vp;
   vp.innerHTML = `
-    <div class="px-3 py-2 ${th.subBar} font-black text-sm shrink-0">選擇事故類別（停車 ≥3s 可用）</div>
-    <div class="p-3 grid grid-cols-2 gap-2 shrink-0">
-      ${types.map(t => `
-        <button data-itype="${esc(t)}" class="inc-btn py-3.5 rounded-lg bg-red-600 active:brightness-90 text-white font-black text-sm shadow-sm">${esc(t)}</button>
+    <div class="px-3.5 py-2.5 ${th.subBar} font-black text-base text-center shrink-0">選擇事故項目</div>
+    <div class="divide-y ${th.divider} shrink-0">
+      ${incidentItems.map(it => `
+        <button data-itype="${esc(it.label)}" class="inc-btn w-full px-4 py-4 flex items-center justify-between ${th.row} text-left">
+          <span class="text-xl font-black">${it.no}. ${esc(it.label)}</span>
+          <span class="${th.muted} text-2xl font-bold">›</span>
+        </button>
       `).join('')}
     </div>
-    <div class="px-3 py-1.5 ${th.subBar} text-xs font-black shrink-0">電子站長紙事故記錄 (${state.incidents.length})</div>
-    <div class="flex-1 overflow-y-auto no-scrollbar divide-y ${th.divider} px-3">
-      ${state.incidents.length === 0 ? `<div class="py-6 text-center text-xs ${th.muted} font-bold">暫無已中止車程事故記錄</div>` : state.incidents.map(rec => `
-        <div class="py-2 flex items-center justify-between text-xs">
-          <span class="font-black text-red-500">${esc(rec.route)} · ${esc(rec.type)}</span>
-          <span class="font-mono ${th.muted}">${esc(rec.time)}-${esc(rec.endTime || '')}</span>
-        </div>
-      `).join('')}
-    </div>
+    ${state.incidents.length > 0 ? `
+      <div class="px-3.5 py-1.5 ${th.subBar} text-xs font-black flex items-center justify-between shrink-0 mt-auto">
+        <span>電子站長紙事故記錄 (${state.incidents.length})</span>
+        <button id="btnClearIncInline" class="text-[11px] font-bold text-red-500 active:opacity-70">清除</button>
+      </div>
+      <div class="max-h-24 overflow-y-auto no-scrollbar divide-y ${th.divider} px-3.5 shrink-0">
+        ${state.incidents.map(rec => `
+          <div class="py-1.5 flex items-center justify-between text-xs">
+            <span class="font-black text-red-500 truncate pr-2">${esc(rec.route)} · ${esc(rec.type)}</span>
+            <span class="font-mono ${th.muted} shrink-0">${esc(rec.time)}-${esc(rec.endTime || '')}</span>
+          </div>
+        `).join('')}
+      </div>
+    ` : `<div class="flex-1 flex items-end justify-center pb-3 px-4 text-[11px] font-bold ${th.muted} text-center">如遇任何緊急情況，應先行報警及安頓乘客，才使用報站器之「事故」功能</div>`}
   `;
+  bar.className = blackBarCls;
   bar.innerHTML = `
-    <button id="botClearInc" class="col-span-2 h-11 rounded-lg bg-zinc-700 text-white font-black text-sm">清除記錄</button>
-    <button id="botBackRoute" class="col-span-2 h-11 rounded-lg bg-[#0068FF] text-white font-black text-sm">返回路線</button>
+    <button id="botBackRoute" class="h-11 rounded-lg bg-[#0074f0] active:brightness-90 text-white font-black text-3xl flex items-center justify-center">‹</button>
   `;
+
   vp.querySelectorAll('.inc-btn').forEach(btn => {
     btn.onclick = () => {
       const t = new Date().toTimeString().slice(0, 8);
-      state.incidentState = { stage: 'active', type: btn.dataset.itype, startTime: t };
+      const chosenType = btn.dataset.itype;
+      state.incidentState = { stage: 'active', type: chosenType, startTime: t };
+      state.etaMap = {};
       stopAllAudio();
       playAlertBeep(true);
       renderAll();
-      playAnnouncementSegments([{
-        files: [],
-        tc: '各位乘客請注意，因發生突發事故，本班車暫時停止行駛，請遵從車長指示。',
-        en: 'Attention passengers, due to an incident, this bus service is temporarily suspended.',
-        sc: ''
-      }]);
+      playAnnouncementSegments([getIncidentBroadcastSegment(chosenType)]);
     };
   });
-  document.getElementById('botClearInc').onclick = () => { state.incidents = []; renderAll(); };
+  const btnClr = document.getElementById('btnClearIncInline');
+  if (btnClr) btnClr.onclick = () => { state.incidents = []; renderAll(); };
   document.getElementById('botBackRoute').onclick = () => { state.currentTab = 'route'; renderAll(); };
 }
 
