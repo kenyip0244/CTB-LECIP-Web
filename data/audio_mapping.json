@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "updatedAt": "2026-11-25T14:50:33.370Z",
+  "updatedAt": "2026-11-25T14:56:06.824Z",
   "confirmed": {
     "2": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1312_a.mp3",
     "3": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1226_a.mp3",
@@ -24352,6 +24352,98 @@
       "tripNames": [],
       "note": "",
       "updatedAt": "2026-11-24T10:10:06.099Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/!48_OCP.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "48-海洋公園-2"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-25T14:55:49.296Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/!48_SWA.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "48-深灣-1",
+        "48-深灣-2"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-25T14:53:19.164Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/48_WFN.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "48-華富邨華安樓-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-25T14:55:12.588Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/48_WFN_OCP.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "48-海洋公園-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-25T14:55:41.514Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/73P_CYB.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "73P-數碼港-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-25T14:51:12.312Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/73_CYB.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "73-數碼港-1",
+        "73-數碼港-2"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-25T14:51:22.872Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/73_STV.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "73-赤柱村-1",
+        "73-赤柱村-2"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-25T14:51:31.321Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/73_WFN.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "73-華富 (北)-1",
+        "73-華富 (北)-2"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-25T14:51:39.894Z",
       "updatedBy": "Ken"
     },
     {
