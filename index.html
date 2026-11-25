@@ -135,6 +135,39 @@
     }
   </style>
 <!-- === LECIP FONTS END === -->
+<!-- === LECIP TAB CORNERS CSS START === -->
+  <style id="lecip-tab-round-css">
+    .lecip-nav-tab {
+      position: relative !important;
+      overflow: visible !important;
+      border-top-left-radius: 15px !important;
+      border-top-right-radius: 15px !important;
+    }
+    .lecip-nav-tab.lecip-tab-active {
+      z-index: 5;
+    }
+    .lecip-nav-tab.lecip-tab-active:not(.lecip-tab-first)::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: -10px;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+      background: radial-gradient(circle at 0 0, transparent 10px, var(--lecip-tab-bg, #D8DAFF) 10.5px);
+    }
+    .lecip-nav-tab.lecip-tab-active:not(.lecip-tab-last)::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      right: -10px;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+      background: radial-gradient(circle at 100% 0, transparent 10px, var(--lecip-tab-bg, #D8DAFF) 10.5px);
+    }
+  </style>
+<!-- === LECIP TAB CORNERS CSS END === -->
 </head>
 <body class="h-full w-full flex items-center justify-center sm:p-3">
 
@@ -3362,8 +3395,8 @@ function syncStopArrivalSkin() {
 function renderStopsView(vp, bar) {
   const th = themeClasses();
   vp.className = th.dark
-    ? 'flex-1 flex flex-col overflow-hidden bg-[#141923] text-white'
-    : 'flex-1 flex flex-col overflow-hidden bg-[#9ab5dc] text-zinc-900';
+    ? 'flex-1 flex flex-col overflow-hidden bg-[#3A3937] text-white'
+    : 'flex-1 flex flex-col overflow-hidden bg-[#D8DAFF] text-zinc-900';
 
   const cur = state.tripStops[state.currentStopIdx];
   if (!cur) {
@@ -3399,10 +3432,10 @@ function renderStopsView(vp, bar) {
   );
   const curName = getLecipStopDisplayName(cur);
 
-  const headerBg = th.dark ? 'bg-[#1b2230] border-b border-zinc-700 text-white' : 'bg-[#a4bce0] border-b border-[#7a92b8] text-[#111827]';
-  const secBoxCls = th.dark ? 'border-zinc-500/90 bg-[#141923]/60 text-white' : 'border-[#647b9e] bg-[#a4bce0] text-[#111827]';
-  const curPanelCls = th.dark ? 'bg-[#12161f] border-b border-zinc-700 text-white' : 'bg-white border-b border-zinc-400 text-[#111827]';
-  const upRowCls = th.dark ? 'bg-[#171d29] active:bg-zinc-800 text-zinc-100 border-zinc-800' : 'bg-white active:bg-blue-50 text-[#111827] border-zinc-400';
+  const headerBg = 'bg-[#D8DAFF] border-b border-[#989cc4] text-[#111827]';
+  const secBoxCls = 'border-[#5a5e7a] bg-[#D8DAFF] text-[#111827]';
+  const curPanelCls = th.dark ? 'bg-[#3A3937] border-b border-[#555350] text-white' : 'bg-white border-b border-zinc-400 text-[#111827]';
+  const upRowCls = th.dark ? 'bg-[#3A3937] active:bg-[#4a4946] text-zinc-100 border-[#555350]' : 'bg-white active:bg-blue-50 text-[#111827] border-zinc-400';
 
   const curMinsText = state.lang === 'en' ? `${curEta.mins} min` : `${curEta.mins}分鐘`;
   const curDistText = formatDistanceLabel(curEta.distM);
@@ -3465,7 +3498,7 @@ function renderStopsView(vp, bar) {
             </div>
           </div>
 
-          <div class="relative w-full h-[26px] rounded-full ${th.dark ? 'bg-[#2a2f38]' : 'bg-black'} overflow-hidden shadow-inner">
+          <div class="relative w-full h-[26px] rounded-full ${th.dark ? 'bg-[#1c1b1a]' : 'bg-black'} overflow-hidden shadow-inner">
             <div id="stopProgressFill" class="h-full ${isArrived ? 'bg-[#00c824]' : 'bg-[#00a846]'} transition-all duration-300" style="width:${isArrived ? 100 : Math.max(12, state.stopProgressPct)}%"></div>
             <div id="stopArrivedLabel" class="${isArrived ? 'flex' : 'hidden'} absolute inset-0 items-center justify-center text-white font-bold text-[16px] tracking-wider pointer-events-none">
               ${state.lang === 'en' ? 'Arrived' : '已到達'}
@@ -5257,6 +5290,78 @@ bindGlobalEvents();
 renderTopStatus();
 setInterval(renderTopStatus, 1000);
 runBootSequence(false);
+
+// === LECIP TAB CORNERS JS START ===
+(function initLecipTabCorners() {
+  let syncing = false;
+  const getTabButtons = () => {
+    let btns = Array.from(document.querySelectorAll('[data-tab]'));
+    if (btns.length < 4) {
+      btns = Array.from(document.querySelectorAll('#tabRoute, #tabBroadcast, #tabMessage, #tabIncident, #tabSettings, #navRoute, #navBroadcast, #navMessage, #navIncident, #navSettings'));
+    }
+    return btns;
+  };
+
+  const syncTabs = () => {
+    if (syncing) return;
+    const btns = getTabButtons();
+    if (!btns.length) return;
+    syncing = true;
+    try {
+      const onStops = typeof state !== 'undefined' && state.currentTab === 'route' && state.routeStage === 'stops';
+      // 先清除行內覆蓋色，準確讀取原本的選中狀態
+      btns.forEach(btn => { btn.style.backgroundColor = ''; });
+
+      btns.forEach((btn, idx) => {
+        if (!btn.classList.contains('lecip-nav-tab')) btn.classList.add('lecip-nav-tab');
+        const bg = getComputedStyle(btn).backgroundColor;
+        const isInactive = !bg || bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent' || bg === 'rgb(0, 0, 0)';
+        const isActive = !isInactive;
+
+        if (btn.classList.contains('lecip-tab-active') !== isActive) btn.classList.toggle('lecip-tab-active', isActive);
+        if (btn.classList.contains('lecip-tab-first') !== (idx === 0)) btn.classList.toggle('lecip-tab-first', idx === 0);
+        if (btn.classList.contains('lecip-tab-last') !== (idx === btns.length - 1)) btn.classList.toggle('lecip-tab-last', idx === btns.length - 1);
+
+        if (isActive) {
+          const isRouteTab = idx === 0 || btn.dataset.tab === 'route';
+          const finalBg = (onStops && isRouteTab) ? '#D8DAFF' : bg;
+          if (onStops && isRouteTab) btn.style.backgroundColor = '#D8DAFF';
+          btn.style.setProperty('--lecip-tab-bg', finalBg);
+        } else {
+          btn.style.removeProperty('--lecip-tab-bg');
+        }
+      });
+    } finally {
+      syncing = false;
+    }
+  };
+
+  const attach = () => {
+    syncTabs();
+    const btns = getTabButtons();
+    if (!btns.length) return;
+    const nav = btns[0].parentElement;
+    if (!nav || nav.dataset.lecipTabCornerObs === '1') return;
+    nav.dataset.lecipTabCornerObs = '1';
+
+    let rafId = 0;
+    const schedule = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(syncTabs);
+    };
+    const obs = new MutationObserver(schedule);
+    obs.observe(nav, { attributes: true, subtree: true, attributeFilter: ['class'] });
+    const vp = document.getElementById('mainViewport');
+    if (vp) obs.observe(vp, { childList: true });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attach, { once: true });
+  } else {
+    attach();
+  }
+})();
+// === LECIP TAB CORNERS JS END ===
 </script>
 </body>
 </html>
