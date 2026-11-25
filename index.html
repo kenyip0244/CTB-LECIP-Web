@@ -3010,6 +3010,14 @@ function getStudioTripLabel(t, globalIdx) {
 }
 function bndKey(b) { return String(b || 'O').trim().toUpperCase(); }
 
+function getEffectiveWebTripSeq(trip, fallbackSeq = 1) {
+  const rec = trip?._studioTripRec || (typeof findStudioTripRecordForWeb === 'function' ? findStudioTripRecordForWeb(trip) : null);
+  if (rec && rec.customSeqNo != null && String(rec.customSeqNo).trim() !== '') {
+    return String(rec.customSeqNo).trim();
+  }
+  return String(fallbackSeq ?? 1);
+}
+
 function renderTripList(vp, bar) {
   const th = themeClasses();
   vp.className = th.vp;
@@ -3029,7 +3037,8 @@ function renderTripList(vp, bar) {
         const dest = state.lang === 'en' ? (getDestEn(t) || getDestTc(t)) : (getDestTc(t) || getDestEn(t));
         const remark = getRealTripRemark(t);
         const studioLabel = (typeof getStudioTripLabel === 'function') ? getStudioTripLabel(t, globalIdx) : '';
-        const defaultName = `${state.selectedRouteNo}-${dest || '班次'}-${globalIdx + 1}`;
+        const effTripSeq = getEffectiveWebTripSeq(t, globalIdx + 1);
+        const defaultName = `${state.selectedRouteNo}-${dest || '班次'}-${effTripSeq}`;
         const autoNormal = (globalIdx === 0 && !t?._studioTripRec?.labelCleared) ? (state.lang === 'en' ? 'Normal Route' : '正常路線') : '';
         const displayName = studioLabel || remark || autoNormal || defaultName;
         return `
@@ -3060,7 +3069,7 @@ function renderTripList(vp, bar) {
       const t = trips[tidx];
       if (!t) return;
       state.selectedTrip = t;
-      state.selectedTripSeq = tidx + 1;
+      state.selectedTripSeq = getEffectiveWebTripSeq(t, tidx + 1);
       try {
         state.tripStops = await ensureStopsLoaded(t);
         state.currentStopIdx = 0;
@@ -3605,7 +3614,7 @@ function renderStopsView(vp, bar) {
     <!-- 路線與分段標頭 -->
     <div class="px-3.5 py-2 ${headerBg} flex items-stretch justify-between gap-2 shrink-0">
       <div class="min-w-0 flex flex-col justify-center">
-        <div class="text-[20px] font-black tracking-tight leading-snug truncate">${esc(state.selectedRouteNo)}-${esc(dest || '終點')}-${esc(state.selectedTripSeq || 1)}</div>
+        <div class="text-[20px] font-black tracking-tight leading-snug truncate">${esc(state.selectedRouteNo)}-${esc(dest || '終點')}-${esc(getEffectiveWebTripSeq(trip, state.selectedTripSeq || 1))}</div>
         <div class="text-[15px] font-extrabold leading-snug truncate mt-0.5 opacity-90">${esc(remark)}</div>
       </div>
       <div class="w-[74px] py-1 rounded-[3px] border ${secBoxCls} flex flex-col items-center justify-center shrink-0">
