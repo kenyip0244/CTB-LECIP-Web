@@ -1024,26 +1024,39 @@ function getWelcomeAudioFiles() {
   const isFlyer = /^(A|NA)\d+/.test(rno);
   const all = state.audioManifest || [];
 
-  const findByKw = (kws) => {
-    for (const kw of kws) {
-      const hit = all.find(p => p.toLowerCase().includes(kw));
+  // 排除所有已在 Studio 標記為「指定單一方向班次」的專屬歡迎詞
+  const tripOnlyPaths = new Set(
+    (state.studioWelcomeRules || [])
+      .filter(w => w && w.audioPath && w.scope !== 'default')
+      .map(w => String(w.audioPath).trim().toLowerCase())
+  );
+
+  // 只比對檔名本身（不比對資料夾路徑 audio/welcome/），避免誤抽 A10_LLS.mp3
+  const getStem = (p) => String(p || '').split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
+  const findExactStem = (stems) => {
+    for (const target of stems) {
+      const hit = all.find(p => {
+        if (!p || tripOnlyPaths.has(String(p).trim().toLowerCase())) return false;
+        return getStem(p) === target;
+      });
       if (hit) return hit;
     }
     return '';
   };
 
   if (isFlyer) {
-    const flyerHit = findByKw(['welcome_cityflyer', 'welcome_flyer', 'cityflyer_welcome']);
+    const flyerHit = findExactStem(['welcome_cityflyer', 'welcome_flyer', 'cityflyer_welcome']);
     if (flyerHit) return [flyerHit];
   }
 
-  const stdHit = findByKw(['welcome_citybus', 'welcome_ctb', 'welcome.mp3', 'welcome']);
+  const stdHit = findExactStem(['welcome_citybus', 'welcome_ctb', 'ctb_welcome', 'welcome']);
   if (stdHit) return [stdHit];
 
   if (state.audioStemMap && state.audioStemMap.has('welcome')) {
-    return [state.audioStemMap.get('welcome')];
+    const p = state.audioStemMap.get('welcome');
+    if (p && !tripOnlyPaths.has(String(p).trim().toLowerCase())) return [p];
   }
-  return ['Welcome.mp3'];
+  return [];
 }
 
 function getStudioCurrentTripCandidates() {
