@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "updatedAt": "2026-11-25T12:35:25.715Z",
+  "updatedAt": "2026-11-25T13:15:35.814Z",
   "confirmed": {
     "2": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1312_a.mp3",
     "3": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1226_a.mp3",
@@ -593,7 +593,6 @@
     "12436": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1237_A.mp3",
     "12469": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1038_A.mp3",
     "12481": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1402_a.mp3",
-    "12493": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1385_a.mp3",
     "12498": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1362_a.mp3",
     "12529": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1081_a.mp3",
     "12531": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1237_A.mp3",
@@ -5429,21 +5428,6 @@
       "scope": "single",
       "heardTc": "興華邨裕興樓",
       "heardEn": "Yu Hing House Hing Wah Estate",
-      "note": "",
-      "updatedBy": "Ken"
-    },
-    "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1385_a.mp3": {
-      "stopId": "12493",
-      "stopIds": [
-        "12493"
-      ],
-      "routeMode": "all",
-      "routes": [],
-      "tripMode": "all",
-      "tripNames": [],
-      "scope": "single",
-      "heardTc": "柏立基夫人健康院",
-      "heardEn": "Lady Robert Black Clinic",
       "note": "",
       "updatedBy": "Ken"
     },
@@ -12993,19 +12977,6 @@
       "updatedBy": "Ken"
     },
     {
-      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1385_a.mp3",
-      "stopIds": [
-        "12493"
-      ],
-      "routeMode": "all",
-      "routes": [],
-      "tripMode": "all",
-      "tripNames": [],
-      "note": "",
-      "updatedAt": "2026-11-24T15:14:44.327Z",
-      "updatedBy": "Ken"
-    },
-    {
       "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1388_A.mp3",
       "stopIds": [
         "287",
@@ -16437,11 +16408,10 @@
         "A22-機場 (地面運輸中心)-1",
         "A25-機場 (地面運輸中心)-1",
         "A26-機場 (地面運輸中心)-1",
-        "A29-機場 (地面運輸中心)-1",
-        "A28-去程-2"
+        "A29-機場 (地面運輸中心)-1"
       ],
       "note": "",
-      "updatedAt": "2026-11-24T15:36:27.220Z",
+      "updatedAt": "2026-11-24T14:28:02.281Z",
       "updatedBy": "Ken"
     },
     {
