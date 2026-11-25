@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "updatedAt": "2026-11-25T14:56:06.824Z",
+  "updatedAt": "2026-11-25T14:59:51.190Z",
   "confirmed": {
     "2": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1312_a.mp3",
     "3": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1226_a.mp3",
@@ -886,7 +886,9 @@
     "12469": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1038_A.mp3",
     "12474": "audio/stops/Shek Pai Wan Estate.mp3",
     "12476": "audio/stops/Wah Fu Road.mp3",
-    "12477": "audio/stops/Bel Air on the Peak.mp3",
+    "12477": "audio/stops/Residence Bel Air.mp3",
+    "12478": "audio/stops/Bel Air on the Peak.mp3",
+    "12479": "audio/stops/Bel Air on the Peak.mp3",
     "12481": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1402_a.mp3",
     "12493": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1385_a.mp3",
     "12498": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1362_a.mp3",
@@ -900,7 +902,7 @@
     "12562": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1237_A.mp3",
     "12564": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1707_A.mp3",
     "12570": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1043_A.mp3",
-    "12574": "audio/stops/Bel Air on the Peak.mp3",
+    "12574": "audio/stops/Residence Bel Air.mp3",
     "12575": "audio/stops/Cyberport 3.mp3",
     "12581": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1527_A.mp3",
     "12746": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1540_a.mp3",
@@ -11969,18 +11971,18 @@
       "updatedBy": "Ken"
     },
     "audio/stops/Bel Air on the Peak.mp3": {
-      "stopId": "12477",
+      "stopId": "12479",
       "stopIds": [
-        "12477",
-        "12574"
+        "12479",
+        "12478"
       ],
       "routeMode": "all",
       "routes": [],
       "tripMode": "all",
       "tripNames": [],
       "scope": "multi",
-      "heardTc": "貝沙灣",
-      "heardEn": "Residence Bel-Air",
+      "heardTc": "貝沙灣南灣",
+      "heardEn": "Bel-Air on the Peak",
       "note": "",
       "updatedBy": "Ken"
     },
@@ -12760,6 +12762,22 @@
       "scope": "single",
       "heardTc": "淺水灣別墅",
       "heardEn": "Repulse Bay Villas",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Residence Bel Air.mp3": {
+      "stopId": "12574",
+      "stopIds": [
+        "12574",
+        "12477"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "貝沙灣",
+      "heardEn": "Residence Bel-Air",
       "note": "",
       "updatedBy": "Ken"
     },
@@ -22846,15 +22864,15 @@
     {
       "audioPath": "audio/stops/Bel Air on the Peak.mp3",
       "stopIds": [
-        "12477",
-        "12574"
+        "12479",
+        "12478"
       ],
       "routeMode": "all",
       "routes": [],
       "tripMode": "all",
       "tripNames": [],
       "note": "",
-      "updatedAt": "2026-11-25T14:37:08.792Z",
+      "updatedAt": "2026-11-25T14:59:29.767Z",
       "updatedBy": "Ken"
     },
     {
@@ -23532,6 +23550,20 @@
       "tripNames": [],
       "note": "",
       "updatedAt": "2026-11-25T14:42:35.148Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Residence Bel Air.mp3",
+      "stopIds": [
+        "12574",
+        "12477"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:59:49.439Z",
       "updatedBy": "Ken"
     },
     {
