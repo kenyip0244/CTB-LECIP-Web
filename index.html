@@ -1048,18 +1048,174 @@ async function playSpecialAnnouncementByItem(item) {
   }
 }
 
+// === CTB LOC CODE AUTO WELCOME START ===
+const CTB_LOC_CODES = {"AAT": "駿坪路亞洲空運貨站外", "ABE": "香港仔", "ABT": "香港仔隧道", "ADC": "金鐘 (海富中心)", "ADE": "金鐘站 (東)", "ADM": "金鐘站", "ADW": "金鐘站 (西)", "ALC": "鴨脷洲邨", "ALH": "中環 (歷山大廈)", "ALM": "鴨脷洲大街", "ALP": "旺角 (聯合廣場)", "AMA": "機場 (飛機維修區)", "APA": "香港演藝學院", "APR": "香港仔海旁道 (逸港居)", "AQU": "深旺道 (碧海藍天)", "ASG": "黃竹坑 (香港仔運動場)", "ASH": "軒尼詩道 (軍器廠街)", "ATO": "機場 1 號客運大樓", "AUT": "凹頭", "AWE": "亞洲國際博覽館", "BEB": "堅尼地城 (卑路乍灣總站)", "BGA": "荔枝角道 (泓景臺)", "BRD": "廣播道", "BRH": "寶馬山", "BUS": "旺角 (弼街)", "BWB": "大浪灣", "CAB": "銅鑼灣站", "CAR": "堅道", "CBS": "高士威道 (銅鑼灣運動場)", "CCC": "中華基督教墳場", "CDA": "鶴咀", "CDF": "中環 (三號碼頭)", "CEC": "灣仔 (會展新翼)", "CEF": "中環 (渡輪碼頭)", "CEL": "銅鑼灣 (中央圖書館)", "CEM": "中環街市", "CES": "西營盤 (正街)", "CFD": "創富道車廠", "CFF": "置富花園", "CFO": "創富道寫字樓", "CFR": "創富道", "CGO": "金鐘 (政府總部)", "CHE": "彩虹", "CHF": "彩福邨", "CHG": "富安花園", "CHM": "彩虹站", "CHN": "彩虹道 (寧遠街)", "CHO": "澤安邨", "CHR": "香港仔 (成都道)", "CHT": "紅磡 (海底隧道收費廣場)", "CHW": "柴灣站", "CHY": "竹園邨", "CIH": "中環 (大會堂)", "CKO": "舂坎角", "CKR": "上環 (中港道)", "CLY": "屯門 (置樂花園)", "CMF": "干諾道中港澳碼頭外", "COE": "長安邨", "COG": "高樂花園", "CON": "頌安邨", "COS": "沙田第一城", "CPC": "青山發電廠", "CPO": "機場 (1 號停車場)", "CRB": "灣仔堅拿道巴士專用線", "CRO": "尖沙咀 (廣東道)", "CRS": "漆咸道南 (香港科學館外)", "CRT": "啟德郵輪碼頭", "CSP": "長沙灣廣場", "CTD": "金鐘 (紅棉路支路力寶中心外)", "CTI": "菁田邨", "CTU": "翔東邨", "CVR": "雲景道", "CWA": "彩雲邨", "CWC": "柴灣墳場", "CWD": "柴灣車廠", "CWE": "柴灣 (東)", "CWG": "長宏邨", "CWS": "柴灣車廠訓練學校", "CXC": "國泰城", "CYB": "數碼港", "DIH": "鑽石山站", "DIP": "荃灣 (愉景新城)", "DIS": "迪士尼站", "DOS": "中環 (德忌利士街)", "DRS": "金鐘 (德立街)", "DWB": "深水灣", "EHC": "東區海底隧道", "EHR": "銅鑼灣 (東院道)", "ENS": "九龍灣 (企業廣場)", "ENT": "尖山隧道", "EXS": "中環 (交易廣場)", "FAN": "粉嶺站", "FEV": "摩星嶺", "FHR": "炮台山道", "FOH": "炮台山站", "FSR": "白石角 (科城路)", "FTC": "火炭 (駿洋邨)", "FUC": "富昌邨", "FUT": "富泰邨", "GAL": "加士居道勞資審裁處", "GAR": "花園道 (下纜車總站)", "GIS": "中環 (機利民街)", "GOC": "香港黃金海岸", "GOP": "西沙 GO PARK, 海映路", "GRG": "青衣 (翠怡花園)", "GRP": "西灣河 (嘉亨灣)", "GRT": "康翠臺", "GTC": "機場 (地面運輸中心)", "HAG": "富欣花園", "HAH": "坑口站", "HAR": "灣仔 (港灣道)", "HAS": "海晏街", "HCS": "鰂魚涌 (海澤街)", "HEC": "軒尼詩道 (希慎廣場)", "HEF": "軒尼詩道 (菲林明道以西)", "HEL": "軒尼詩道 (盧押道以西)", "HFC": "杏花邨", "HFR": "大角咀 (海輝道)", "HFS": "銅鑼灣 (興發街)", "HHC": "紅磡街市", "HHF": "紅磡碼頭", "HHN": "坑口 (北)", "HIW": "柴灣 (興華邨)", "HKC": "香港體育館", "HLC": "曉麗苑", "HLY": "康樂園", "HMT": "何文田", "HOK": "中環 (香港站)", "HOL": "海麗邨", "HOR": "荷李活道", "HOT": "海達邨", "HOY": "海盈邨", "HSB": "德輔道中 (恒生大廈)", "HSC": "北角 (健康中街)", "HSG": "將軍澳 (康盛花園)", "HUE": "香港大學東閘", "HUH": "紅磡站", "HUK": "紅橋", "HVL": "跑馬地 (下)", "HVR": "跑馬地馬場 (馬會正門)", "HVU": "跑馬地 (上)", "HYW": "香園圍口岸", "HZM": "大橋香港口岸 (公共交通交匯處)", "HZO": "大橋香港口岸 (落客區)", "ICW": "香港專業教育學院 (柴灣)", "IMT": "告士打道 (入境事務大樓)", "IRC": "迪欣湖", "IRS": "銅鑼灣 (伊榮街)", "ISP": "港運城", "ISR": "小西灣 (藍灣半島)", "JAH": "中環 (怡和大廈)", "JAL": "渣甸山", "JCR": "粉嶺 (馬會道)", "JOD": "佐敦道", "JOV": "牛頭角", "KAC": "啟德 (啟晴邨)", "KAT": "啟德 (AIRSIDE)", "KAY": "啟業邨", "KBA": "九龍灣站 (觀塘道東行)", "KBD": "九龍灣泊車場", "KCC": "啟翔苑", "KCE": "葵涌邨", "KCF": "九龍城碼頭", "KER": "堅尼地道", "KET": "堅尼地城", "KFE": "大埔 (廣福邨)", "KFF": "大埔 (廣福球場)", "KIG": "天水圍 (嘉湖銀座)", "KIM": "健明邨公共交通交匯處", "KKS": "景光街", "KLD": "九巴荔枝角車廠", "KLR": "調景嶺 (景嶺路)", "KLT": "嘉龍村", "KOB": "九龍灣站", "KOP": "康山道", "KOR": "旭和道", "KOS": "嘉安街", "KOT": "九龍塘站", "KOW": "九龍站", "KSP": "啟德體育園", "KST": "九龍城 (盛德街)", "KTA": "啟德站 A 出口 (沐安街)", "KTF": "觀塘碼頭", "KTS": "長沙灣 (甘泉街)", "KTU": "古洞站", "KWH": "葵興站", "KWT": "觀塘", "KWY": "廣源邨", "KYC": "錦英苑", "LAC": "麗港城", "LAL": "青嶼幹線巴士轉乘站", "LAT": "藍田站", "LAV": "海逸豪園", "LEC": "銅鑼灣 (禮頓中心)", "LEO": "利安邨", "LER": "禮頓道", "LET": "利東邨", "LEY": "瀝源邨", "LHP": "康城站", "LKC": "告士打道 (六國中心)", "LKE": "麗閣邨", "LKR": "鯉景道", "LLS": "鴨脷洲 (利樂街)", "LNR": "鴨脷洲 (利南道工業區)", "LOC": "嘉湖山莊 (樂湖居)", "LOF": "樂富站", "LRC": "灣仔 (駱克道市政大廈)", "LRT": "獅子山隧道", "LTE": "青山公路藍地與藍地大街交界", "LTM": "利東街市", "LTN": "藍田 (北)", "LTT": "勵德邨", "LUM": "屯門 (龍門居)", "LYC": "嘉湖山莊 (麗湖居)", "LYR": "鯉魚門道", "LYS": "香港仔 (洛陽街)", "MAF": "中環 (港澳碼頭)", "MAG": "青衣 (美景花園)", "MAH": "馬坑邨", "MAR": "麥當勞道", "MCS": "木廠街", "MEF": "美孚", "MEL": "美林邨", "MET": "美田邨", "MHC": "海怡半島 (美康閣)", "MIK": "輕鐵鳴琴站", "MIR": "尖沙咀 (中間道)", "MKR": "旺角道", "MKS": "中環 (民光街)", "MNS": "啟德 (沐寧街)", "MOK": "旺角站", "MOR": "尖沙咀 (麼地道)", "MOS": "馬鞍山市中心", "MOT": "銅鑼灣 (摩頓台)", "MTC": "馬頭涌道", "MUC": "西灣河 (港島民生書院)", "MUD": "博物館道", "MUT": "東涌 (滿東邨)", "MWP": "馬灣碼頭", "MYS": "中環 (民耀街)", "NAC": "南昌站", "NAF": "旺角 (彌敦道與快富街交界)", "NCH": "泥涌", "NES": "旺角 (奶路臣街)", "NFR": "南風道", "NHS": "耀興道 (南康街)", "NLS": "黃竹坑 (南朗山)", "NOH": "荔枝角 (盈暉臺)", "NOP": "北角", "NPF": "北角碼頭", "NTK": "牛頭角站", "NTP": "沙田 (新城市廣場)", "OCP": "海洋公園 (正門)", "OCS": "馬鞍山 (鞍駿街)", "OME": "何文田 (愛民邨)", "ONV": "維港一號", "OPD": "海洋公園車廠", "OPF": "黃竹坑車廠入油後往海廠", "OSS": "清水灣半島", "OWP": "舊灣仔警署", "OYS": "愛賢街 (愛東商場外)", "PAD": "沙田馬場天幕", "PAR": "柏道", "PAS": "銅鑼灣 (百德新街)", "PAT": "白田邨", "PEA": "山頂", "PED": "中環 (畢打街)", "PEN": "尖沙咀 (半島酒店)", "PES": "銅鑼灣 (邊寧頓街)", "PFR": "北角 (百福道)", "PHE": "博康邨", "PIS": "坪石邨", "POA": "將軍澳 (寶琳)", "POR": "蒲飛路", "POT": "寶達邨", "PRE": "太子站", "PSK": "百勝角", "PSS": "沙田第一城 (寶城街)", "PST": "銅鑼灣 (波斯富街)", "PTB": "機場 (客運大樓)", "PTC": "北潭涌", "PTN": "白田 (北)", "PWR": "上水 (寶運路)", "QES": "伊利沙伯體育館", "QUB": "鰂魚涌", "QUC": "高士威道 (皇仁書院)", "QUE": "金鐘道", "QUS": "皇后街", "RAC": "沙田馬場", "REB": "淺水灣", "ROR": "羅便臣道 (花園台)", "ROS": "金鐘 (樂禮街)", "RRC": "羅便臣道 (高主教書院)", "RUS": "中環 (林士街巴士總站)", "SAK": "西貢", "SAS": "西沙 GO PARK", "SAT": "落馬洲 (新田)", "SAW": "黃竹坑新圍", "SCO": "水泉澳邨", "SFG": "赤柱炮台閘口", "SFR": "啟德 (承豐道)", "SHD": "小濠灣車廠", "SHK": "屯門 (山景邨)", "SHL": "順利邨", "SHM": "石門站", "SHO": "石澳", "SHP": "沙田廣場", "SHS": "上水站", "SHT": "沙田站", "SHW": "上環", "SIH": "兆康站", "SKM": "石硤尾站", "SKS": "紅磡 (崇潔街)", "SKT": "掃管笏村", "SKW": "筲箕灣", "SLK": "荃灣 (西樓角路)", "SMC": "秀茂坪 (中)", "SMT": "長沙灣 (深旺道)", "SNS": "堅尼地城 (西寧街)", "SOD": "海怡路", "SOH": "海怡半島", "SOK": "掃管笏", "SOP": "軒尼詩道 (修頓球場)", "SOU": "蘇屋邨", "SPR": "石排灣道", "SPS": "赤柱警署", "SPW": "石排灣", "SSC": "兆山苑", "SSE": "三聖邨", "SSG": "小西灣運動場", "SSH": "十四鄉", "SSR": "長沙灣 (深盛路)", "SSW": "小西灣邨", "STA": "香港大球場", "STC": "沙田英童學院", "STE": "順天邨", "STF": "中環 (天星碼頭)", "STI": "沙田圍巴士總站", "STP": "赤柱監獄", "STR": "順東路", "STS": "深井", "STV": "赤柱村", "STW": "沙田圍站", "SUN": "欣澳站", "SWA": "深灣", "SWC": "西灣河 (西灣河文娛中心對面)", "SWD": "上環廠", "SWO": "梳士巴利道永安廣場外", "SYB": "西沙路 (帝琴灣)", "SYL": "元朗 (新元朗中心)", "SYS": "洗衣街", "SZB": "深圳灣口岸", "TAK": "太古城", "TAS": "金鐘 (添馬街)", "TAW": "大圍站", "TCC": "天水圍 (天頌苑)", "TCD": "東涌車廠", "TCF": "東涌新發展碼頭", "TCI": "屯門赤鱲角隧道轉車站", "TCN": "東涌 (北)", "TCT": "大老山隧道", "TCW": "駿宏街", "TCY": "駿日街", "TEC": "沙田馬場電話投注中心", "TFR": "東輝路", "TGT": "告士打道 (鵬利中心)", "THD": "大坑徑", "THE": "天恒邨", "THK": "青龍頭 (豪景花園)", "THR": "大坑道", "THS": "太康街", "THT": "天后廟道", "TIH": "銅鑼灣 (天后站)", "TIK": "調景嶺站", "TIS": "天水圍站 (屏欣苑)", "TIT": "天慈邨", "TIW": "田灣邨", "TIY": "天耀邨", "TKD": "將軍澳車廠", "TKI": "將軍澳工業邨", "TKM": "馬頭圍道 (土瓜灣街市)", "TKO": "將軍澳站", "TKR": "天葵路", "TKT": "大角咀 (維港灣)", "TLG": "上水 (翠麗花園)", "TLL": "天樂里", "TLR": "銅鑼灣道", "TLS": "新蒲崗 (爵祿街)", "TLT": "青龍頭村", "TMC": "屯門市中心", "TMD": "屯門車廠", "TMF": "屯門碼頭", "TMI": "屯門公路巴士轉乘站", "TOS": "深水埗 (東京街)", "TPC": "大埔中心", "TPD": "大埔泊車場", "TPM": "港鐵大埔巴士維修中心", "TPT": "大埔頭", "TSB": "天瑞邨", "TSC": "天水圍市中心", "TSE": "尖沙咀東", "TSF": "尖沙咀碼頭", "TSP": "天水圍公園", "TST": "尖沙咀", "TSU": "海洋公園水上樂園", "TSV": "田心村", "TSY": "青衣站", "TTE": "大坑東邨", "TTR": "汀太路", "TTW": "赤柱 (東頭灣道)", "TUC": "東涌站", "TUM": "屯門站", "TVC": "將軍澳電視城", "TVP": "將軍澳 (駿才街) 泊車位", "TWC": "慈雲山 (中)", "TWH": "大窩口站", "TWM": "荃灣站", "TWN": "慈雲山 (北)", "TWO": "太和站", "TWP": "青山公路荃灣站多層停車場外", "TWR": "天華路", "TWS": "慈雲山 (南)", "TWT": "荃灣大會堂", "TWW": "荃灣西站", "TYA": "天福路 (天祐苑)", "TYC": "青衣中華電力發電廠", "TYE": "天恩邨", "UST": "香港科技大學", "VAR": "紅磡 (山谷道)", "VPM": "維多利亞公園正門", "WAC": "灣仔", "WAK": "華貴邨", "WAT": "沙田屈臣氏中心", "WCD": "黃竹坑車廠", "WCF": "灣仔碼頭／灣仔北", "WCH": "黃竹坑站", "WCR": "佐敦 (匯翔道)", "WEK": "西九龍站", "WFC": "華富 (中)", "WFN": "華富 (北)", "WFS": "華富 (南)", "WHC": "西區海底隧道", "WHG": "黃埔花園", "WHR": "銅鑼灣 (威非路道)", "WIS": "銅鑼灣 (永興街)", "WKD": "西九龍車廠", "WKR": "屯門 (湖景路)", "WKS": "烏溪沙站", "WNB": "黃泥涌道 (樂活道)", "WOF": "黃竹坑消防局", "WOH": "華富邨華安樓", "WOR": "將軍澳 (環澳路)", "WOT": "衛城道 (活倫臺)", "WSP": "黃石碼頭", "WSR": "屯門 (湖山路)", "WTI": "和田邨", "WTS": "黃大仙", "WTT": "運頭塘", "WWS": "中環 (永和街)", "WYG": "偉恒昌新邨", "YAT": "油塘", "YCF": "欽州街 (福榮街)", "YCS": "深水埗 (欽州街)", "YIO": "耀安邨", "YIT": "耀東邨", "YIW": "屯門 (業旺邨)", "YLP": "元朗 (元朗廣場)", "YMC": "將軍澳 (煜明苑)", "YMS": "觀塘 (裕民坊)", "YNC": "裕雅苑", "YNS": "裕雅商場", "YPS": "旺角 (染布房街)", "YTE": "東涌 (迎東邨)", "YTS": "東涌 (逸東街)", "YTU": "東涌 (逸東邨)", "YUC": "愉翠苑", "YWS": "怡和街", "YWV": "屯門 (悅湖山莊)", "YYT": "又一城", "LHS": "日出康城", "LT": "藍田站", "KT": "啟德"};
+
+function parseRouteLocCodeFromPath(filePath) {
+  const fn = String(filePath || '').split(/[\\/]/).pop() || '';
+  const stem = fn.replace(/\.[^.]+$/, '').trim();
+  if (!stem) return null;
+  const m = stem.match(/^\+?([A-Z]{0,2}\d{1,3}[A-Z]?)_([A-Z]{2,4})(\d?)$/i);
+  if (!m) return null;
+  const routeId = m[1].toUpperCase();
+  const code = m[2].toUpperCase();
+  const variant = m[3] || '';
+  const locName = CTB_LOC_CODES[code];
+  if (!locName) return null;
+  return { routeId, code, locName, variant };
+}
+
+function _splitLocParts(raw) {
+  let s = String(raw || '').trim().toUpperCase();
+  s = s.replace(/（/g, '(').replace(/）/g, ')').replace(/／/g, '/');
+  s = s.replace(/公共運輸交匯處|公共交通交匯處|巴士總站|總站/g, '').trim();
+  const m = s.match(/^([^()]+?)\(([^()]+)\)$/);
+  const norm = (x) => String(x || '').replace(/[\s\-_,，、\.·]/g, '');
+  if (m) {
+    return { full: norm(m[1] + m[2]), main: norm(m[1]), sub: norm(m[2]) };
+  }
+  const dash = s.split(/\s+-\s+/);
+  if (dash.length === 2) {
+    return { full: norm(dash[0] + dash[1]), main: norm(dash[0]), sub: norm(dash[1]) };
+  }
+  const n = norm(s);
+  return { full: n, main: n, sub: '' };
+}
+
+function _stripUnit(s) {
+  return String(s || '').replace(/(站|邨|村|街|道|路|中心|廣場|花園|碼頭)$/g, '');
+}
+
+function scoreLocNameAgainstDest(locName, destTc) {
+  if (!locName || !destTc) return 0;
+  const alts = String(locName).split(/[／\/]/).map(x => x.trim()).filter(Boolean);
+  const d = _splitLocParts(destTc);
+  if (!d.full) return 0;
+  const dBase = _stripUnit(d.full);
+  const dMainBase = _stripUnit(d.main);
+  const dSubBase = _stripUnit(d.sub);
+
+  let best = 0;
+  for (const alt of alts) {
+    const l = _splitLocParts(alt);
+    if (!l.full) continue;
+    const lBase = _stripUnit(l.full);
+    const lMainBase = _stripUnit(l.main);
+    const lSubBase = _stripUnit(l.sub);
+
+    if (l.sub && d.sub && lMainBase === dMainBase && lSubBase !== dSubBase) {
+      if (!l.sub.includes(d.sub) && !d.sub.includes(l.sub)) continue;
+    }
+
+    if (l.full === d.full) { best = Math.max(best, 100); continue; }
+    if (lBase.length >= 2 && lBase === dBase) { best = Math.max(best, 96); continue; }
+
+    if (l.full.length >= 2 && d.full.includes(l.full)) { best = Math.max(best, 90); continue; }
+    if (d.full.length >= 2 && l.full.includes(d.full)) { best = Math.max(best, 88); continue; }
+
+    if (l.sub && lSubBase.length >= 2) {
+      if (d.full.includes(l.sub) || (dSubBase && dSubBase === lSubBase) || (dMainBase && dMainBase === lSubBase)) {
+        best = Math.max(best, 84);
+        continue;
+      }
+    }
+    if (d.sub && dSubBase.length >= 2) {
+      if (l.full.includes(d.sub) || (lMainBase && lMainBase === dSubBase)) {
+        best = Math.max(best, 82);
+        continue;
+      }
+    }
+
+    if (l.main === '中環' && l.sub.includes('渡輪') && d.full.includes('中環碼頭')) {
+      best = Math.max(best, 85);
+      continue;
+    }
+    if (l.full.includes('大橋香港口岸') && d.full.includes('大橋香港口岸')) {
+      best = Math.max(best, 86);
+      continue;
+    }
+
+    if (!l.sub && !d.sub && lMainBase.length >= 2 && (lMainBase === dMainBase || (lMainBase.length >= 3 && (dMainBase.includes(lMainBase) || lMainBase.includes(dMainBase))))) {
+      best = Math.max(best, 76);
+      continue;
+    }
+    if (l.full.includes('康城') && d.full.includes('康城')) {
+      best = Math.max(best, 82);
+      continue;
+    }
+  }
+  return best;
+}
+
+function getCurrentTripDestTcForWelcome() {
+  const trip = state.selectedTrip || {};
+  let destTc = String(trip.destTc || trip.dest_tc || trip.endStopNameTc || '').trim();
+  if (!destTc && Array.isArray(state.tripStops) && state.tripStops.length > 0) {
+    const lastSt = state.tripStops[state.tripStops.length - 1];
+    destTc = typeof getStopNameTc === 'function' ? getStopNameTc(lastSt) : (lastSt?.nameTc || '');
+  }
+  if (destTc.includes('/')) {
+    const parts = destTc.split(/\s*\/\s*/).map(p => p.trim()).filter(Boolean);
+    if (parts.length === 2 && !/^(G|UG|LG|M|B\d?|\d+)$/i.test(parts[0])) destTc = parts[1];
+  }
+  return destTc.trim();
+}
+
+function findAutoWelcomeByRouteLocCode() {
+  const rno = String(state.selectedRouteNo || '').replace(/^CTB-/i, '').trim().toUpperCase();
+  if (!rno) return '';
+  const destTc = getCurrentTripDestTcForWelcome();
+  if (!destTc) return '';
+
+  const candidates = [];
+  const seen = new Set();
+  const pushIfMatch = (p) => {
+    if (!p || typeof p !== 'string') return;
+    const key = p.trim().toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    const parsed = parseRouteLocCodeFromPath(p);
+    if (!parsed || parsed.routeId !== rno) return;
+    const score = scoreLocNameAgainstDest(parsed.locName, destTc);
+    if (score >= 72) {
+      const isWelDir = key.includes('/welcome/') ? 2 : 0;
+      const isBaseVar = !parsed.variant ? 1 : 0;
+      candidates.push({ path: p, score, bonus: isWelDir + isBaseVar });
+    }
+  };
+
+  if (Array.isArray(state.audioManifest)) {
+    for (const p of state.audioManifest) pushIfMatch(p);
+  }
+  if (state.audioStemMap && state.audioStemMap.size > 0) {
+    for (const p of state.audioStemMap.values()) pushIfMatch(p);
+  }
+
+  if (!candidates.length) return '';
+  candidates.sort((a, b) => b.score - a.score || b.bonus - a.bonus);
+  return candidates[0].path;
+}
+
 function getWelcomeAudioFile() {
+  const autoCodeHit = findAutoWelcomeByRouteLocCode();
+  if (autoCodeHit) return autoCodeHit;
+
   const firstStop = state.tripStops[0];
   if (firstStop && firstStop.stopAudioFile) {
     const stem = String(firstStop.stopAudioFile).split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
     if (stem && !/^\d+_[a-z]$/i.test(stem)) return firstStop.stopAudioFile;
   }
+
   const routeNo = String(state.selectedRouteNo || '').toLowerCase();
   if (routeNo && state.audioStemMap.size > 0) {
     const prefix = routeNo + '_';
     const matches = [];
     for (const [stem, path] of state.audioStemMap.entries()) {
-      if (stem.startsWith(prefix) && !/^\d+_[a-z]$/i.test(stem)) matches.push(path);
+      if (stem.startsWith(prefix) && !/^\d+_[a-z]$/i.test(stem)) {
+        const parsed = parseRouteLocCodeFromPath(path);
+        if (parsed) continue;
+        matches.push(path);
+      }
     }
     if (matches.length === 1) return matches[0];
   }
@@ -1067,18 +1223,19 @@ function getWelcomeAudioFile() {
 }
 
 function getWelcomeAudioFiles() {
+  const autoCodeHit = findAutoWelcomeByRouteLocCode();
+  if (autoCodeHit) return [autoCodeHit];
+
   const rno = String(state.selectedRouteNo || '').trim().toUpperCase();
   const isFlyer = /^(A|NA)\d+/.test(rno);
   const all = state.audioManifest || [];
 
-  // 排除所有已在 Studio 標記為「指定單一方向班次」的專屬歡迎詞
   const tripOnlyPaths = new Set(
     (state.studioWelcomeRules || [])
       .filter(w => w && w.audioPath && w.scope !== 'default')
       .map(w => String(w.audioPath).trim().toLowerCase())
   );
 
-  // 只比對檔名本身（不比對資料夾路徑 audio/welcome/），避免誤抽 A10_LLS.mp3
   const getStem = (p) => String(p || '').split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
   const findExactStem = (stems) => {
     for (const target of stems) {
@@ -1105,6 +1262,7 @@ function getWelcomeAudioFiles() {
   }
   return [];
 }
+// === CTB LOC CODE AUTO WELCOME END ===
 
 function getStudioCurrentTripCandidates() {
   const names = new Set();
