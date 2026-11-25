@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "updatedAt": "2026-11-25T14:29:02.123Z",
+  "updatedAt": "2026-11-25T14:50:33.370Z",
   "confirmed": {
     "2": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1312_a.mp3",
     "3": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1226_a.mp3",
@@ -45,6 +45,11 @@
     "64": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1215_A.mp3",
     "74": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1317_A.mp3",
     "75": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1318_A.mp3",
+    "82": "audio/stops/Stanley Village.mp3",
+    "84": "audio/stops/St Stephens College.mp3",
+    "87": "audio/stops/St Stephens College.mp3",
+    "89": "audio/stops/Stanley Mound Road.mp3",
+    "90": "audio/stops/Stanley Beach Road.mp3",
     "96": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1318_A.mp3",
     "97": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1317_A.mp3",
     "99": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1253_A.mp3",
@@ -166,6 +171,9 @@
     "297": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1251_A.mp3",
     "300": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1346_A.mp3",
     "301": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1290_A.mp3",
+    "309": "audio/stops/Wah Fu Road.mp3",
+    "310": "audio/stops/Tin Wan Street.mp3",
+    "312": "audio/stops/Yip Yee Mansion.mp3",
     "319": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1142_A.mp3",
     "320": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1046_A.mp3",
     "321": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1124_A.mp3",
@@ -191,6 +199,9 @@
     "356": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1065_A.mp3",
     "359": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1170_A.mp3",
     "360": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1171_A.mp3",
+    "369": "audio/stops/Victory Factory Building.mp3",
+    "371": "audio/stops/Aberdeen Promenade.mp3",
+    "372": "audio/stops/Aberdeen Wholesale Fish Market.mp3",
     "377": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1006_A.mp3",
     "378": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1007_A.mp3",
     "379": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1108_A.mp3",
@@ -208,16 +219,70 @@
     "399": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1081_a.mp3",
     "400": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1079_a.mp3",
     "401": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1174_A.mp3",
+    "406": "audio/stops/Stanley Gap Road Interchange.mp3",
+    "407": "audio/stops/Wilson Trail.mp3",
+    "408": "audio/stops/Headland Road.mp3",
+    "409": "audio/stops/90 Repulse Bay Road.mp3",
+    "411": "audio/stops/Repulse Bay Beach.mp3",
+    "412": "audio/stops/Belleview Drive.mp3",
+    "413": "audio/stops/Island Club.mp3",
+    "416": "audio/stops/Hong Kong Country Club.mp3",
+    "430": "audio/stops/Wong Chuk Hang San Wai Ocean Park Station.mp3",
+    "431": "audio/stops/Hong Kong Country Club.mp3",
+    "434": "audio/stops/Island Club.mp3",
+    "435": "audio/stops/Belleview Drive.mp3",
+    "436": "audio/stops/Repulse Bay Beach.mp3",
+    "437": "audio/stops/Repulse Bay Towers.mp3",
+    "440": "audio/stops/Headland Road.mp3",
+    "441": "audio/stops/Stanley Gap Road.mp3",
+    "443": "audio/stops/Stanley Mound Pumping Station.mp3",
+    "444": "audio/stops/Stanley Gap Road Interchange.mp3",
+    "446": "audio/stops/Stanley Court.mp3",
+    "449": "audio/stops/Ap Lei Chau Estate.mp3",
+    "450": "audio/stops/Lee Chi Road.mp3",
+    "451": "audio/stops/Ap Lei Chau Drive.mp3",
+    "452": "audio/stops/Ap Lei Chau Drive.mp3",
+    "453": "audio/stops/Lee Chi Road Main Street Ap Lei Chau.mp3",
+    "454": "audio/stops/The Oasis Ap Lei Chau Estate.mp3",
+    "457": "audio/stops/South Horizons.mp3",
+    "462": "audio/stops/Ocean Court Aberdeen Tennis and Squash Centre.mp3",
     "467": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1139_A.mp3",
     "471": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1009_A.mp3",
     "472": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1010_A.mp3",
     "473": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1015_A.mp3",
     "474": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1016_A.mp3",
+    "475": "audio/stops/St Peters Church Aberdeen Centre.mp3",
+    "476": "audio/stops/Yue Fai Road.mp3",
+    "482": "audio/stops/Hong Kong True Light College Yue On Court.mp3",
+    "483": "audio/stops/Lei Tung Estate.mp3",
+    "484": "audio/stops/Lei Tung Market.mp3",
+    "487": "audio/stops/Ocean Park.mp3",
+    "489": "audio/stops/Wah Fu North.mp3",
+    "490": "audio/stops/Wah Sang House Wah Fu Estate.mp3",
+    "491": "audio/stops/Wah Fu South.mp3",
+    "493": "audio/stops/Wong Chuk Hang Recreation Ground Lhotel Island South.mp3",
+    "495": "audio/stops/Wah Lok House Wah Fu Estate.mp3",
+    "496": "audio/stops/Wah Fu Commercial Complex.mp3",
+    "497": "audio/stops/Wah Ching House Wah Fu Estate.mp3",
+    "498": "audio/stops/Pui Ying Secondary School.mp3",
+    "499": "audio/stops/Wah Tai House Wah Fu Estate.mp3",
+    "505": "audio/stops/Aberdeen.mp3",
     "506": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1035_A.mp3",
     "507": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1134_A.mp3",
     "508": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1064_A.mp3",
     "510": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1176_A.mp3",
+    "511": "audio/stops/Hing Wai Industrial Centre.mp3",
+    "512": "audio/stops/Dairy Farm Ice and Cold Storage.mp3",
+    "513": "audio/stops/Wah Kwai Estate.mp3",
+    "514": "audio/stops/Dairy Farm Ice and Cold Storage.mp3",
     "518": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1157_A.mp3",
+    "528": "audio/stops/Wong Chuk Hang Sports Centre Aberdeen Sports Ground.mp3",
+    "529": "audio/stops/Yip HIng Street Lhotel Island South.mp3",
+    "530": "audio/stops/Tsung Man Street Aberdeen Tin Hau Temple.mp3",
+    "531": "audio/stops/Pak Sha Lau Yue Kwong Chuen St Peters Secondary School.mp3",
+    "532": "audio/stops/Hoy Au Lau Yue Kwong Chuen Aberdeen Country Park.mp3",
+    "535": "audio/stops/Yat Fai House Yue Fai Court.mp3",
+    "536": "audio/stops/King Fai House.mp3",
     "550": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1207_A.mp3",
     "551": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1355_A.mp3",
     "552": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1357_A.mp3",
@@ -226,6 +291,8 @@
     "555": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1360_A.mp3",
     "556": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1361_A.mp3",
     "557": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1375_A.mp3",
+    "558": "audio/stops/Caritas Oswald Cheung International House.mp3",
+    "560": "audio/stops/Yew Chung College of Early Childhood Education.mp3",
     "562": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1376_A.mp3",
     "563": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1350_A.mp3",
     "564": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1351_A.mp3",
@@ -264,13 +331,18 @@
     "646": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1160_A.mp3",
     "647": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1031_A.mp3",
     "657": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1285_A.mp3",
+    "659": "audio/stops/Tung Hing House Lei Tung EstateAL.mp3",
     "661": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1374_A.mp3",
+    "668": "audio/stops/Wah Fu Central Pui Ying Secondary School.mp3",
     "673": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1064_A.mp3",
     "674": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1017_A.mp3",
     "675": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1050_A.mp3",
+    "687": "audio/stops/Pok Fu Lam Fire Station.mp3",
+    "689": "audio/stops/Victoria Road Zone Sub Station.mp3",
     "706": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1494_A.mp3",
     "707": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1496_A.mp3",
     "712": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1508_A.mp3",
+    "716": "audio/stops/127 Repulse Bay Road.mp3",
     "723": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1416_B.mp3",
     "724": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1399_A.mp3",
     "725": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1554_A.mp3",
@@ -351,6 +423,7 @@
     "972": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1444_A.mp3",
     "973": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1434_a.mp3",
     "981": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1058_A.mp3",
+    "987": "audio/stops/Yans Tower.mp3",
     "993": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1725_A.mp3",
     "994": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1734_A.mp3",
     "995": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1706_A.mp3",
@@ -524,6 +597,8 @@
     "1467": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1094_A.mp3",
     "1468": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1095_A.mp3",
     "1469": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1097_A.mp3",
+    "1479": "audio/stops/Lei Chak House Ap Lei Chau Estate.mp3",
+    "1481": "audio/stops/Hoi Wan Court South Horizons.mp3",
     "1487": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1110_a.mp3",
     "1499": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1028_A.mp3",
     "1510": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1126_A.mp3",
@@ -538,12 +613,14 @@
     "1560": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1336_a.mp3",
     "1563": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1371_A.mp3",
     "1565": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1344_a.mp3",
+    "1567": "audio/stops/Lok Yeung Street Aberdeen Centre.mp3",
     "1568": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1383_a.mp3",
     "1574": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1178_A.mp3",
     "1581": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1038_A.mp3",
     "3001": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1298_a.mp3",
     "3002": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1217_a.mp3",
     "3004": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1320_A.mp3",
+    "3008": "audio/stops/Stanford Villa.mp3",
     "3024": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1040_a.mp3",
     "3025": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1004_A.mp3",
     "3027": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1177_A.mp3",
@@ -556,12 +633,26 @@
     "3082": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1242_a.mp3",
     "3083": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1326_A.mp3",
     "3084": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1327_A.mp3",
+    "3091": "audio/stops/Deepdene.mp3",
+    "3109": "audio/stops/102 Repulse Bay Road.mp3",
+    "3110": "audio/stops/Repulse Bay Villas.mp3",
+    "3112": "audio/stops/Deepdene.mp3",
+    "3113": "audio/stops/Deep Water Bay.mp3",
+    "3114": "audio/stops/Deep Water Bay.mp3",
     "3116": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1188_A.mp3",
+    "3134": "audio/stops/Yee Wan Court South Horizons.mp3",
+    "3135": "audio/stops/Yue On Court.mp3",
+    "3142": "audio/stops/Nam Long Shan Road.mp3",
+    "3144": "audio/stops/Aberdeen Centre.mp3",
     "3171": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1218_a.mp3",
     "3174": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1347_A.mp3",
     "3178": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1259_A.mp3",
     "3185": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1115_a.mp3",
     "3196": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1062_A.mp3",
+    "3198": "audio/stops/Yip HIng Street Lhotel Island South.mp3",
+    "3200": "audio/stops/Tin Wan Shopping Centre.mp3",
+    "3202": "audio/stops/Nam Long Shan Road Cooked Food Market.mp3",
+    "3225": "audio/stops/Stanley Prison.mp3",
     "3246": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1337_a.mp3",
     "3247": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1292_A.mp3",
     "3248": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/2582_A.mp3",
@@ -657,6 +748,9 @@
     "7091": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1661_A.mp3",
     "7092": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1756_A.mp3",
     "7100": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1721_A.mp3",
+    "7111": "audio/stops/Wah On House Wah Fu Estate.mp3",
+    "7112": "audio/stops/Wong Chuk Hang Recreation Ground Lhotel Island South.mp3",
+    "7113": "audio/stops/Grantham Hospital Aberdeen Sports Ground.mp3",
     "7120": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1093_A.mp3",
     "7121": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1098_A.mp3",
     "7122": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1093_A.mp3",
@@ -675,7 +769,9 @@
     "8015": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1190_B.mp3",
     "8016": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1192_a.mp3",
     "8019": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1022_A.mp3",
+    "8028": "audio/stops/Ap Lei Chau Estate.mp3",
     "8050": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1074_A.mp3",
+    "8065": "audio/stops/Chung Hom Kok Road.mp3",
     "8086": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1688_A.mp3",
     "8105": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1752_A.mp3",
     "8106": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1754_A.mp3",
@@ -760,6 +856,8 @@
     "9252": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1441_A.mp3",
     "9425": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/3112_A.mp3",
     "9564": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1435_A.mp3",
+    "10001": "audio/stops/Hong Kong Sea School.mp3",
+    "10224": "audio/stops/Nam Long Shan Road Cooked Food Market.mp3",
     "10226": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1390_A.mp3",
     "10239": "audio/stops/Lantau BBI.mp3",
     "10240": "audio/stops/Lantau BBI.mp3",
@@ -771,22 +869,30 @@
     "10298": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1092_a.mp3",
     "10303": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1092_a.mp3",
     "10306": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1319_A.mp3",
+    "10312": "audio/stops/Stanley Gap Road.mp3",
     "10313": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1100_A.mp3",
     "10314": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1099_A.mp3",
     "10319": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1199_a.mp3",
     "10333": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1693_A.mp3",
     "10336": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1723_A.mp3",
     "10361": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1308_A.mp3",
+    "10370": "audio/stops/Cyberport.mp3",
     "12371": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1413_A.mp3",
     "12392": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1353_A.mp3",
     "12429": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1603_A.mp3",
     "12436": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1237_A.mp3",
+    "12455": "audio/stops/Chan Pak Sha School.mp3",
+    "12466": "audio/stops/Tin Wan Street.mp3",
     "12469": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1038_A.mp3",
+    "12474": "audio/stops/Shek Pai Wan Estate.mp3",
+    "12476": "audio/stops/Wah Fu Road.mp3",
+    "12477": "audio/stops/Bel Air on the Peak.mp3",
     "12481": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1402_a.mp3",
     "12493": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1385_a.mp3",
     "12498": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1362_a.mp3",
     "12529": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1081_a.mp3",
     "12531": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1237_A.mp3",
+    "12533": "audio/stops/Sham Wan.mp3",
     "12536": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1186_A.mp3",
     "12544": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1178_A.mp3",
     "12551": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/3159_A.mp3",
@@ -794,6 +900,8 @@
     "12562": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1237_A.mp3",
     "12564": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1707_A.mp3",
     "12570": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1043_A.mp3",
+    "12574": "audio/stops/Bel Air on the Peak.mp3",
+    "12575": "audio/stops/Cyberport 3.mp3",
     "12581": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1527_A.mp3",
     "12746": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1540_a.mp3",
     "12752": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1267_A.mp3",
@@ -803,27 +911,37 @@
     "12906": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1242_a.mp3",
     "12911": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1403_a.mp3",
     "12914": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1746_A.mp3",
+    "12924": "audio/stops/Ap Lei Chau Main Street.mp3",
+    "12925": "audio/stops/Hong Kong Academy of Medicine.mp3",
+    "12932": "audio/stops/Wilson Trail.mp3",
     "12939": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1398_a.mp3",
     "12948": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1162_a.mp3",
     "12950": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1109_a.mp3",
     "12981": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1406_A.mp3",
     "12982": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1269_a.mp3",
     "12983": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1362_a.mp3",
+    "12988": "audio/stops/Wah Fu Central Pui Ying Secondary School.mp3",
+    "12994": "audio/stops/Hing Wo Street.mp3",
+    "12995": "audio/stops/Tin Wan Street.mp3",
     "13022": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1432_A.mp3",
     "13023": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1764_A.mp3",
     "13024": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1764_A.mp3",
     "13038": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1223_a.mp3",
     "13046": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1768_A.mp3",
+    "13076": "audio/stops/Aberdeen Chengtu Road.mp3",
     "13077": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1416_B.mp3",
     "13083": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1274_a.mp3",
     "13120": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1028_A.mp3",
     "13129": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1483_A.mp3",
+    "13174": "audio/stops/Aberdeen.mp3",
     "13186": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1692_a.mp3",
     "13228": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1500_A.mp3",
     "13309": "audio/stops/Expo.mp3",
     "13310": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1399_A.mp3",
     "13313": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1653_A.mp3",
     "13327": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1603_A.mp3",
+    "13330": "audio/stops/102 Repulse Bay Road.mp3",
+    "13331": "audio/stops/Stanley Village Stanley Market.mp3",
     "13332": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1573_A.mp3",
     "13345": "audio/stops/HZMBHKport.mp3",
     "13415": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1478_A.mp3",
@@ -833,6 +951,7 @@
     "10000106": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1205_a.mp3",
     "10000107": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1205_a.mp3",
     "10000121": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1338_a.mp3",
+    "10000124": "audio/stops/Wah Fu North.mp3",
     "10000144": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1776_A.mp3",
     "10000148": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1508_A.mp3",
     "10000173": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1057_A.mp3",
@@ -842,6 +961,7 @@
     "10000202": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1266_B.mp3",
     "10000204": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1268_a.mp3",
     "10000250": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1389_A.mp3",
+    "10000304": "audio/stops/Wah Fu North.mp3",
     "10000307": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1366_a.mp3",
     "10000345": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1399_A.mp3"
   },
@@ -11588,6 +11708,377 @@
       "note": "",
       "updatedBy": "Ken"
     },
+    "audio/stops/102 Repulse Bay Road.mp3": {
+      "stopId": "3109",
+      "stopIds": [
+        "3109",
+        "13330"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "淺水灣道 102 號",
+      "heardEn": "102 Repulse Bay Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/127 Repulse Bay Road.mp3": {
+      "stopId": "716",
+      "stopIds": [
+        "716"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "淺水灣道 127 號",
+      "heardEn": "127 Repulse Bay Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/90 Repulse Bay Road.mp3": {
+      "stopId": "409",
+      "stopIds": [
+        "409"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "淺水灣道 90 號",
+      "heardEn": "90 Repulse Bay Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Caritas Oswald Cheung International House.mp3": {
+      "stopId": "558",
+      "stopIds": [
+        "558"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "明愛張奧偉國際賓館",
+      "heardEn": "Caritas Oswald Cheung International House",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Chung Hom Kok Road.mp3": {
+      "stopId": "8065",
+      "stopIds": [
+        "8065"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "舂磡角道",
+      "heardEn": "Chung Hom Kok Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Chan Pak Sha School.mp3": {
+      "stopId": "12455",
+      "stopIds": [
+        "12455"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "陳白沙紀念中學",
+      "heardEn": "Chan Pak Sha School",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/China HK City.mp3": {
+      "stopId": "1289",
+      "stopIds": [
+        "1289",
+        "12939"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "中港城",
+      "heardEn": "China Hong Kong City",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Cyberport 3.mp3": {
+      "stopId": "12575",
+      "stopIds": [
+        "12575"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "數碼港三座",
+      "heardEn": "Cyberport 3",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Cyberport.mp3": {
+      "stopId": "10370",
+      "stopIds": [
+        "10370"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "數碼港",
+      "heardEn": "Cyberport",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Aberdeen Centre.mp3": {
+      "stopId": "3144",
+      "stopIds": [
+        "3144"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "香港仔中心",
+      "heardEn": "Aberdeen Centre",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Aberdeen Chengtu Road.mp3": {
+      "stopId": "13076",
+      "stopIds": [
+        "13076"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "香港仔 (成都道)",
+      "heardEn": "Aberdeen (Chengtu Road)",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Aberdeen Promenade.mp3": {
+      "stopId": "371",
+      "stopIds": [
+        "371"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "香港仔海濱公園",
+      "heardEn": "Aberdeen Promenade",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Aberdeen Wholesale Fish Market.mp3": {
+      "stopId": "372",
+      "stopIds": [
+        "372"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "香港仔魚類批發市場",
+      "heardEn": "Aberdeen Wholesale Fish Market",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Aberdeen.mp3": {
+      "stopId": "505",
+      "stopIds": [
+        "505",
+        "13174"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "香港仔",
+      "heardEn": "Aberdeen",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Ap Lei Chau Drive.mp3": {
+      "stopId": "451",
+      "stopIds": [
+        "451",
+        "452"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "鴨脷洲徑",
+      "heardEn": "Ap Lei Chau Drive",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Ap Lei Chau Estate.mp3": {
+      "stopId": "449",
+      "stopIds": [
+        "449",
+        "8028"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "鴨脷洲邨",
+      "heardEn": "Ap Lei Chau Estate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Ap Lei Chau Main Street.mp3": {
+      "stopId": "12924",
+      "stopIds": [
+        "12924"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "鴨脷洲大街",
+      "heardEn": "Ap Lei Chau Main Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Bel Air on the Peak.mp3": {
+      "stopId": "12477",
+      "stopIds": [
+        "12477",
+        "12574"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "貝沙灣",
+      "heardEn": "Residence Bel-Air",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Belleview Drive.mp3": {
+      "stopId": "412",
+      "stopIds": [
+        "412",
+        "435"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "麗景道",
+      "heardEn": "Belleview Drive",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Grantham Hospital Aberdeen Sports Ground.mp3": {
+      "stopId": "7113",
+      "stopIds": [
+        "7113"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "葛量洪醫院",
+      "heardEn": "Grantham Hospital",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Dairy Farm Ice and Cold Storage.mp3": {
+      "stopId": "512",
+      "stopIds": [
+        "512",
+        "514"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "香港製冰冰廠及冷庫",
+      "heardEn": "HKICS Ice Plant & Cold Storage",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Deep Water Bay.mp3": {
+      "stopId": "3113",
+      "stopIds": [
+        "3113",
+        "3114"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "深水灣",
+      "heardEn": "Deep Water Bay",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Deepdene.mp3": {
+      "stopId": "3091",
+      "stopIds": [
+        "3091",
+        "3112"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "蒲苑",
+      "heardEn": "Deepdene",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/E. TST.mp3": {
+      "stopId": "1279",
+      "stopIds": [
+        "1279",
+        "1286"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "尖東站",
+      "heardEn": "East Tsim Sha Tsui Station",
+      "note": "",
+      "updatedBy": "Ken"
+    },
     "audio/stops/Expo.mp3": {
       "stopId": "13309",
       "stopIds": [
@@ -11600,6 +12091,21 @@
       "scope": "single",
       "heardTc": "機場博覽館",
       "heardEn": "AsiaWorld-Expo",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/King Fai House.mp3": {
+      "stopId": "536",
+      "stopIds": [
+        "536"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "漁暉苑景暉閣",
+      "heardEn": "King Fai House Yue Fai Court",
       "note": "",
       "updatedBy": "Ken"
     },
@@ -11618,6 +12124,204 @@
       "note": "",
       "updatedBy": "Ken"
     },
+    "audio/stops/Hoy Au Lau Yue Kwong Chuen Aberdeen Country Park.mp3": {
+      "stopId": "532",
+      "stopIds": [
+        "532"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "漁光村海鷗樓",
+      "heardEn": "Hoy Au Lau Yue Kwong Chuen",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Hoi Wan Court South Horizons.mp3": {
+      "stopId": "1481",
+      "stopIds": [
+        "1481"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "海怡半島海韻閣",
+      "heardEn": "Hoi Wan Court South Horizons",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Hong Kong Academy of Medicine.mp3": {
+      "stopId": "12925",
+      "stopIds": [
+        "12925"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "香港醫學專科學院",
+      "heardEn": "Hong Kong Academy of Medicine",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Hong Kong Country Club.mp3": {
+      "stopId": "416",
+      "stopIds": [
+        "416",
+        "431"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "鄉村俱樂部",
+      "heardEn": "Hong Kong Country Club",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Hong Kong Sea School.mp3": {
+      "stopId": "10001",
+      "stopIds": [
+        "10001"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "香港航海學校",
+      "heardEn": "Hong Kong Sea School",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Hong Kong True Light College Yue On Court.mp3": {
+      "stopId": "482",
+      "stopIds": [
+        "482"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "香港真光書院",
+      "heardEn": "Hong Kong True Light College",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Headland Road.mp3": {
+      "stopId": "408",
+      "stopIds": [
+        "408",
+        "440"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "赫蘭道",
+      "heardEn": "Headland Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Hing Wai Industrial Centre.mp3": {
+      "stopId": "511",
+      "stopIds": [
+        "511"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "興偉中心",
+      "heardEn": "Hing Wai Centre",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Hing Wo Street.mp3": {
+      "stopId": "12994",
+      "stopIds": [
+        "12994"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "興和街",
+      "heardEn": "Hing Wo Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Island Club.mp3": {
+      "stopId": "413",
+      "stopIds": [
+        "413",
+        "434"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "香島小築",
+      "heardEn": "Island Club",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Ocean Court Aberdeen Tennis and Squash Centre.mp3": {
+      "stopId": "462",
+      "stopIds": [
+        "462"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "逸港居",
+      "heardEn": "Ocean Court",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Ocean Park.mp3": {
+      "stopId": "487",
+      "stopIds": [
+        "487"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "海洋公園",
+      "heardEn": "Ocean Park",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Lok Yeung Street Aberdeen Centre.mp3": {
+      "stopId": "1567",
+      "stopIds": [
+        "1567"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "洛陽街",
+      "heardEn": "Lok Yeung Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
     "audio/stops/Lantau BBI.mp3": {
       "stopId": "10239",
       "stopIds": [
@@ -11631,6 +12335,905 @@
       "scope": "multi",
       "heardTc": "青嶼幹線巴士轉乘站",
       "heardEn": "Lantau Link Bus-Bus Interchange",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Lee Chi Road Main Street Ap Lei Chau.mp3": {
+      "stopId": "453",
+      "stopIds": [
+        "453"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "利枝道",
+      "heardEn": "Lee Chi Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Lee Chi Road.mp3": {
+      "stopId": "450",
+      "stopIds": [
+        "450"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "利枝道",
+      "heardEn": "Lee Chi Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Lei Chak House Ap Lei Chau Estate.mp3": {
+      "stopId": "1479",
+      "stopIds": [
+        "1479"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "鴨脷洲邨利澤樓",
+      "heardEn": "Lei Chak House Ap Lei Chau Estate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Lei Tung Estate.mp3": {
+      "stopId": "483",
+      "stopIds": [
+        "483"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "利東邨",
+      "heardEn": "Lei Tung Estate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Lei Tung Market.mp3": {
+      "stopId": "484",
+      "stopIds": [
+        "484"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "利東街市",
+      "heardEn": "Lei Tung Market",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Nam Long Shan Road Cooked Food Market.mp3": {
+      "stopId": "3202",
+      "stopIds": [
+        "3202",
+        "10224"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "南朗山道熟食市場",
+      "heardEn": "Nam Long Shan Road Cooked Food Market",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Nam Long Shan Road.mp3": {
+      "stopId": "3142",
+      "stopIds": [
+        "3142"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "南朗山道",
+      "heardEn": "Nam Long Shan Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/South Horizons.mp3": {
+      "stopId": "457",
+      "stopIds": [
+        "457"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "海怡半島",
+      "heardEn": "South Horizons",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Sham Wan.mp3": {
+      "stopId": "12533",
+      "stopIds": [
+        "12533"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "深灣",
+      "heardEn": "Sham Wan",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Shek Pai Wan Estate.mp3": {
+      "stopId": "12474",
+      "stopIds": [
+        "12474"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "石排灣邨",
+      "heardEn": "Shek Pai Wan Estate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/St Stephens College.mp3": {
+      "stopId": "84",
+      "stopIds": [
+        "84",
+        "87"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "聖士提反書院",
+      "heardEn": "St. Stephen's College",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/St Peters Church Aberdeen Centre.mp3": {
+      "stopId": "475",
+      "stopIds": [
+        "475"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "聖伯多祿堂",
+      "heardEn": "St. Peter's Church",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Stanford Villa.mp3": {
+      "stopId": "3008",
+      "stopIds": [
+        "3008"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "旭逸居",
+      "heardEn": "Stanford Villa",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Stanley Beach Road.mp3": {
+      "stopId": "90",
+      "stopIds": [
+        "90"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "赤柱灘道",
+      "heardEn": "Stanley Beach Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Stanley Court.mp3": {
+      "stopId": "446",
+      "stopIds": [
+        "446"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "海灣園",
+      "heardEn": "Stanley Court",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Stanley Gap Road.mp3": {
+      "stopId": "441",
+      "stopIds": [
+        "441",
+        "10312"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "赤柱峽道",
+      "heardEn": "Stanley Gap Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Stanley Gap Road Interchange.mp3": {
+      "stopId": "406",
+      "stopIds": [
+        "406",
+        "444"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "赤柱峽道交匯處",
+      "heardEn": "Stanley Gap Road Interchange",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Stanley Mound Pumping Station.mp3": {
+      "stopId": "443",
+      "stopIds": [
+        "443"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "赤柱崗抽水站",
+      "heardEn": "Stanley Mound Pumping Station",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Stanley Mound Road.mp3": {
+      "stopId": "89",
+      "stopIds": [
+        "89"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "赤柱崗道",
+      "heardEn": "Stanley Mound Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Stanley Prison.mp3": {
+      "stopId": "3225",
+      "stopIds": [
+        "3225"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "赤柱監獄",
+      "heardEn": "Stanley Prison",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Stanley Village Stanley Market.mp3": {
+      "stopId": "13331",
+      "stopIds": [
+        "13331"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "赤柱村",
+      "heardEn": "Stanley Village",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Stanley Village.mp3": {
+      "stopId": "82",
+      "stopIds": [
+        "82"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "赤柱村",
+      "heardEn": "Stanley Village",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Pok Fu Lam Fire Station.mp3": {
+      "stopId": "687",
+      "stopIds": [
+        "687"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "薄扶林消防局",
+      "heardEn": "Pok Fu Lam Fire Station",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Pak Sha Lau Yue Kwong Chuen St Peters Secondary School.mp3": {
+      "stopId": "531",
+      "stopIds": [
+        "531"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "漁光村白沙樓",
+      "heardEn": "Pak Sha Lau Yue Kwong Chuen",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Pui Ying Secondary School.mp3": {
+      "stopId": "498",
+      "stopIds": [
+        "498"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "培英中學",
+      "heardEn": "Pui Ying Secondary School",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Repulse Bay Beach.mp3": {
+      "stopId": "411",
+      "stopIds": [
+        "411",
+        "436"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "淺水灣海灘",
+      "heardEn": "Repulse Bay Beach",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Repulse Bay Towers.mp3": {
+      "stopId": "437",
+      "stopIds": [
+        "437"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "保華大廈",
+      "heardEn": "Repulse Bay Towers",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Repulse Bay Villas.mp3": {
+      "stopId": "3110",
+      "stopIds": [
+        "3110"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "淺水灣別墅",
+      "heardEn": "Repulse Bay Villas",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wong Chuk Hang San Wai Ocean Park Station.mp3": {
+      "stopId": "430",
+      "stopIds": [
+        "430"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "黃竹坑新圍",
+      "heardEn": "Wong Chuk Hang San Wai",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wong Chuk Hang Sports Centre Aberdeen Sports Ground.mp3": {
+      "stopId": "528",
+      "stopIds": [
+        "528"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "黃竹坑體育館",
+      "heardEn": "Wong Chuk Hang Sports Centre",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wong Chuk Hang Recreation Ground Lhotel Island South.mp3": {
+      "stopId": "493",
+      "stopIds": [
+        "493",
+        "7112"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "黃竹坑遊樂場",
+      "heardEn": "Wong Chuk Hang Recreation Ground",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wong Chuk Hang Recreation Ground.mp3": {
+      "stopId": "7112",
+      "stopIds": [
+        "7112"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "黃竹坑遊樂場",
+      "heardEn": "Wong Chuk Hang Recreation Ground",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wah On House Wah Fu Estate.mp3": {
+      "stopId": "7111",
+      "stopIds": [
+        "7111"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "華富邨華安樓",
+      "heardEn": "Wah On House Wah Fu Estate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wah Ching House Wah Fu Estate.mp3": {
+      "stopId": "497",
+      "stopIds": [
+        "497"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "華富邨華清樓",
+      "heardEn": "Wah Ching House Wah Fu Estate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wah Fu North.mp3": {
+      "stopId": "489",
+      "stopIds": [
+        "489",
+        "10000304",
+        "10000124"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "華富 (北)",
+      "heardEn": "Wah Fu (North)",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wah Fu Central Pui Ying Secondary School.mp3": {
+      "stopId": "668",
+      "stopIds": [
+        "668",
+        "12988"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "華富 (中)",
+      "heardEn": "Wah Fu (Central)",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wah Fu Commercial Complex.mp3": {
+      "stopId": "496",
+      "stopIds": [
+        "496"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "華富商場",
+      "heardEn": "Wah Fu Commercial Complex",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wah Fu Road.mp3": {
+      "stopId": "309",
+      "stopIds": [
+        "309",
+        "12476"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "華富道",
+      "heardEn": "Wah Fu Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wah Fu South.mp3": {
+      "stopId": "491",
+      "stopIds": [
+        "491"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "華富 (南)",
+      "heardEn": "Wah Fu (South)",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wah Kwai Estate.mp3": {
+      "stopId": "513",
+      "stopIds": [
+        "513"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "華貴邨",
+      "heardEn": "Wah Kwai Estate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wah Lok House Wah Fu Estate.mp3": {
+      "stopId": "495",
+      "stopIds": [
+        "495"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "華富邨華樂樓",
+      "heardEn": "Wah Lok House Wah Fu Estate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wah Sang House Wah Fu Estate.mp3": {
+      "stopId": "490",
+      "stopIds": [
+        "490"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "華富邨華生樓",
+      "heardEn": "Wah Sang House Wah Fu Estate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wah Tai House Wah Fu Estate.mp3": {
+      "stopId": "499",
+      "stopIds": [
+        "499"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "華富邨華泰樓",
+      "heardEn": "Wah Tai House Wah Fu Estate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Wilson Trail.mp3": {
+      "stopId": "407",
+      "stopIds": [
+        "407",
+        "12932"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "衛奕信徑",
+      "heardEn": "Wilson Trail",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/The Oasis Ap Lei Chau Estate.mp3": {
+      "stopId": "454",
+      "stopIds": [
+        "454"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "御庭園",
+      "heardEn": "The Oasis",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Tin Wan Shopping Centre.mp3": {
+      "stopId": "3200",
+      "stopIds": [
+        "3200"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "田灣商場",
+      "heardEn": "Tin Wan Shopping Centre",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Tin Wan Street.mp3": {
+      "stopId": "310",
+      "stopIds": [
+        "310",
+        "12466",
+        "12995"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "田灣街",
+      "heardEn": "Tin Wan Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Tsung Man Street Aberdeen Tin Hau Temple.mp3": {
+      "stopId": "530",
+      "stopIds": [
+        "530"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "崇文街",
+      "heardEn": "Tsung Man Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Tung Hing House Lei Tung EstateAL.mp3": {
+      "stopId": "659",
+      "stopIds": [
+        "659"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "利東邨東興樓",
+      "heardEn": "Tung Hing House Lei Tung Estate",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Victoria Road Zone Sub Station.mp3": {
+      "stopId": "689",
+      "stopIds": [
+        "689"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "域多利道分區電力站",
+      "heardEn": "Victoria Road Zone Sub-station",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Victory Factory Building.mp3": {
+      "stopId": "369",
+      "stopIds": [
+        "369"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "勝利工廠大廈",
+      "heardEn": "Victory Factory Building",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Yat Fai House Yue Fai Court.mp3": {
+      "stopId": "535",
+      "stopIds": [
+        "535"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "漁暉苑日暉閣",
+      "heardEn": "Yat Fai House Yue Fai Court",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Yans Tower.mp3": {
+      "stopId": "987",
+      "stopIds": [
+        "987"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "甄沾記大廈",
+      "heardEn": "Yan's Tower",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Yew Chung College of Early Childhood Education.mp3": {
+      "stopId": "560",
+      "stopIds": [
+        "560"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "耀中幼教學院",
+      "heardEn": "Yew Chung College of Early Childhood Education",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Yee Wan Court South Horizons.mp3": {
+      "stopId": "3134",
+      "stopIds": [
+        "3134"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "海怡半島怡韻閣",
+      "heardEn": "Yee Wan Court South Horizons",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Yip HIng Street Lhotel Island South.mp3": {
+      "stopId": "529",
+      "stopIds": [
+        "529",
+        "3198"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "multi",
+      "heardTc": "業興街",
+      "heardEn": "Yip Hing Street",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Yip Yee Mansion.mp3": {
+      "stopId": "312",
+      "stopIds": [
+        "312"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "業漁大廈",
+      "heardEn": "Yip Yee Mansion",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Yue On Court.mp3": {
+      "stopId": "3135",
+      "stopIds": [
+        "3135"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "漁安苑",
+      "heardEn": "Yue On Court",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Yue Fai Road.mp3": {
+      "stopId": "476",
+      "stopIds": [
+        "476"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "漁暉道",
+      "heardEn": "Yue Fai Road",
       "note": "",
       "updatedBy": "Ken"
     }
@@ -21015,6 +22618,329 @@
       "updatedBy": "Ken"
     },
     {
+      "audioPath": "audio/stops/102 Repulse Bay Road.mp3",
+      "stopIds": [
+        "3109",
+        "13330"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:35:59.672Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/127 Repulse Bay Road.mp3",
+      "stopIds": [
+        "716"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:36:06.463Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/90 Repulse Bay Road.mp3",
+      "stopIds": [
+        "409"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:35:47.084Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Caritas Oswald Cheung International House.mp3",
+      "stopIds": [
+        "558"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:37:36.325Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Chung Hom Kok Road.mp3",
+      "stopIds": [
+        "8065"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:38:24.933Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Chan Pak Sha School.mp3",
+      "stopIds": [
+        "12455"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:37:40.124Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/China HK City.mp3",
+      "stopIds": [
+        "1289",
+        "12939"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:38:21.228Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Cyberport 3.mp3",
+      "stopIds": [
+        "12575"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:38:27.526Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Cyberport.mp3",
+      "stopIds": [
+        "10370"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:38:29.114Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Aberdeen Centre.mp3",
+      "stopIds": [
+        "3144"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:36:18.438Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Aberdeen Chengtu Road.mp3",
+      "stopIds": [
+        "13076"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:36:26.603Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Aberdeen Promenade.mp3",
+      "stopIds": [
+        "371"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:36:32.522Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Aberdeen Wholesale Fish Market.mp3",
+      "stopIds": [
+        "372"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:36:33.818Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Aberdeen.mp3",
+      "stopIds": [
+        "505",
+        "13174"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:36:44.343Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Ap Lei Chau Drive.mp3",
+      "stopIds": [
+        "451",
+        "452"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:36:47.857Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Ap Lei Chau Estate.mp3",
+      "stopIds": [
+        "449",
+        "8028"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:36:51.117Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Ap Lei Chau Main Street.mp3",
+      "stopIds": [
+        "12924"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:36:52.347Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Bel Air on the Peak.mp3",
+      "stopIds": [
+        "12477",
+        "12574"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:37:08.792Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Belleview Drive.mp3",
+      "stopIds": [
+        "412",
+        "435"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:37:12.380Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Grantham Hospital Aberdeen Sports Ground.mp3",
+      "stopIds": [
+        "7113"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:39:07.979Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Dairy Farm Ice and Cold Storage.mp3",
+      "stopIds": [
+        "512",
+        "514"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:38:39.108Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Deep Water Bay.mp3",
+      "stopIds": [
+        "3113",
+        "3114"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:38:44.498Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Deepdene.mp3",
+      "stopIds": [
+        "3091",
+        "3112"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:38:47.829Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/E. TST.mp3",
+      "stopIds": [
+        "1279",
+        "1286"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:38:59.368Z",
+      "updatedBy": "Ken"
+    },
+    {
       "audioPath": "audio/stops/Expo.mp3",
       "stopIds": [
         "13309"
@@ -21025,6 +22951,19 @@
       "tripNames": [],
       "note": "",
       "updatedAt": "2026-11-24T15:09:51.887Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/King Fai House.mp3",
+      "stopIds": [
+        "536"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:40:17.910Z",
       "updatedBy": "Ken"
     },
     {
@@ -21041,6 +22980,178 @@
       "updatedBy": "Ken"
     },
     {
+      "audioPath": "audio/stops/Hoy Au Lau Yue Kwong Chuen Aberdeen Country Park.mp3",
+      "stopIds": [
+        "532"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:40:13.288Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Hoi Wan Court South Horizons.mp3",
+      "stopIds": [
+        "1481"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:39:28.011Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Hong Kong Academy of Medicine.mp3",
+      "stopIds": [
+        "12925"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:39:31.440Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Hong Kong Country Club.mp3",
+      "stopIds": [
+        "416",
+        "431"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:39:34.777Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Hong Kong Sea School.mp3",
+      "stopIds": [
+        "10001"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:39:45.142Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Hong Kong True Light College Yue On Court.mp3",
+      "stopIds": [
+        "482"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:39:56.537Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Headland Road.mp3",
+      "stopIds": [
+        "408",
+        "440"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:39:13.096Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Hing Wai Industrial Centre.mp3",
+      "stopIds": [
+        "511"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:39:20.245Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Hing Wo Street.mp3",
+      "stopIds": [
+        "12994"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:39:24.991Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Island Club.mp3",
+      "stopIds": [
+        "413",
+        "434"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:40:15.721Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Ocean Court Aberdeen Tennis and Squash Centre.mp3",
+      "stopIds": [
+        "462"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:41:24.891Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Ocean Park.mp3",
+      "stopIds": [
+        "487"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:41:56.405Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Lok Yeung Street Aberdeen Centre.mp3",
+      "stopIds": [
+        "1567"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:41:10.896Z",
+      "updatedBy": "Ken"
+    },
+    {
       "audioPath": "audio/stops/Lantau BBI.mp3",
       "stopIds": [
         "10239",
@@ -21052,6 +23163,787 @@
       "tripNames": [],
       "note": "",
       "updatedAt": "2026-11-24T14:32:40.662Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Lee Chi Road Main Street Ap Lei Chau.mp3",
+      "stopIds": [
+        "453"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:40:31.959Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Lee Chi Road.mp3",
+      "stopIds": [
+        "450"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:40:37.248Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Lei Chak House Ap Lei Chau Estate.mp3",
+      "stopIds": [
+        "1479"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:40:40.908Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Lei Tung Estate.mp3",
+      "stopIds": [
+        "483"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:40:44.438Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Lei Tung Market.mp3",
+      "stopIds": [
+        "484"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:40:51.821Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Nam Long Shan Road Cooked Food Market.mp3",
+      "stopIds": [
+        "3202",
+        "10224"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:41:16.907Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Nam Long Shan Road.mp3",
+      "stopIds": [
+        "3142"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:41:19.089Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/South Horizons.mp3",
+      "stopIds": [
+        "457"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:42:52.837Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Sham Wan.mp3",
+      "stopIds": [
+        "12533"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:42:49.317Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Shek Pai Wan Estate.mp3",
+      "stopIds": [
+        "12474"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:42:50.950Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/St Stephens College.mp3",
+      "stopIds": [
+        "84",
+        "87"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:43:44.396Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/St Peters Church Aberdeen Centre.mp3",
+      "stopIds": [
+        "475"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:43:14.937Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Stanford Villa.mp3",
+      "stopIds": [
+        "3008"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:43:47.443Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Stanley Beach Road.mp3",
+      "stopIds": [
+        "90"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:43:49.356Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Stanley Court.mp3",
+      "stopIds": [
+        "446"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:43:51.052Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Stanley Gap Road.mp3",
+      "stopIds": [
+        "441",
+        "10312"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:43:57.678Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Stanley Gap Road Interchange.mp3",
+      "stopIds": [
+        "406",
+        "444"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:43:54.022Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Stanley Mound Pumping Station.mp3",
+      "stopIds": [
+        "443"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:43:59.476Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Stanley Mound Road.mp3",
+      "stopIds": [
+        "89"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:44:01.074Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Stanley Prison.mp3",
+      "stopIds": [
+        "3225"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:44:02.209Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Stanley Village Stanley Market.mp3",
+      "stopIds": [
+        "13331"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:44:20.629Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Stanley Village.mp3",
+      "stopIds": [
+        "82"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:44:24.739Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Pok Fu Lam Fire Station.mp3",
+      "stopIds": [
+        "687"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:42:05.422Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Pak Sha Lau Yue Kwong Chuen St Peters Secondary School.mp3",
+      "stopIds": [
+        "531"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:42:04.035Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Pui Ying Secondary School.mp3",
+      "stopIds": [
+        "498"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:42:24.352Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Repulse Bay Beach.mp3",
+      "stopIds": [
+        "411",
+        "436"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:42:27.598Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Repulse Bay Towers.mp3",
+      "stopIds": [
+        "437"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:42:33.245Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Repulse Bay Villas.mp3",
+      "stopIds": [
+        "3110"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:42:35.148Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wong Chuk Hang San Wai Ocean Park Station.mp3",
+      "stopIds": [
+        "430"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:46:50.773Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wong Chuk Hang Sports Centre Aberdeen Sports Ground.mp3",
+      "stopIds": [
+        "528"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:47:09.449Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wong Chuk Hang Recreation Ground Lhotel Island South.mp3",
+      "stopIds": [
+        "493",
+        "7112"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:46:40.840Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wong Chuk Hang Recreation Ground.mp3",
+      "stopIds": [
+        "7112"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:46:43.851Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wah On House Wah Fu Estate.mp3",
+      "stopIds": [
+        "7111"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:46:15.565Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wah Ching House Wah Fu Estate.mp3",
+      "stopIds": [
+        "497"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:45:13.389Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wah Fu North.mp3",
+      "stopIds": [
+        "489",
+        "10000304",
+        "10000124"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:45:47.681Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wah Fu Central Pui Ying Secondary School.mp3",
+      "stopIds": [
+        "668",
+        "12988"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:45:32.294Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wah Fu Commercial Complex.mp3",
+      "stopIds": [
+        "496"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:45:35.288Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wah Fu Road.mp3",
+      "stopIds": [
+        "309",
+        "12476"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:45:55.457Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wah Fu South.mp3",
+      "stopIds": [
+        "491"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:46:10.303Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wah Kwai Estate.mp3",
+      "stopIds": [
+        "513"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:46:12.572Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wah Lok House Wah Fu Estate.mp3",
+      "stopIds": [
+        "495"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:46:14.290Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wah Sang House Wah Fu Estate.mp3",
+      "stopIds": [
+        "490"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:46:16.818Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wah Tai House Wah Fu Estate.mp3",
+      "stopIds": [
+        "499"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:46:17.939Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Wilson Trail.mp3",
+      "stopIds": [
+        "407",
+        "12932"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:46:20.130Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/The Oasis Ap Lei Chau Estate.mp3",
+      "stopIds": [
+        "454"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:44:36.825Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Tin Wan Shopping Centre.mp3",
+      "stopIds": [
+        "3200"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:44:38.287Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Tin Wan Street.mp3",
+      "stopIds": [
+        "310",
+        "12466",
+        "12995"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:44:41.826Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Tsung Man Street Aberdeen Tin Hau Temple.mp3",
+      "stopIds": [
+        "530"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:44:55.463Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Tung Hing House Lei Tung EstateAL.mp3",
+      "stopIds": [
+        "659"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:45:00.579Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Victoria Road Zone Sub Station.mp3",
+      "stopIds": [
+        "689"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:45:10.330Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Victory Factory Building.mp3",
+      "stopIds": [
+        "369"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:45:11.882Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Yat Fai House Yue Fai Court.mp3",
+      "stopIds": [
+        "535"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:47:33.277Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Yans Tower.mp3",
+      "stopIds": [
+        "987"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:47:30.157Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Yew Chung College of Early Childhood Education.mp3",
+      "stopIds": [
+        "560"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:47:36.926Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Yee Wan Court South Horizons.mp3",
+      "stopIds": [
+        "3134"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:47:35.569Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Yip HIng Street Lhotel Island South.mp3",
+      "stopIds": [
+        "529",
+        "3198"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:47:50.338Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Yip Yee Mansion.mp3",
+      "stopIds": [
+        "312"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:47:51.994Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Yue On Court.mp3",
+      "stopIds": [
+        "3135"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:48:08.903Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Yue Fai Road.mp3",
+      "stopIds": [
+        "476"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-25T14:47:53.528Z",
       "updatedBy": "Ken"
     }
   ],
@@ -21358,6 +24250,18 @@
       "updatedBy": "Ken"
     },
     {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/592_MOT.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "592-銅鑼灣 (摩頓台)-1",
+        "592-銅鑼灣 (摩頓台)-2"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-25T14:50:30.106Z",
+      "updatedBy": "Ken"
+    },
+    {
       "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/789_ISR.mp3",
       "scope": "trips",
       "routes": [],
@@ -21448,6 +24352,41 @@
       "tripNames": [],
       "note": "",
       "updatedAt": "2026-11-24T10:10:06.099Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/973_STV.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "973-赤柱村-1",
+        "973-赤柱村-2",
+        "973-赤柱村-3"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-25T14:35:12.774Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/98_CHR.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "98-香港仔 (成都道)-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-25T14:48:49.293Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/98_LET.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "98-利東邨-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-25T14:49:03.111Z",
       "updatedBy": "Ken"
     },
     {
