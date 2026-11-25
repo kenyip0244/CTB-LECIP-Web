@@ -1889,12 +1889,16 @@ function startGpsTracking() {
       }
 
       if (typeof updateTrainingMapGps === 'function') updateTrainingMapGps(latitude, longitude, effHeading);
-      const distEl = document.getElementById('etaCurDist');
-      if (distEl && state.gpsEnabled && state.gpsDistanceM != null) {
-        distEl.textContent = formatDistanceLabel(state.gpsDistanceM);
+      if (typeof syncStopArrivalSkin === 'function') {
+        syncStopArrivalSkin();
+      } else {
+        const distEl = document.getElementById('etaCurDist');
+        if (distEl && state.gpsEnabled && state.gpsDistanceM != null) {
+          distEl.textContent = formatDistanceLabel(state.gpsDistanceM);
+        }
+        const bar = document.getElementById('stopProgressFill');
+        if (bar) bar.style.width = `${state.stopProgressPct}%`;
       }
-      const bar = document.getElementById('stopProgressFill');
-      if (bar) bar.style.width = `${state.stopProgressPct}%`;
       if (state.routeStage === 'stops') refreshRouteEtas(false);
     },
     err => {
@@ -3331,6 +3335,37 @@ function initOrUpdateTrainingMap() {
 }
 // === TRAINING MAP MODULE END ===
 
+// === STOP ARRIVAL SKIN START ===
+function syncStopArrivalSkin() {
+  const isArrived = Boolean(state.gpsEnabled && (state.gpsArrivedCur || state.stopProgressPct >= 100));
+  const timeWrap = document.getElementById('etaCurTimeWrap');
+  const distEl = document.getElementById('etaCurDist');
+  const fill = document.getElementById('stopProgressFill');
+  const lbl = document.getElementById('stopArrivedLabel');
+
+  if (timeWrap) {
+    timeWrap.classList.toggle('hidden', isArrived);
+    timeWrap.classList.toggle('flex', !isArrived);
+  }
+  if (distEl) {
+    distEl.classList.toggle('hidden', isArrived);
+    if (!isArrived && state.gpsDistanceM != null) {
+      distEl.textContent = formatDistanceLabel(state.gpsDistanceM);
+    }
+  }
+  if (fill) {
+    fill.style.width = `${isArrived ? 100 : Math.max(12, state.stopProgressPct)}%`;
+    fill.classList.toggle('bg-[#00c824]', isArrived);
+    fill.classList.toggle('bg-[#00a846]', !isArrived);
+  }
+  if (lbl) {
+    lbl.textContent = state.lang === 'en' ? 'Arrived' : '已到達';
+    lbl.classList.toggle('hidden', !isArrived);
+    lbl.classList.toggle('flex', isArrived);
+  }
+}
+// === STOP ARRIVAL SKIN END ===
+
 function renderStopsView(vp, bar) {
   const th = themeClasses();
   vp.className = th.dark
@@ -3379,6 +3414,7 @@ function renderStopsView(vp, bar) {
   const curMinsText = state.lang === 'en' ? `${curEta.mins} min` : `${curEta.mins}分鐘`;
   const curDistText = formatDistanceLabel(curEta.distM);
   const hasGpsFix = Number.isFinite(state.gpsLat) && Number.isFinite(state.gpsLng);
+  const isArrived = Boolean(state.gpsEnabled && (state.gpsArrivedCur || state.stopProgressPct >= 100));
 
   vp.innerHTML = `
     <!-- 路線與分段標頭 -->
@@ -3409,31 +3445,36 @@ function renderStopsView(vp, bar) {
           </button>
         </div>
       ` : `
-        <div class="mt-2.5 space-y-1.5">
-          <div class="flex items-center justify-end gap-5 text-[15px] font-extrabold ${th.dark ? 'text-zinc-200' : 'text-[#2b303a]'}">
-            <div class="flex items-center gap-1.5">
+        <div class="mt-2.5">
+          <div class="flex items-end justify-end gap-5 pr-2 text-[15px] font-extrabold ${th.dark ? 'text-zinc-200' : 'text-[#2b303a]'} min-h-[26px]">
+            <div id="etaCurTimeWrap" class="${isArrived ? 'hidden' : 'flex'} items-center gap-1.5 pb-1">
               <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="9.5"/>
                 <polyline points="8.2 10.5 12 13 16.2 9.5"/>
               </svg>
               <span id="etaCurMins">${esc(curMinsText)}</span>
             </div>
-            <div class="flex items-center gap-1.5">
-              <span id="etaCurDist" class="font-mono font-extrabold">${esc(curDistText)}</span>
-              <svg class="w-5 h-6 shrink-0" viewBox="0 0 22 26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 5.5C5 3.5 7 2 11 2s6 1.5 6 3.5V17H5V5.5z"/>
-                <line x1="5" y1="6.5" x2="17" y2="6.5"/>
-                <line x1="8" y1="9.5" x2="14" y2="9.5"/>
-                <line x1="8" y1="12.5" x2="14" y2="12.5"/>
-                <line x1="8" y1="15" x2="14" y2="15"/>
-                <line x1="6.5" y1="17" x2="6.5" y2="24"/>
+            <div class="flex items-end gap-1.5">
+              <span id="etaCurDist" class="${isArrived ? 'hidden' : ''} font-mono font-extrabold pb-1">${esc(curDistText)}</span>
+              <svg class="w-5 h-[26px] shrink-0 block -mb-[1px]" viewBox="0 0 22 26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 5C5 3.2 7 2 11 2s6 1.2 6 3v12H5V5z"/>
+                <line x1="5" y1="6.2" x2="17" y2="6.2"/>
+                <line x1="5" y1="9.8" x2="17" y2="9.8"/>
+                <line x1="5" y1="13.4" x2="17" y2="13.4"/>
+                <line x1="9" y1="6.2" x2="9" y2="17"/>
+                <line x1="13" y1="6.2" x2="13" y2="17"/>
+                <line x1="5.5" y1="17" x2="5.5" y2="26"/>
               </svg>
             </div>
           </div>
 
-          <div class="w-full h-[24px] rounded-full bg-[#454b54] overflow-hidden shadow-inner">
-            <div id="stopProgressFill" class="h-full bg-[#00a846] transition-all duration-300" style="width:${Math.max(12, state.stopProgressPct)}%"></div>
+          <div class="relative w-full h-[26px] rounded-full bg-[#454b54] overflow-hidden shadow-inner">
+            <div id="stopProgressFill" class="h-full ${isArrived ? 'bg-[#00c824]' : 'bg-[#00a846]'} transition-all duration-300" style="width:${isArrived ? 100 : Math.max(12, state.stopProgressPct)}%"></div>
+            <div id="stopArrivedLabel" class="${isArrived ? 'flex' : 'hidden'} absolute inset-0 items-center justify-center text-white font-black text-[15px] tracking-wider pointer-events-none">
+              ${state.lang === 'en' ? 'Arrived' : '已到達'}
+            </div>
           </div>
+        </div>
         </div>
       `}
     </div>
