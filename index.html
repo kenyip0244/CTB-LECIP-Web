@@ -3193,7 +3193,7 @@ function getTrainingRouteLatLngs() {
 function zoomTrainingMap(delta) {
   if (!_trainMap) return;
   const curZ = _trainMap.getZoom();
-  const nextZ = Math.max(12, Math.min(19, curZ + delta));
+  const nextZ = Math.max(11, Math.min(20, curZ + delta));
   state.trainingMapZoom = nextZ;
   _trainMap.setZoom(nextZ);
 }
@@ -3254,7 +3254,7 @@ function initOrUpdateTrainingMap() {
   else if (Number.isFinite(curLat) && Number.isFinite(curLng)) center = [curLat, curLng];
   else if (routePts.length) center = routePts[0];
 
-  const zoom = Math.max(12, Math.min(19, Number(state.trainingMapZoom) || 17));
+  const zoom = Math.max(11, Math.min(20, Number(state.trainingMapZoom) || 17));
   _trainMap = L.map(el, {
     center,
     zoom,
@@ -3262,9 +3262,14 @@ function initOrUpdateTrainingMap() {
     attributionControl: false
   });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 19
+  const hkLabelLang = state.lang === 'en' ? 'en' : 'tc';
+  L.tileLayer('https://mapapi.hkmapservice.gov.hk/gs/api/v1.0.0/xyz/basemap/WGS84/{z}/{x}/{y}.png', {
+    minZoom: 10,
+    maxZoom: 20
+  }).addTo(_trainMap);
+  L.tileLayer(`https://mapapi.hkmapservice.gov.hk/gs/api/v1.0.0/xyz/label/hk/${hkLabelLang}/WGS84/{z}/{x}/{y}.png`, {
+    minZoom: 10,
+    maxZoom: 20
   }).addTo(_trainMap);
 
   _trainMap.on('dragstart', () => { state.trainingMapFollow = false; });
@@ -3421,6 +3426,7 @@ function renderStopsView(vp, bar) {
       <!-- 訓練模式（GPS 自動）實時路線地圖（取代未來三個巴士站位置） -->
       <div id="trainingMapWrap" class="relative flex-1 w-full overflow-hidden">
         <div id="trainingLeafletMap" class="w-full h-full"></div>
+        <div id="hkLandsdCredit" class="absolute bottom-1 left-1.5 z-[400] px-1.5 py-0.5 rounded bg-white/80 text-zinc-700 text-[9px] font-bold pointer-events-none">© 香港地政總署</div>
         <div id="trainingMapGpsBadge" class="${hasGpsFix ? 'hidden' : ''} absolute top-2 left-2 z-[400] px-2.5 py-1 rounded-md bg-black/75 text-yellow-300 text-[11px] font-black pointer-events-none">
           等待 GPS 定位...
         </div>
