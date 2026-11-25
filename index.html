@@ -2325,38 +2325,15 @@ function openStaffIdModal() {
 
 // 2) 路線訓練模式（密碼 9999）
 function handleTrainingModeToggle() {
+  state.currentTab = 'settings';
   if (state.trainingMode) {
-    if (confirm('確定要退出「訓練模式」並恢復正常營運嗎？')) {
-      state.trainingMode = false;
-      renderAll();
-      showToast('已退出路線訓練模式');
-    }
-    return;
+    state.settingsPage = 'train_exit';
+  } else {
+    state.trainPwdInput = '';
+    state.trainPwdErr = '';
+    state.settingsPage = 'train_auth';
   }
-  openNumericModal({
-    title: '路線訓練模式',
-    subtitle: '僅供路線訓練時使用，請輸入 4 位數密碼（9999）',
-    maxLen: 4,
-    mask: true,
-    initialHint: '請輸入密碼：9999',
-    onChange: (val, hintEl) => {
-      hintEl.textContent = val.length === 4 ? '按 ✓ 確認進入訓練模式' : '請輸入 4 位數密碼';
-    },
-    onConfirm: (val, hintEl, close) => {
-      if (val === '9999') {
-        state.trainingMode = true;
-        state.trainingMapFollow = true;
-        if (state.gpsEnabled && state.routeStage === 'stops' && state.gpsWatchId == null) startGpsTracking();
-        close();
-        state.settingsPage = 'menu';
-        renderAll();
-        showToast('已啟動「訓練模式」，電子路線牌已轉為暫停載客');
-      } else {
-        hintEl.textContent = '密碼錯誤，請輸入 9999';
-        playAlertBeep(true);
-      }
-    }
-  });
+  renderAll();
 }
 
 // 3) 特別廣播數字鍵盤（輸入編號後 3 秒自動播放，播完跳回路線）
@@ -4105,6 +4082,148 @@ function renderSettingsView(vp, bar) {
     : 'flex-1 flex flex-col overflow-hidden bg-[#cfcfcf] text-black';
   const blackBarCls = 'grid grid-cols-4 gap-1.5 p-1.5 bg-black border-t border-black shrink-0';
 
+  // === TRAINING MODE SUBPAGES START ===
+  // 子頁 T1：訓練模式輸入密碼（9999，還原實機 V1.2 步驟 3）
+  if (state.settingsPage === 'train_auth') {
+    vp.className = gridVpCls;
+    const isEn = state.lang === 'en';
+    const curVal = String(state.trainPwdInput || '');
+    const dots = '•'.repeat(curVal.length);
+    const errMsg = state.trainPwdErr || '';
+
+    vp.innerHTML = `
+      <div class="pt-3 pb-1 text-center text-[19px] font-black tracking-wide shrink-0">${isEn ? 'Training Mode' : '訓練模式'}</div>
+      <div class="px-4 pb-2 text-center text-sm font-black ${th.dark ? 'text-zinc-200' : 'text-zinc-800'} shrink-0">${isEn ? 'Enter Password' : '輸入密碼'}</div>
+
+      <div class="px-3.5 pb-2 flex items-center gap-2 shrink-0">
+        <div id="trainPwdDisplay" class="flex-1 h-12 rounded-xl border-2 ${errMsg ? 'border-red-500' : (th.dark ? 'border-zinc-500' : 'border-zinc-400')} ${th.dark ? 'bg-zinc-900 text-white' : 'bg-[#f8f7ec] text-black'} flex items-center justify-center text-3xl font-black tracking-[0.45em] pl-3 shadow-inner">
+          ${dots || '<span class="text-sm font-bold tracking-normal opacity-40">----</span>'}
+        </div>
+        <button id="btnTrainPwdDel" title="刪除" class="w-16 h-12 rounded-xl bg-[#0074f0] active:brightness-90 text-white flex items-center justify-center shadow shrink-0">
+          <svg class="w-7 h-7" viewBox="0 0 28 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H10l-7-8 7-8z"/>
+            <line x1="14" y1="9" x2="20" y2="15"/>
+            <line x1="20" y1="9" x2="14" y2="15"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="trainPwdHint" class="px-4 pb-2 min-h-[20px] text-center text-xs font-black ${errMsg ? 'text-red-500' : (th.dark ? 'text-zinc-300' : 'text-zinc-700')} shrink-0">
+        ${esc(errMsg || (isEn ? 'Please enter 4-digit password (9999)' : '請輸入 4 位數密碼（9999）'))}
+      </div>
+
+      <div class="flex-1 px-3.5 pb-3 grid grid-cols-3 gap-2">
+        ${['1','2','3','4','5','6','7','8','9'].map(d => `
+          <button data-tpwd="${d}" class="train-pwd-key rounded-xl ${th.dark ? 'bg-[#1d2430] text-white border border-zinc-600' : 'bg-white text-black border border-zinc-400'} active:bg-[#0074f0] active:text-white font-black text-2xl shadow-sm flex items-center justify-center">${d}</button>
+        `).join('')}
+        <button id="btnTrainPwdClear" class="rounded-xl bg-[#6b7280] active:brightness-90 text-white font-black text-base shadow-sm flex items-center justify-center">${isEn ? 'Clear' : '清除'}</button>
+        <button data-tpwd="0" class="train-pwd-key rounded-xl ${th.dark ? 'bg-[#1d2430] text-white border border-zinc-600' : 'bg-white text-black border border-zinc-400'} active:bg-[#0074f0] active:text-white font-black text-2xl shadow-sm flex items-center justify-center">0</button>
+        <button id="btnTrainPwdOk" class="rounded-xl bg-[#16a34a] active:brightness-90 text-white font-black text-xl shadow-sm flex items-center justify-center">✓</button>
+      </div>
+    `;
+    bar.className = blackBarCls;
+    bar.innerHTML = `
+      <button id="botTrainAuthBack" class="h-11 rounded-lg bg-[#0074f0] text-white font-black text-3xl flex items-center justify-center active:brightness-90">‹</button>
+    `;
+
+    const submitPwd = () => {
+      const code = String(state.trainPwdInput || '');
+      if (code === '9999') {
+        state.trainingMode = true;
+        state.trainingMapFollow = true;
+        state.trainPwdInput = '';
+        state.trainPwdErr = '';
+        if (state.gpsEnabled && state.routeStage === 'stops' && state.gpsWatchId == null) {
+          startGpsTracking();
+        }
+        state.settingsPage = 'menu';
+        state.currentTab = 'route';
+        renderAll();
+        showToast('已啟動訓練模式，電子牌已轉為「暫停載客」');
+      } else {
+        state.trainPwdInput = '';
+        state.trainPwdErr = isEn ? 'Incorrect password (9999)' : '密碼錯誤，請輸入 9999';
+        playAlertBeep(true);
+        renderMain();
+      }
+    };
+
+    vp.querySelectorAll('.train-pwd-key').forEach(btn => {
+      btn.onclick = () => {
+        if ((state.trainPwdInput || '').length >= 4) return;
+        state.trainPwdErr = '';
+        state.trainPwdInput = (state.trainPwdInput || '') + btn.dataset.tpwd;
+        renderMain();
+        if (state.trainPwdInput.length === 4) {
+          setTimeout(submitPwd, 120);
+        }
+      };
+    });
+    document.getElementById('btnTrainPwdDel').onclick = () => {
+      state.trainPwdInput = String(state.trainPwdInput || '').slice(0, -1);
+      state.trainPwdErr = '';
+      renderMain();
+    };
+    document.getElementById('btnTrainPwdClear').onclick = () => {
+      state.trainPwdInput = '';
+      state.trainPwdErr = '';
+      renderMain();
+    };
+    document.getElementById('btnTrainPwdOk').onclick = submitPwd;
+    document.getElementById('botTrainAuthBack').onclick = () => {
+      state.trainPwdInput = '';
+      state.trainPwdErr = '';
+      state.settingsPage = 'prefs';
+      renderAll();
+    };
+    return;
+  }
+
+  // 子頁 T2：確定離開訓練模式（還原實機 V1.2 步驟 5）
+  if (state.settingsPage === 'train_exit') {
+    vp.className = gridVpCls;
+    const isEn = state.lang === 'en';
+    vp.innerHTML = `
+      <div class="pt-5 pb-2 text-center text-[20px] font-black tracking-wide shrink-0">${isEn ? 'Training Mode' : '訓練模式'}</div>
+      <div class="flex-1 flex flex-col items-center justify-center px-5 pb-6 space-y-6">
+        <div class="text-center space-y-2">
+          <div class="text-xl font-black">${isEn ? 'Exit Training Mode?' : '確定離開訓練模式?'}</div>
+          <div class="text-xs font-bold ${th.dark ? 'text-zinc-300' : 'text-zinc-700'}">
+            ${isEn ? 'Turning off the engine also exits Training Mode.' : '（離開後將恢復正常營運；關閉引擎亦會自動退出訓練模式）'}
+          </div>
+        </div>
+        <div class="w-full grid grid-cols-2 gap-3.5 max-w-[300px]">
+          <button id="btnTrainExitNo" class="h-16 rounded-[14px] bg-[#dc2626] active:brightness-90 text-white font-black text-2xl shadow">
+            ${isEn ? 'No' : '否'}
+          </button>
+          <button id="btnTrainExitYes" class="h-16 rounded-[14px] bg-[#0074f0] active:brightness-90 text-white font-black text-2xl shadow">
+            ${isEn ? 'Yes' : '是'}
+          </button>
+        </div>
+      </div>
+    `;
+    bar.className = blackBarCls;
+    bar.innerHTML = `
+      <button id="botTrainExitBack" class="h-11 rounded-lg bg-[#0074f0] text-white font-black text-3xl flex items-center justify-center active:brightness-90">‹</button>
+    `;
+    document.getElementById('btnTrainExitNo').onclick = () => {
+      state.settingsPage = 'prefs';
+      renderAll();
+    };
+    document.getElementById('btnTrainExitYes').onclick = () => {
+      state.trainingMode = false;
+      state.settingsPage = 'prefs';
+      renderAll();
+      showToast('已離開訓練模式，恢復正常營運');
+    };
+    document.getElementById('botTrainExitBack').onclick = () => {
+      state.settingsPage = 'prefs';
+      renderAll();
+    };
+    return;
+  }
+  // === TRAINING MODE SUBPAGES END ===
+
   // 子頁 1：車長喜好設定（3×2 實機藍掣佈局）
   if (state.settingsPage === 'prefs') {
     vp.className = gridVpCls;
@@ -4886,6 +5005,7 @@ async function playBootLecipTestAudio() {
 // === BOOT LECIP_TEST END ===
 
 function runBootSequence(isReplay = false) {
+  state.trainingMode = false;
   const overlay = document.getElementById('lecipBootOverlay');
   const pAndroid = document.getElementById('bootPhaseAndroid');
   const pDiag = document.getElementById('bootPhaseDiag');
