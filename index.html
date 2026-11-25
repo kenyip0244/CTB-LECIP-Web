@@ -107,6 +107,20 @@
   color: #ffffff !important;
 }
 </style>
+<!-- === LEAFLET TRAINING MAP HEAD START === -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style id="lecip-training-map-css">
+    #trainingLeafletMap { width: 100%; height: 100%; background: #d8dfe8; z-index: 1; }
+    #screenBox.lecip-night #trainingLeafletMap { background: #1c222d; }
+    #screenBox.lecip-night #trainingLeafletMap .leaflet-tile-pane {
+      filter: brightness(0.84) contrast(1.06) saturate(0.92);
+    }
+    #trainingLeafletMap .leaflet-control-attribution,
+    #trainingLeafletMap .leaflet-control-zoom { display: none !important; }
+    .lecip-gps-arrow-wrap { background: transparent !important; border: 0 !important; }
+  </style>
+<!-- === LEAFLET TRAINING MAP HEAD END === -->
 </head>
 <body class="h-full w-full flex items-center justify-center sm:p-3">
 
@@ -397,7 +411,11 @@ const state = {
   displayFault: false,   // 電子牌連接失靈模擬（頂部 [123] 轉紅）
   octopusMode: 0,        // 0: 完成連動, 1: 暫停收費/未完成連動, 2: 連動失效
   isStopped3s: true,
-  gpsEnabled: false,
+  gpsEnabled: true,
+  trainingMapZoom: 17,
+  trainingMapFollow: true,
+  gpsHeading: 0,
+  lastGpsPos: null,
   gpsWatchId: null,
   gpsSpeedKmh: 0,
   lastGpsSpeedKmh: 0,
@@ -1757,7 +1775,22 @@ function startGpsTracking() {
   state.gpsWatchId = navigator.geolocation.watchPosition(
     pos => {
       const nowMs = Date.now();
-      const { latitude, longitude, speed } = pos.coords;
+      const { latitude, longitude, speed, heading } = pos.coords;
+      let effHeading = Number.isFinite(state.gpsHeading) ? state.gpsHeading : 0;
+      if (typeof heading === 'number' && Number.isFinite(heading) && heading >= 0 && (speed == null || speed > 0.6)) {
+        effHeading = heading;
+      } else if (state.lastGpsPos && Number.isFinite(state.lastGpsPos.lat) && Number.isFinite(state.lastGpsPos.lng)) {
+        const movedM = calcDistanceMeters(state.lastGpsPos.lat, state.lastGpsPos.lng, latitude, longitude);
+        if (movedM >= 3) {
+          const toRad = d => d * Math.PI / 180;
+          const y = Math.sin(toRad(longitude - state.lastGpsPos.lng)) * Math.cos(toRad(latitude));
+          const x = Math.cos(toRad(state.lastGpsPos.lat)) * Math.sin(toRad(latitude)) -
+                    Math.sin(toRad(state.lastGpsPos.lat)) * Math.cos(toRad(latitude)) * Math.cos(toRad(longitude - state.lastGpsPos.lng));
+          effHeading = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+        }
+      }
+      state.gpsHeading = effHeading;
+      state.lastGpsPos = { lat: latitude, lng: longitude };
       state.gpsLat = latitude;
       state.gpsLng = longitude;
       const kmh = typeof speed === 'number' && !Number.isNaN(speed) ? Math.round(speed * 3.6) : 0;
@@ -1842,6 +1875,7 @@ function startGpsTracking() {
         }
       }
 
+      if (typeof updateTrainingMapGps === 'function') updateTrainingMapGps(latitude, longitude, effHeading);
       const distEl = document.getElementById('etaCurDist');
       if (distEl && state.gpsEnabled && state.gpsDistanceM != null) {
         distEl.textContent = formatDistanceLabel(state.gpsDistanceM);
@@ -1924,17 +1958,25 @@ function findStudioTripRecordForWeb(trip) {
   if (!map || typeof map !== 'object') return null;
   const rno = getRouteNo(trip);
   const bnd = getBound(trip);
+  const patId = String(trip?.patternId ?? '').trim();
   const svc = String(trip?.serviceType || trip?.service_type || '1').trim();
-  const tryKeys = [trip.tripKey, trip.patternId, `${rno}|${bnd}|${svc}`, `${rno}_${bnd}_${svc}`].filter(Boolean);
+  const tryKeys = [
+    trip.tripKey,
+    patId ? `${rno}|${bnd}|${patId}` : '',
+    !patId ? `${rno}|${bnd}|${svc}` : '',
+    !patId ? `${rno}_${bnd}_${svc}` : ''
+  ].filter(Boolean);
   for (const k of tryKeys) {
     if (map[k] && typeof map[k] === 'object') return map[k];
   }
-  return Object.values(map).find(v =>
-    v && !v.isManual &&
-    String(v.routeId || '').trim().toUpperCase() === rno &&
-    String(v.bound || '').trim().toUpperCase() === bnd &&
-    String(v.serviceType || '1').trim() === svc
-  ) || null;
+  return Object.values(map).find(v => {
+    if (!v || v.isManual) return false;
+    if (String(v.routeId || '').trim().toUpperCase() !== rno) return false;
+    if (String(v.bound || '').trim().toUpperCase() !== bnd) return false;
+    const vPat = String(v.patternId ?? '').trim();
+    if (patId || vPat) return vPat === patId;
+    return String(v.serviceType || '1').trim() === svc;
+  }) || null;
 }
 
 async function ensureStopsLoaded(trip) {
@@ -2283,6 +2325,8 @@ function handleTrainingModeToggle() {
     onConfirm: (val, hintEl, close) => {
       if (val === '9999') {
         state.trainingMode = true;
+        state.trainingMapFollow = true;
+        if (state.gpsEnabled && state.routeStage === 'stops' && state.gpsWatchId == null) startGpsTracking();
         close();
         state.settingsPage = 'menu';
         renderAll();
@@ -2346,6 +2390,9 @@ function renderMain() {
   const vp = document.getElementById('mainViewport');
   const bar = document.getElementById('bottomBar');
   if (!vp || !bar) return;
+  if (!(state.currentTab === 'route' && state.routeStage === 'stops' && state.trainingMode && state.gpsEnabled)) {
+    if (typeof destroyTrainingMap === 'function') destroyTrainingMap();
+  }
   bar.className = themeClasses().botBar;
 
   if (state.currentTab === 'route') {
@@ -2715,17 +2762,10 @@ function renderBoundList(vp, bar) {
 }
 
 function getStudioTripLabel(t, globalIdx) {
-  if (t && t._studioTripRec) {
-    const r = t._studioTripRec;
-    if (typeof r.tripLabel === 'string' && r.tripLabel.trim()) return r.tripLabel.trim();
-    if (r.tripType === 'normal') return '正常路線';
-    if (r.tripType === 'express') return '特快班次';
-    if (r.tripType === 'special_via') return r.viaText ? `特別班次經${r.viaText}` : '特別班次';
-  }
-  const map = state.studioTripNames;
-  if (!map || typeof map !== 'object') return '';
+  const recFromObj = t?._studioTripRec || findStudioTripRecordForWeb(t);
   const rno = getRouteNo(t);
   const bound = getBound(t);
+  const patId = String(t?.patternId ?? '').trim();
   const seqStr = String((globalIdx ?? 0) + 1);
   const svcStr = String(t?.serviceType || t?.service_type || seqStr).trim();
   const destTc = getDestTc(t);
@@ -2733,51 +2773,38 @@ function getStudioTripLabel(t, globalIdx) {
   const baseTcSeq = `${rno}-${destTc || '班次'}-${seqStr}`;
   const baseTcSvc = `${rno}-${destTc || '班次'}-${svcStr}`;
 
-  const tryKeys = [
-    t?.tripKey, t?.tripId, t?.id,
-    `${rno}|${bound}|${svcStr}`, `${rno}_${bound}_${svcStr}`, `${rno}-${bound}-${svcStr}`,
-    `${rno}|${bound}|${seqStr}`, `${rno}_${bound}_${seqStr}`, `${rno}-${bound}-${seqStr}`,
-    `CTB-${rno}|${bound}|${svcStr}`
-  ].filter(Boolean);
-
-  let rec = null;
-  for (const k of tryKeys) {
-    if (map[k] && typeof map[k] === 'object') { rec = map[k]; break; }
-  }
-
-  if (!rec) {
-    const vals = Object.values(map);
-    rec = vals.find(v => v && (v.defaultName === baseTcSeq || v.name === baseTcSeq || v.defaultName === baseTcSvc || v.name === baseTcSvc));
+  let rec = recFromObj;
+  const map = state.studioTripNames;
+  if (!rec && map && typeof map === 'object') {
+    const tryKeys = [
+      t?.tripKey,
+      patId ? `${rno}|${bndKey(bound)}|${patId}` : '',
+      !patId ? `${rno}|${bound}|${svcStr}` : '',
+      !patId ? `${rno}|${bound}|${seqStr}` : ''
+    ].filter(Boolean);
+    for (const k of tryKeys) {
+      if (map[k] && typeof map[k] === 'object') { rec = map[k]; break; }
+    }
     if (!rec) {
-      rec = vals.find(v =>
-        v &&
-        String(v.routeId || '').trim().toUpperCase() === rno &&
-        String(v.bound || '').trim().toUpperCase() === bound &&
-        String(v.serviceType || '1').trim() === svcStr
-      );
-    }
-    if (!rec && destTc) {
-      const nDest = normStopName(destTc);
-      rec = vals.find(v =>
-        v &&
-        String(v.routeId || '').trim().toUpperCase() === rno &&
-        normStopName(v.destTc || '') === nDest &&
-        String(v.serviceType || '1').trim() === seqStr
-      );
+      const vals = Object.values(map);
+      rec = vals.find(v => v && (v.defaultName === baseTcSeq || v.name === baseTcSeq || (!patId && (v.defaultName === baseTcSvc || v.name === baseTcSvc))));
     }
   }
 
-  if (!rec) return '';
-  if (typeof rec.tripLabel === 'string' && rec.tripLabel.trim()) return rec.tripLabel.trim();
-  if (rec.tripType === 'normal') return '正常路線';
-  if (rec.tripType === 'express') return '特快班次';
-  if (rec.tripType === 'special_via') return rec.viaText ? `特別班次經${rec.viaText}` : '特別班次';
-  if (rec.name && rec.defaultName && rec.name !== rec.defaultName) {
-    const pfx = `${rno}-${destTc || destEn || ''}-`;
-    return rec.name.startsWith(pfx) ? rec.name.slice(pfx.length).trim() : rec.name.trim();
+  if (rec) {
+    if (rec.labelCleared) return '';
+    if (typeof rec.tripLabel === 'string' && rec.tripLabel.trim()) return rec.tripLabel.trim();
+    if (rec.tripType === 'normal') return '正常路線';
+    if (rec.tripType === 'express') return '特快班次';
+    if (rec.tripType === 'special_via') return rec.viaText ? `特別班次經${rec.viaText}` : '特別班次';
+    if (rec.name && rec.defaultName && rec.name !== rec.defaultName) {
+      const pfx = `${rno}-${destTc || destEn || ''}-`;
+      return rec.name.startsWith(pfx) ? rec.name.slice(pfx.length).trim() : rec.name.trim();
+    }
   }
   return '';
 }
+function bndKey(b) { return String(b || 'O').trim().toUpperCase(); }
 
 function renderTripList(vp, bar) {
   const th = themeClasses();
@@ -2799,7 +2826,8 @@ function renderTripList(vp, bar) {
         const remark = getRealTripRemark(t);
         const studioLabel = (typeof getStudioTripLabel === 'function') ? getStudioTripLabel(t, globalIdx) : '';
         const defaultName = `${state.selectedRouteNo}-${dest || '班次'}-${globalIdx + 1}`;
-        const displayName = studioLabel || remark || defaultName;
+        const autoNormal = (globalIdx === 0 && !t?._studioTripRec?.labelCleared) ? (state.lang === 'en' ? 'Normal Route' : '正常路線') : '';
+        const displayName = studioLabel || remark || autoNormal || defaultName;
         return `
           <button data-tidx="${globalIdx}" class="pick-trip-btn flex-1 px-4 py-3 flex items-center justify-between ${th.row} text-left">
             <div class="min-w-0 pr-2">
@@ -2847,6 +2875,20 @@ function renderTripList(vp, bar) {
   document.getElementById('botNext').onclick = () => { if (canNext) { state.pageOffset++; renderAll(); } };
 }
 
+function stripAfterComma(str) {
+  const s = String(str || '').trim();
+  if (!s) return '';
+  return s.split(/[,，]/)[0].trim();
+}
+
+function getLecipStopDisplayName(st) {
+  if (!st) return '';
+  const rawName = state.lang === 'en'
+    ? (getStopNameEn(st) || getStopNameTc(st))
+    : getStopNameTc(st);
+  return stripAfterComma(rawName);
+}
+
 function renderStartStopList(vp, bar) {
   const th = themeClasses();
   vp.className = th.vp;
@@ -2875,8 +2917,7 @@ function renderStartStopList(vp, bar) {
         return `
           <button data-sidx="${sIdx}" class="pick-start-btn flex-1 px-4 py-2.5 flex items-center justify-between ${rowCls} text-left">
             <div class="min-w-0 pr-2">
-              <div class="text-lg font-black truncate">${sIdx + 1}. ${esc(state.lang === 'en' ? (getStopNameEn(st) || getStopNameTc(st)) : getStopNameTc(st))}</div>
-              ${sub ? `<div class="text-xs font-bold ${subCls} truncate">${esc(sub)}</div>` : ''}
+              <div class="text-lg font-black truncate">${sIdx + 1}. ${esc(getLecipStopDisplayName(st))}</div>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
               <span class="${arrowCls} text-2xl font-black">›</span>
@@ -3097,6 +3138,178 @@ async function refreshRouteEtas(force = false) {
 }
 
 // ============ 報站主畫面（還原實機排版：分段框、正常路線、綠進度條、時鐘＋巴士站距離、右側疊排 ETA 分鐘） ============
+// === TRAINING MAP MODULE START ===
+let _trainMap = null;
+let _trainRouteLayer = null;
+let _trainStopsLayer = null;
+let _trainGpsMarker = null;
+
+function destroyTrainingMap() {
+  if (_trainMap) {
+    try { _trainMap.remove(); } catch (_) {}
+    _trainMap = null;
+  }
+  _trainRouteLayer = null;
+  _trainStopsLayer = null;
+  _trainGpsMarker = null;
+}
+
+function buildTrainingGpsArrowIcon(deg = 0) {
+  const angle = Number.isFinite(Number(deg)) ? Number(deg) : 0;
+  return L.divIcon({
+    className: 'lecip-gps-arrow-wrap',
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    html: `
+      <div style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;transform:rotate(${angle}deg);transition:transform 0.25s linear;">
+        <svg width="28" height="28" viewBox="0 0 32 32" style="filter:drop-shadow(0 1px 3px rgba(0,0,0,0.65));">
+          <circle cx="16" cy="16" r="13" fill="#0f2f24" stroke="#ffffff" stroke-width="2.2"/>
+          <polygon points="16,5 23,23 16,19 9,23" fill="#22c55e" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    `
+  });
+}
+
+function getTrainingRouteLatLngs() {
+  const pts = [];
+  const rawPath = state.selectedTrip?.routePath;
+  if (Array.isArray(rawPath) && rawPath.length >= 2) {
+    for (const p of rawPath) {
+      const la = Array.isArray(p) ? Number(p[0]) : Number(p?.lat ?? p?.latitude);
+      const ln = Array.isArray(p) ? Number(p[1]) : Number(p?.lng ?? p?.lon ?? p?.long ?? p?.longitude);
+      if (Number.isFinite(la) && Number.isFinite(ln)) pts.push([la, ln]);
+    }
+  }
+  if (pts.length >= 2) return pts;
+  for (const st of (state.tripStops || [])) {
+    const la = getStopLat(st);
+    const ln = getStopLng(st);
+    if (Number.isFinite(la) && Number.isFinite(ln)) pts.push([la, ln]);
+  }
+  return pts;
+}
+
+function zoomTrainingMap(delta) {
+  if (!_trainMap) return;
+  const curZ = _trainMap.getZoom();
+  const nextZ = Math.max(12, Math.min(19, curZ + delta));
+  state.trainingMapZoom = nextZ;
+  _trainMap.setZoom(nextZ);
+}
+
+function recenterTrainingMap() {
+  state.trainingMapFollow = true;
+  if (!_trainMap) return;
+  const hasGps = Number.isFinite(state.gpsLat) && Number.isFinite(state.gpsLng);
+  if (hasGps) {
+    _trainMap.setView([state.gpsLat, state.gpsLng], state.trainingMapZoom || 17, { animate: true });
+    showToast('地圖已鎖定實時 GPS 位置');
+  } else {
+    const curSt = state.tripStops?.[state.currentStopIdx];
+    const la = curSt ? getStopLat(curSt) : NaN;
+    const ln = curSt ? getStopLng(curSt) : NaN;
+    if (Number.isFinite(la) && Number.isFinite(ln)) {
+      _trainMap.setView([la, ln], state.trainingMapZoom || 17, { animate: true });
+    }
+    showToast('等待 GPS 定位訊號中...');
+  }
+}
+
+function updateTrainingMapGps(lat, lng, headingDeg = 0) {
+  if (!state.trainingMode || !state.gpsEnabled || !_trainMap) return;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+  const pos = [lat, lng];
+  if (!_trainGpsMarker) {
+    _trainGpsMarker = L.marker(pos, { icon: buildTrainingGpsArrowIcon(headingDeg), zIndexOffset: 1000 }).addTo(_trainMap);
+  } else {
+    _trainGpsMarker.setLatLng(pos);
+    _trainGpsMarker.setIcon(buildTrainingGpsArrowIcon(headingDeg));
+  }
+  const badge = document.getElementById('trainingMapGpsBadge');
+  if (badge) badge.classList.add('hidden');
+  if (state.trainingMapFollow) {
+    _trainMap.panTo(pos, { animate: true, duration: 0.35 });
+  }
+}
+
+function initOrUpdateTrainingMap() {
+  const el = document.getElementById('trainingLeafletMap');
+  if (!el) return;
+  if (typeof L === 'undefined') {
+    el.innerHTML = `<div class="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-700 px-4 text-center">地圖元件載入中，請確認網路連線後重試</div>`;
+    return;
+  }
+
+  destroyTrainingMap();
+
+  const curSt = state.tripStops?.[state.currentStopIdx];
+  const curLat = curSt ? getStopLat(curSt) : NaN;
+  const curLng = curSt ? getStopLng(curSt) : NaN;
+  const hasGps = Number.isFinite(state.gpsLat) && Number.isFinite(state.gpsLng);
+  const routePts = getTrainingRouteLatLngs();
+
+  let center = [22.3193, 114.1694];
+  if (hasGps) center = [state.gpsLat, state.gpsLng];
+  else if (Number.isFinite(curLat) && Number.isFinite(curLng)) center = [curLat, curLng];
+  else if (routePts.length) center = routePts[0];
+
+  const zoom = Math.max(12, Math.min(19, Number(state.trainingMapZoom) || 17));
+  _trainMap = L.map(el, {
+    center,
+    zoom,
+    zoomControl: false,
+    attributionControl: false
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(_trainMap);
+
+  _trainMap.on('dragstart', () => { state.trainingMapFollow = false; });
+  _trainMap.on('zoomend', () => {
+    if (_trainMap) state.trainingMapZoom = _trainMap.getZoom();
+  });
+
+  // 繪製路線藍線（外白框＋內鮮藍）
+  _trainRouteLayer = L.layerGroup().addTo(_trainMap);
+  if (routePts.length >= 2) {
+    L.polyline(routePts, { color: '#ffffff', weight: 8, opacity: 0.9, lineCap: 'round', lineJoin: 'round' }).addTo(_trainRouteLayer);
+    L.polyline(routePts, { color: '#0068FF', weight: 5, opacity: 0.96, lineCap: 'round', lineJoin: 'round' }).addTo(_trainRouteLayer);
+  }
+
+  // 繪製沿途巴士站點（高亮即將到達嘅站）
+  _trainStopsLayer = L.layerGroup().addTo(_trainMap);
+  (state.tripStops || []).forEach((st, idx) => {
+    const la = getStopLat(st);
+    const ln = getStopLng(st);
+    if (!Number.isFinite(la) || !Number.isFinite(ln)) return;
+    const isCur = idx === state.currentStopIdx;
+    const isPast = idx < state.currentStopIdx;
+    const marker = L.circleMarker([la, ln], {
+      radius: isCur ? 7 : 4.5,
+      color: '#ffffff',
+      weight: isCur ? 2.5 : 1.5,
+      fillColor: isCur ? '#00a846' : (isPast ? '#94a3b8' : '#0068FF'),
+      fillOpacity: 1
+    }).addTo(_trainStopsLayer);
+    marker.bindTooltip(`${idx + 1}. ${getLecipStopDisplayName(st)}`, { direction: 'top', offset: [0, -6] });
+  });
+
+  if (hasGps) {
+    _trainGpsMarker = L.marker([state.gpsLat, state.gpsLng], {
+      icon: buildTrainingGpsArrowIcon(state.gpsHeading || 0),
+      zIndexOffset: 1000
+    }).addTo(_trainMap);
+  }
+
+  requestAnimationFrame(() => {
+    if (_trainMap) _trainMap.invalidateSize(false);
+  });
+}
+// === TRAINING MAP MODULE END ===
+
 function renderStopsView(vp, bar) {
   const th = themeClasses();
   vp.className = th.dark
@@ -3105,9 +3318,13 @@ function renderStopsView(vp, bar) {
 
   const cur = state.tripStops[state.currentStopIdx];
   if (!cur) {
+    destroyTrainingMap();
     vp.innerHTML = `<div class="flex-1 flex items-center justify-center ${th.muted} font-bold">無站點資料</div>`;
     return;
   }
+
+  const showTrainingMap = Boolean(state.trainingMode && state.gpsEnabled);
+  if (!showTrainingMap) destroyTrainingMap();
 
   const UPCOMING_PER_PAGE = 3; // 連同正在前往的車站，每頁同時最多顯示 4 個車站
   const remainingTotal = Math.max(0, state.tripStops.length - 1 - state.currentStopIdx);
@@ -3121,15 +3338,17 @@ function renderStopsView(vp, bar) {
   const curSec = sections[state.currentStopIdx] || { sectionNo: 1, activeFare: null, badgeFare: null };
   const trip = state.selectedTrip || {};
   const dest = state.lang === 'en' ? (getDestEn(trip) || getDestTc(trip)) : (getDestTc(trip) || getDestEn(trip));
-  const remark = getRealTripRemark(trip) || (state.lang === 'en' ? 'Normal Route' : '正常路線');
+  const studioTripLbl = (typeof getStudioTripLabel === 'function')
+    ? getStudioTripLabel(trip, Math.max(0, (state.selectedTripSeq || 1) - 1))
+    : '';
+  const remark = studioTripLbl || getRealTripRemark(trip) || (state.lang === 'en' ? 'Normal Route' : '正常路線');
 
   const startOffset = state.stopsPage * UPCOMING_PER_PAGE;
   const upcoming = state.tripStops.slice(
     state.currentStopIdx + 1 + startOffset,
     state.currentStopIdx + 1 + startOffset + UPCOMING_PER_PAGE
   );
-  const curName = state.lang === 'en' ? (getStopNameEn(cur) || getStopNameTc(cur)) : getStopNameTc(cur);
-  const curSub = getStopSub(cur);
+  const curName = getLecipStopDisplayName(cur);
 
   const headerBg = th.dark ? 'bg-[#1b2230] border-b border-zinc-700 text-white' : 'bg-[#a4bce0] border-b border-[#7a92b8] text-[#111827]';
   const secBoxCls = th.dark ? 'border-zinc-500/90 bg-[#141923]/60 text-white' : 'border-[#647b9e] bg-[#a4bce0] text-[#111827]';
@@ -3138,6 +3357,7 @@ function renderStopsView(vp, bar) {
 
   const curMinsText = state.lang === 'en' ? `${curEta.mins} min` : `${curEta.mins}分鐘`;
   const curDistText = formatDistanceLabel(curEta.distM);
+  const hasGpsFix = Number.isFinite(state.gpsLat) && Number.isFinite(state.gpsLng);
 
   vp.innerHTML = `
     <!-- 路線與分段標頭 -->
@@ -3155,8 +3375,7 @@ function renderStopsView(vp, bar) {
     <!-- 正在前往的車站（第 1 站位） -->
     <div class="px-3.5 py-3 ${curPanelCls} shrink-0">
       <button id="btnReplayCurrent" class="w-full text-left active:opacity-80">
-        <div class="text-[23px] font-black leading-snug">${state.currentStopIdx + 1}. ${esc(curName)}</div>
-        ${curSub ? `<div class="text-xs font-bold ${th.muted} mt-0.5 truncate">${esc(curSub)}</div>` : ''}
+        <div class="text-[23px] font-black leading-snug truncate">${state.currentStopIdx + 1}. ${esc(curName)}</div>
       </button>
 
       ${!state.gpsEnabled ? `
@@ -3169,7 +3388,7 @@ function renderStopsView(vp, bar) {
           </button>
         </div>
       ` : `
-        <div class="mt-3 space-y-1.5">
+        <div class="mt-2.5 space-y-1.5">
           <div class="flex items-center justify-end gap-5 text-[15px] font-extrabold ${th.dark ? 'text-zinc-200' : 'text-[#2b303a]'}">
             <div class="flex items-center gap-1.5">
               <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3191,53 +3410,74 @@ function renderStopsView(vp, bar) {
             </div>
           </div>
 
-          <div class="w-full h-[26px] rounded-full bg-[#454b54] overflow-hidden shadow-inner">
+          <div class="w-full h-[24px] rounded-full bg-[#454b54] overflow-hidden shadow-inner">
             <div id="stopProgressFill" class="h-full bg-[#00a846] transition-all duration-300" style="width:${Math.max(12, state.stopProgressPct)}%"></div>
           </div>
         </div>
       `}
     </div>
 
-    <!-- 後續站位列表（每頁最多顯示 3 個，連同上方共 4 站；不足 3 站時下方留白） -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-      ${upcoming.length === 0 ? `
-        <div class="px-4 py-6 text-center text-sm font-black ${th.dark ? 'text-amber-400' : 'text-zinc-800'}">已到達本班次終點站</div>
-      ` : upcoming.map((st, offset) => {
-        const targetIdx = state.currentStopIdx + 1 + startOffset + offset;
-        const nm = state.lang === 'en' ? (getStopNameEn(st) || getStopNameTc(st)) : getStopNameTc(st);
-        const sInfo = sections[targetIdx] || {};
-        const uEta = state.etaMap[targetIdx] || { mins: Math.max(2, (startOffset + offset + 1) * 3) };
-        return `
-          <button data-jump="${targetIdx}" class="jump-stop-btn w-full h-1/3 px-3.5 text-left border-b ${upRowCls} flex items-center justify-between gap-2 shrink-0">
-            <div class="min-w-0 flex items-center gap-2">
-              <span class="text-[20px] font-bold truncate">${targetIdx + 1}. ${esc(nm)}</span>
-            </div>
-            ${state.gpsEnabled ? `
-            <div class="shrink-0 text-center leading-tight min-w-[38px]">
-              <div data-eta-idx="${targetIdx}" class="text-[19px] font-black leading-none">${uEta.mins}</div>
-              <div class="text-[11px] font-bold opacity-80 mt-0.5">${state.lang === 'en' ? 'min' : '分鐘'}</div>
-            </div>
-            ` : ''}
-          </button>
-        `;
-      }).join('')}
-    </div>
+    ${showTrainingMap ? `
+      <!-- 訓練模式（GPS 自動）實時路線地圖（取代未來三個巴士站位置） -->
+      <div id="trainingMapWrap" class="relative flex-1 w-full overflow-hidden">
+        <div id="trainingLeafletMap" class="w-full h-full"></div>
+        <div id="trainingMapGpsBadge" class="${hasGpsFix ? 'hidden' : ''} absolute top-2 left-2 z-[400] px-2.5 py-1 rounded-md bg-black/75 text-yellow-300 text-[11px] font-black pointer-events-none">
+          等待 GPS 定位...
+        </div>
+        <button id="btnMapCompass" title="回正 GPS 位置" class="absolute top-2.5 right-2.5 z-[400] w-11 h-11 rounded-full bg-[#1d63ed] border-2 border-white/90 shadow-lg flex items-center justify-center active:scale-95">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">
+            <polygon points="12,3 15.5,12 12,10.5 8.5,12" fill="#ffffff"/>
+            <polygon points="12,21 15.5,12 12,13.5 8.5,12" fill="#ef4444"/>
+            <circle cx="12" cy="12" r="1.4" fill="#1d63ed"/>
+          </svg>
+        </button>
+      </div>
+    ` : `
+      <!-- 後續站位列表（每頁最多顯示 3 個，連同上方共 4 站；不足 3 站時下方留白） -->
+      <div class="flex-1 flex flex-col overflow-hidden">
+        ${upcoming.length === 0 ? `
+          <div class="px-4 py-6 text-center text-sm font-black ${th.dark ? 'text-amber-400' : 'text-zinc-800'}">已到達本班次終點站</div>
+        ` : upcoming.map((st, offset) => {
+          const targetIdx = state.currentStopIdx + 1 + startOffset + offset;
+          const nm = getLecipStopDisplayName(st);
+          const uEta = state.etaMap[targetIdx] || { mins: Math.max(2, (startOffset + offset + 1) * 3) };
+          return `
+            <button data-jump="${targetIdx}" class="jump-stop-btn w-full h-1/3 px-3.5 text-left border-b ${upRowCls} flex items-center justify-between gap-2 shrink-0">
+              <div class="min-w-0 flex items-center gap-2">
+                <span class="text-[20px] font-bold truncate">${targetIdx + 1}. ${esc(nm)}</span>
+              </div>
+              ${state.gpsEnabled ? `
+              <div class="shrink-0 text-center leading-tight min-w-[38px]">
+                <div data-eta-idx="${targetIdx}" class="text-[19px] font-black leading-none">${uEta.mins}</div>
+                <div class="text-[11px] font-bold opacity-80 mt-0.5">${state.lang === 'en' ? 'min' : '分鐘'}</div>
+              </div>
+              ` : ''}
+            </button>
+          `;
+        }).join('')}
+      </div>
+    `}
   `;
 
   const canPrev = state.stopsPage > 0;
   const canNext = state.stopsPage < totalStopPages - 1;
-  bar.className = 'grid grid-cols-4 gap-1.5 p-1.5 bg-[#0d1118] border-t border-zinc-800 shrink-0';
-  bar.innerHTML = `
-    <button id="botBack" class="h-11 rounded-lg bg-[#e53935] text-white font-black text-2xl flex items-center justify-center active:brightness-90">‹</button>
-    <button id="botPrev" class="h-11 rounded-lg ${canPrev ? 'bg-[#0074f0] text-white active:brightness-90' : 'bg-[#5a6069] text-zinc-200'}" ${canPrev ? '' : 'disabled'}>↑</button>
-    <button id="botNext" class="h-11 rounded-lg ${canNext ? 'bg-[#0074f0] text-white active:brightness-90' : 'bg-[#5a6069] text-zinc-200'}" ${canNext ? '' : 'disabled'}>↓</button>
-    <button id="botMore" class="h-11 rounded-lg bg-[#0074f0] text-white font-black text-xl flex items-center justify-center active:brightness-90">•••</button>
-  `;
-  // 確保箭咀字體置中且粗體
-  const bPrev = document.getElementById('botPrev');
-  const bNext = document.getElementById('botNext');
-  if (bPrev) bPrev.className += ' font-black text-2xl flex items-center justify-center';
-  if (bNext) bNext.className += ' font-black text-2xl flex items-center justify-center';
+  bar.className = th.botBar;
+
+  if (showTrainingMap) {
+    bar.innerHTML = `
+      <button id="botBack" class="h-11 rounded-lg bg-[#0074f0] text-white font-black text-2xl flex items-center justify-center active:brightness-90">‹</button>
+      <button id="botMapZoomIn" title="放大地圖" class="h-11 rounded-lg bg-[#0074f0] text-white font-black text-3xl flex items-center justify-center active:brightness-90">＋</button>
+      <button id="botMapZoomOut" title="縮小地圖" class="h-11 rounded-lg bg-[#0074f0] text-white font-black text-3xl flex items-center justify-center active:brightness-90">－</button>
+      <button id="botMore" class="h-11 rounded-lg bg-[#0074f0] text-white font-black text-xl flex items-center justify-center active:brightness-90">•••</button>
+    `;
+  } else {
+    bar.innerHTML = `
+      <button id="botBack" class="h-11 rounded-lg bg-[#e53935] text-white font-black text-2xl flex items-center justify-center active:brightness-90">‹</button>
+      <button id="botPrev" class="h-11 rounded-lg ${canPrev ? 'bg-[#0074f0] text-white active:brightness-90' : 'bg-[#5a6069] text-zinc-200'} font-black text-2xl flex items-center justify-center" ${canPrev ? '' : 'disabled'}>↑</button>
+      <button id="botNext" class="h-11 rounded-lg ${canNext ? 'bg-[#0074f0] text-white active:brightness-90' : 'bg-[#5a6069] text-zinc-200'} font-black text-2xl flex items-center justify-center" ${canNext ? '' : 'disabled'}>↓</button>
+      <button id="botMore" class="h-11 rounded-lg bg-[#0074f0] text-white font-black text-xl flex items-center justify-center active:brightness-90">•••</button>
+    `;
+  }
 
   const advanceStop = () => {
     if (state.currentStopIdx < state.tripStops.length - 1) {
@@ -3270,6 +3510,7 @@ function renderStopsView(vp, bar) {
     btnStop.onclick = () => {
       stopAllAudio();
       stopGpsTracking();
+      destroyTrainingMap();
       state.stopsPage = 0;
       state.routeStage = 'start_stop';
       renderAll();
@@ -3296,12 +3537,24 @@ function renderStopsView(vp, bar) {
   document.getElementById('botBack').onclick = () => {
     stopAllAudio();
     stopGpsTracking();
+    destroyTrainingMap();
     state.stopsPage = 0;
     state.routeStage = 'start_stop';
     renderAll();
   };
-  if (bPrev) bPrev.onclick = () => { if (canPrev) { state.stopsPage--; renderMain(); } };
-  if (bNext) bNext.onclick = () => { if (canNext) { state.stopsPage++; renderMain(); } };
+
+  if (showTrainingMap) {
+    document.getElementById('botMapZoomIn').onclick = () => zoomTrainingMap(1);
+    document.getElementById('botMapZoomOut').onclick = () => zoomTrainingMap(-1);
+    document.getElementById('btnMapCompass').onclick = recenterTrainingMap;
+    initOrUpdateTrainingMap();
+  } else {
+    const bPrev = document.getElementById('botPrev');
+    const bNext = document.getElementById('botNext');
+    if (bPrev) bPrev.onclick = () => { if (canPrev) { state.stopsPage--; renderMain(); } };
+    if (bNext) bNext.onclick = () => { if (canNext) { state.stopsPage++; renderMain(); } };
+  }
+
   document.getElementById('botMore').onclick = () => document.getElementById('moreModal').classList.remove('hidden');
 
   if (state.gpsEnabled) refreshRouteEtas(false);
@@ -4149,9 +4402,10 @@ async function fetchInitialLightData() {
     for (const orig of base) {
       const rno = getRouteNo(orig);
       const bnd = getBound(orig);
+      const patId = String(orig?.patternId ?? '').trim();
       const svc = String(orig?.serviceType || orig?.service_type || '1').trim();
-      const k = `${rno}|${bnd}|${svc}`;
-      const rec = map[k];
+      const k = patId ? `${rno}|${bnd}|${patId}` : `${rno}|${bnd}|${svc}`;
+      const rec = map[k] || (!patId ? map[`${rno}|${bnd}|1`] : null);
       if (rec && rec.deleted) {
         matchedKeys.add(k);
         continue;
