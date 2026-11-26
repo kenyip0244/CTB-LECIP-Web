@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "updatedAt": "2026-11-26T10:39:59.897Z",
+  "updatedAt": "2026-11-26T11:29:10.914Z",
   "confirmed": {
     "2": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1312_a.mp3",
     "3": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1226_a.mp3",
@@ -22,6 +22,7 @@
     "26": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1035_A.mp3",
     "27": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1047_A.mp3",
     "28": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1030_A.mp3",
+    "32": "audio/stops/Wan Chai Ferry.mp3",
     "33": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1216_a.mp3",
     "35": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1218_a.mp3",
     "36": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1219_a.mp3",
@@ -544,6 +545,7 @@
     "1322": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1691_A.mp3",
     "1325": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1519_A.mp3",
     "1326": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1519_A.mp3",
+    "1331": "audio/stops/Temple Street.mp3",
     "1334": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1363_A.mp3",
     "1339": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1395_a.mp3",
     "1340": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1603_A.mp3",
@@ -1027,10 +1029,12 @@
     "10000202": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1266_B.mp3",
     "10000204": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1268_a.mp3",
     "10000245": "audio/stops/Wan Chai Promenade.mp3",
+    "10000249": "audio/stops/Central Harbourfront Event Space.mp3",
     "10000250": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1389_A.mp3",
     "10000304": "audio/stops/Wah Fu North.mp3",
     "10000307": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1366_a.mp3",
     "10000331": "audio/stops/H4 KDN_01.mp3",
+    "10000344": "audio/stops/East Tsim Sha Tsui.mp3",
     "10000345": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1399_A.mp3"
   },
   "details": {
@@ -12354,6 +12358,23 @@
       "note": "",
       "updatedBy": "Ken"
     },
+    "audio/stops/Cameron Road .mp3": {
+      "stopId": "7041",
+      "stopIds": [
+        "7041"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "H2K"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "金馬倫道",
+      "heardEn": "Cameron Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
     "audio/stops/Caritas Oswald Cheung International House.mp3": {
       "stopId": "558",
       "stopIds": [
@@ -12384,6 +12405,21 @@
       "scope": "single",
       "heardTc": "中環碼頭 - 天星小輪",
       "heardEn": "Central Ferry - Star Ferry",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Central Harbourfront Event Space.mp3": {
+      "stopId": "10000249",
+      "stopIds": [
+        "10000249"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "中環海濱活動空間",
+      "heardEn": "Central Harbourfront Event Space",
       "note": "",
       "updatedBy": "Ken"
     },
@@ -12835,6 +12871,23 @@
       "scope": "multi",
       "heardTc": "尖東站",
       "heardEn": "East Tsim Sha Tsui Station",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/East Tsim Sha Tsui.mp3": {
+      "stopId": "10000344",
+      "stopIds": [
+        "10000344"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "H2K"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "尖沙咀 (東)",
+      "heardEn": "East Tsim Sha Tsui",
       "note": "",
       "updatedBy": "Ken"
     },
@@ -14144,6 +14197,23 @@
       "note": "",
       "updatedBy": "Ken"
     },
+    "audio/stops/Wan Chai Ferry.mp3": {
+      "stopId": "32",
+      "stopIds": [
+        "32"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "H2K"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "灣仔碼頭",
+      "heardEn": "Wan Chai Ferry Pier",
+      "note": "",
+      "updatedBy": "Ken"
+    },
     "audio/stops/Wan Chai Promenade.mp3": {
       "stopId": "10000245",
       "stopIds": [
@@ -14224,6 +14294,23 @@
       "scope": "single",
       "heardTc": "大館",
       "heardEn": "Tai Kwun Hollywood Road",
+      "note": "",
+      "updatedBy": "Ken"
+    },
+    "audio/stops/Temple Street.mp3": {
+      "stopId": "1331",
+      "stopIds": [
+        "1331"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "H2K"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "scope": "single",
+      "heardTc": "廟街",
+      "heardEn": "Temple Street",
       "note": "",
       "updatedBy": "Ken"
     },
@@ -24410,6 +24497,21 @@
       "updatedBy": "Ken"
     },
     {
+      "audioPath": "audio/stops/Cameron Road .mp3",
+      "stopIds": [
+        "7041"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "H2K"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-26T11:09:53.238Z",
+      "updatedBy": "Ken"
+    },
+    {
       "audioPath": "audio/stops/Caritas Oswald Cheung International House.mp3",
       "stopIds": [
         "558"
@@ -24436,6 +24538,19 @@
       "tripNames": [],
       "note": "",
       "updatedAt": "2026-11-26T10:11:18.293Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Central Harbourfront Event Space.mp3",
+      "stopIds": [
+        "10000249"
+      ],
+      "routeMode": "all",
+      "routes": [],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-26T11:23:33.121Z",
       "updatedBy": "Ken"
     },
     {
@@ -24831,6 +24946,21 @@
       "tripNames": [],
       "note": "",
       "updatedAt": "2026-11-26T09:49:37.959Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/East Tsim Sha Tsui.mp3",
+      "stopIds": [
+        "10000344"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "H2K"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-26T11:10:00.765Z",
       "updatedBy": "Ken"
     },
     {
@@ -25976,6 +26106,21 @@
       "updatedBy": "Ken"
     },
     {
+      "audioPath": "audio/stops/Wan Chai Ferry.mp3",
+      "stopIds": [
+        "32"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "H2K"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-26T11:10:10.476Z",
+      "updatedBy": "Ken"
+    },
+    {
       "audioPath": "audio/stops/Wan Chai Promenade.mp3",
       "stopIds": [
         "10000245"
@@ -26046,6 +26191,21 @@
       "tripNames": [],
       "note": "",
       "updatedAt": "2026-11-26T09:49:50.479Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/Temple Street.mp3",
+      "stopIds": [
+        "1331"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "H2K"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "note": "",
+      "updatedAt": "2026-11-26T11:10:06.070Z",
       "updatedBy": "Ken"
     },
     {
@@ -27210,10 +27370,11 @@
       "scope": "trips",
       "routes": [],
       "tripNames": [
-        "H4-中環 (香港摩天輪)-1"
+        "H4-中環 (香港摩天輪)-1",
+        "H4-中環 (香港摩天輪)-2"
       ],
       "note": "",
-      "updatedAt": "2026-11-26T10:39:43.151Z",
+      "updatedAt": "2026-11-26T10:47:45.468Z",
       "updatedBy": "Ken"
     },
     {
@@ -27357,6 +27518,17 @@
       "note": "",
       "updatedAt": "2026-11-24T14:59:00.283Z",
       "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/welcome/H2K_STF.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "H2K-中環碼頭 - 天星小輪-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-26T11:10:46.985Z",
+      "updatedBy": "Ken"
     }
   ],
   "specialBroadcasts": [
@@ -27380,6 +27552,58 @@
       "intervalMin": 5,
       "note": "",
       "updatedAt": "2026-11-26T10:10:20.738Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/H2K_return.mp3",
+      "kind": "after_stop",
+      "stopIds": [
+        "219",
+        "1331",
+        "10000065",
+        "10000140",
+        "7041",
+        "4025",
+        "1279",
+        "10000344",
+        "9015"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "H2K"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "locationName": "",
+      "lat": null,
+      "lng": null,
+      "radiusM": 80,
+      "excludeRoutes": [],
+      "intervalMin": 5,
+      "note": "",
+      "updatedAt": "2026-11-26T11:14:33.851Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/H2K arr STF.mp3",
+      "kind": "after_stop",
+      "stopIds": [
+        "360"
+      ],
+      "routeMode": "specific",
+      "routes": [
+        "H2K"
+      ],
+      "tripMode": "all",
+      "tripNames": [],
+      "locationName": "中環碼頭 - 天星小輪",
+      "lat": 22.286702,
+      "lng": 114.160186,
+      "radiusM": 80,
+      "excludeRoutes": [],
+      "intervalMin": 5,
+      "note": "",
+      "updatedAt": "2026-11-26T11:29:08.596Z",
       "updatedBy": "Ken"
     }
   ],
@@ -29124,9 +29348,68 @@
       "routeId": "H1",
       "serviceType": "1",
       "tripKey": "H1|O|SP-8220-1",
-      "tripLabel": "懷舊之旅 (星期日及假日不經遮打道)",
+      "tripLabel": "星期日及假日不經遮打道",
       "tripType": "custom",
-      "updatedAt": "2026-11-26T09:58:43.937Z",
+      "updatedAt": "2026-11-26T10:45:57.000Z",
+      "updatedBy": "Ken",
+      "viaText": "",
+      "customSeqNo": ""
+    },
+    "H4|O|cfgv2z": {
+      "bound": "O",
+      "customStops": [
+        {
+          "seq": 1,
+          "stopId": "487",
+          "sectionFare": 49.7,
+          "section": 1
+        },
+        {
+          "seq": 2,
+          "stopId": "371",
+          "sectionFare": 49.7,
+          "section": 1
+        },
+        {
+          "seq": 3,
+          "stopId": "341",
+          "sectionFare": 49.7,
+          "section": 1
+        },
+        {
+          "seq": 4,
+          "stopId": "350",
+          "sectionFare": 49.7,
+          "section": 1
+        },
+        {
+          "seq": 5,
+          "stopId": "10000331",
+          "sectionFare": 49.7,
+          "section": 1
+        },
+        {
+          "seq": 6,
+          "stopId": "13050",
+          "sectionFare": 49.7,
+          "section": 1
+        }
+      ],
+      "defaultName": "H4-中環 (香港摩天輪)-2",
+      "deleted": false,
+      "destTc": "中環 (香港摩天輪)",
+      "fullFare": 49.7,
+      "isManual": true,
+      "labelCleared": false,
+      "name": "H4-中環 (香港摩天輪)-2",
+      "origTc": "海洋公園",
+      "patternId": "",
+      "routeId": "H4",
+      "serviceType": "cfgv2z",
+      "tripKey": "H4|O|cfgv2z",
+      "tripLabel": "海洋公園站開出",
+      "tripType": "custom",
+      "updatedAt": "2026-11-26T10:47:21.124Z",
       "updatedBy": "Ken",
       "viaText": "",
       "customSeqNo": ""
