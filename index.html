@@ -1609,8 +1609,19 @@ function triggerStopAnnouncement(idx, force = false) {
     segments.push({ files: ['./assets/check_fare.mp3'], tc: '請檢查八達通收費', en: '', sc: '' });
   }
 
+  if (!isTerminus) {
+    state._terminusArrivedKey = '';
+  }
+
   if (isTerminus) {
-    segments.push(buildTerminusSegment(st), ...getAfterStopSpecialSegments(st));
+    // GPS 自動模式：前往終點站時先報終點站名，待 GPS 真正「已到達」先播 Terminus.mp3
+    if (state.gpsEnabled) {
+      segments.push(buildStopSegment(st), ...getAfterStopSpecialSegments(st));
+      playAnnouncementSegments(segments);
+      return;
+    }
+    // 手動模式：先報終點站名，再播 Terminus.mp3，播完自動跳回程起點
+    segments.push(buildStopSegment(st), buildTerminusSegment(st), ...getAfterStopSpecialSegments(st));
     const playPromise = playAnnouncementSegments(segments);
     const snapNonce = _audioStopNonce;
     const snapRouteNo = state.selectedRouteNo;
@@ -3571,10 +3582,38 @@ function initOrUpdateTrainingMap() {
 // === TRAINING MAP MODULE END ===
 
 // === STOP ARRIVAL SKIN START ===
+function triggerTerminusArrivalIfNeeded(isArrived) {
+  if (!isArrived || !state.gpsEnabled) return;
+  if (state.currentTab !== 'route' || state.routeStage !== 'stops') return;
+  if (state.incidentState.stage !== 'idle') return;
+  const stops = state.tripStops || [];
+  const idx = state.currentStopIdx;
+  if (!stops.length || idx !== stops.length - 1) return;
+
+  const st = stops[idx];
+  const key = `${state.selectedRouteNo || ''}|${state.selectedTrip?.bound || ''}|${state.selectedTripSeq || ''}|${idx}`;
+  if (state._terminusArrivedKey === key) return;
+  state._terminusArrivedKey = key;
+
+  const playPromise = playAnnouncementSegments([buildTerminusSegment(st)]);
+  const snapNonce = _audioStopNonce;
+  const snapRouteNo = state.selectedRouteNo;
+  const snapTrip = state.selectedTrip;
+  const snapIdx = idx;
+  Promise.resolve(playPromise).then(() => {
+    if (_audioStopNonce !== snapNonce) return;
+    if (state.currentTab !== 'route' || state.routeStage !== 'stops') return;
+    if (state.incidentState.stage !== 'idle') return;
+    if (state.selectedRouteNo !== snapRouteNo || state.selectedTrip !== snapTrip || state.currentStopIdx !== snapIdx) return;
+    autoJumpToReturnStartStop();
+  });
+}
+
 function syncStopArrivalSkin() {
   const isArrived = Boolean(state.gpsEnabled && (state.gpsArrivedCur || state.stopProgressPct >= 100));
   const timeWrap = document.getElementById('etaCurTimeWrap');
   const distEl = document.getElementById('etaCurDist');
+  const arrowEl = document.getElementById('etaCurArrow');
   const fill = document.getElementById('stopProgressFill');
   const lbl = document.getElementById('stopArrivedLabel');
 
@@ -3582,6 +3621,7 @@ function syncStopArrivalSkin() {
     timeWrap.classList.toggle('hidden', isArrived);
     timeWrap.classList.toggle('flex', !isArrived);
   }
+  if (arrowEl) arrowEl.classList.toggle('hidden', isArrived);
   if (distEl) {
     distEl.classList.toggle('hidden', isArrived);
     if (!isArrived && state.gpsDistanceM != null) {
@@ -3598,6 +3638,8 @@ function syncStopArrivalSkin() {
     lbl.classList.toggle('hidden', !isArrived);
     lbl.classList.toggle('flex', isArrived);
   }
+
+  triggerTerminusArrivalIfNeeded(isArrived);
 }
 // === STOP ARRIVAL SKIN END ===
 
