@@ -1004,10 +1004,36 @@ async function playSingleSegment(relPaths, fallbackTc, fallbackEn, fallbackSc, s
   await playCitybusTtsChime(seqToken);
   if (seqToken !== audioPlaySeqId) return;
 
+  const splitTtsChunks = (txt, maxLen) => {
+    const clean = String(txt || '').replace(/\s+/g, ' ').trim();
+    if (!clean) return [];
+    if (clean.length <= maxLen) return [clean];
+    const parts = clean.split(/(?<=[。！？.!?,，、;；])\s*/).filter(Boolean);
+    const chunks = [];
+    let cur = '';
+    for (const p of parts) {
+      if (!cur) {
+        cur = p;
+      } else if ((cur + ' ' + p).length <= maxLen) {
+        cur += ' ' + p;
+      } else {
+        chunks.push(cur);
+        cur = p;
+      }
+    }
+    if (cur) chunks.push(cur);
+    return chunks.flatMap(c => {
+      if (c.length <= maxLen) return [c];
+      const out = [];
+      for (let i = 0; i < c.length; i += maxLen) out.push(c.slice(i, i + maxLen));
+      return out;
+    });
+  };
+
   const ttsUrls = [
-    fallbackTc ? buildGoogleTtsUrl(fallbackTc, 'yue') : '',
-    fallbackEn ? buildGoogleTtsUrl(fallbackEn, 'en') : '',
-    fallbackSc ? buildGoogleTtsUrl(fallbackSc, 'zh-CN') : ''
+    ...(fallbackTc ? splitTtsChunks(fallbackTc, 75).map(c => buildGoogleTtsUrl(c, 'yue')) : []),
+    ...(fallbackEn ? splitTtsChunks(fallbackEn, 150).map(c => buildGoogleTtsUrl(c, 'en')) : []),
+    ...(fallbackSc ? splitTtsChunks(fallbackSc, 75).map(c => buildGoogleTtsUrl(c, 'zh-CN')) : [])
   ].filter(Boolean);
   const ttsOk = await playUrlListAsync(ttsUrls, seqToken);
   if (!ttsOk && seqToken === audioPlaySeqId) {
