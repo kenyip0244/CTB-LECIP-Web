@@ -903,6 +903,8 @@ function playUrlListAsync(urls, seqToken) {
       }
       const url = urls[idx++];
       const audio = new Audio(url);
+      const isTtsUrl = /translate\.google|translate_tts/i.test(String(url || ''));
+      audio.playbackRate = isTtsUrl ? 1.25 : 1.0;
       audio.volume = state.volume;
       currentAudio = audio;
       let settled = false;
