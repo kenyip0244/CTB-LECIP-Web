@@ -958,6 +958,30 @@ function speakWebSpeechAsync(tcText, enText, scText, seqToken) {
   });
 }
 
+async function playCitybusTtsChime(seqToken) {
+  if (seqToken !== audioPlaySeqId) return;
+  const candidates = [];
+  const manifestHit = (state.audioManifest || []).find(p => {
+    const low = String(p || '').toLowerCase();
+    return low === 'dingdong.mp3' || low.endsWith('/dingdong.mp3');
+  });
+  if (manifestHit) {
+    candidates.push(buildAudioUrl(manifestHit));
+  } else if (state.audioStemMap && state.audioStemMap.has('dingdong')) {
+    candidates.push(buildAudioUrl(state.audioStemMap.get('dingdong')));
+  } else {
+    candidates.push(buildAudioUrl(resolveManifestPath('dingdong.mp3')));
+  }
+  candidates.push('./assets/dingdong.mp3');
+
+  const uniq = Array.from(new Set(candidates.filter(Boolean)));
+  for (const url of uniq) {
+    if (seqToken !== audioPlaySeqId) return;
+    const ok = await playUrlListAsync([url], seqToken);
+    if (ok) return;
+  }
+}
+
 async function playSingleSegment(relPaths, fallbackTc, fallbackEn, fallbackSc, seqToken) {
   if (seqToken !== audioPlaySeqId) return;
   const urls = Array.from(new Set(
@@ -970,6 +994,14 @@ async function playSingleSegment(relPaths, fallbackTc, fallbackEn, fallbackSc, s
     const ok = await playUrlListAsync(urls, seqToken);
     if (ok || seqToken !== audioPlaySeqId) return;
   }
+
+  const hasTts = Boolean(fallbackTc || fallbackEn || fallbackSc);
+  if (!hasTts || seqToken !== audioPlaySeqId) return;
+
+  // 播 TTS 前先播放城巴鈴聲 dingdong.mp3
+  await playCitybusTtsChime(seqToken);
+  if (seqToken !== audioPlaySeqId) return;
+
   const ttsUrls = [
     fallbackTc ? buildGoogleTtsUrl(fallbackTc, 'yue') : '',
     fallbackEn ? buildGoogleTtsUrl(fallbackEn, 'en') : '',
@@ -1386,6 +1418,15 @@ function buildStopSegment(st) {
   if (st.approachAudioFile) files.push(st.approachAudioFile);
   const tcName = getStopNameTc(st);
   const enName = getStopNameEn(st);
+  const isHRoute = /^H\d/i.test(String(state.selectedRouteNo || '').replace(/^CTB-/i, '').trim());
+  if (isHRoute) {
+    return {
+      files,
+      tc: `我哋即將抵達${tcName}`,
+      en: enName ? `We will be approaching ${enName}.` : '',
+      sc: `我們即將抵達${tcName}`
+    };
+  }
   return {
     files,
     tc: `下一站，${tcName}`,
