@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "updatedAt": "2026-11-26T13:03:56.422Z",
+  "updatedAt": "2026-11-26T13:04:49.512Z",
   "confirmed": {
     "2": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1312_a.mp3",
     "3": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1226_a.mp3",
@@ -27902,6 +27902,18 @@
       ],
       "note": "",
       "updatedAt": "2026-11-25T14:51:39.894Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/stops/78_WAK.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "78-黃竹坑 (南朗山)-2",
+        "78-黃竹坑 (南朗山)-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-26T13:04:45.655Z",
       "updatedBy": "Ken"
     },
     {
