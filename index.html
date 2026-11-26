@@ -1482,6 +1482,16 @@ function buildWelcomeSegment() {
     const isNewLecipFlyer = /^(A17|A23|A25)$/i.test(rno);
     const hasHzmb = /^(A11|A21|A22|A29|NA)/i.test(rno);
 
+    if (rno === 'A17' && (fromAirport || /深灣|Sham Wan/i.test(destTc + ' ' + destEn))) {
+      const studioSpecific = resolveStudioWelcomeFiles();
+      return {
+        files: (studioSpecific && studioSpecific.length) ? studioSpecific : [],
+        tc: '歡迎蒞臨香港，多謝選搭城巴機場快線第 A17 號線，前往香港島南區嘅深灣。本班車將途經金鐘、灣仔（皇后大道東）、跑馬地、黃泥涌峽、海洋公園同黃竹坑。宜家離市區第一個巴士站嘅車程，約為30分鐘。請安坐欣賞沿途景色，稍後我哋會播放落車站嘅位置資料。請小心看管您嘅財物，祝旅途愉快。',
+        en: "Welcome to Hong Kong. Thank you for travelling with Cityflyer route A17, bound for Sham Wan on the Southern District of Hong Kong Island, via Admiralty, Wan Chai (Queen's Road East), Happy Valley, Wong Nai Chung Gap, Ocean Park and Wong Chuk Hang. We are about 30 minutes from the first stop in the City. Please sit back, relax and enjoy the scenery. We will broadcast the location information of the bus stop as we proceed. Please make sure your personal belongings are secured. We hope you a pleasant journey.",
+        sc: '歡迎蒞臨香港，謝謝選乘城巴機場快線第A17路，前往香港島南區深灣。本班車將途經金鐘、灣仔（皇后大道東）、跑馬地、黃泥涌峽、海洋公園和黃竹坑。現在離市區第一個車站的車程，約為30分鐘。請安坐欣賞沿途景色，稍後我們會播放下車站的位置資料。請小心看管您的財物，祝您旅途愉快。'
+      };
+    }
+
     if (fromAirport) {
       if (isNewLecipFlyer) {
         return {
