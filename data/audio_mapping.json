@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "updatedAt": "2026-11-26T12:08:53.634Z",
+  "updatedAt": "2026-11-26T13:03:56.422Z",
   "confirmed": {
     "2": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1312_a.mp3",
     "3": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/1226_a.mp3",
@@ -27532,7 +27532,7 @@
         "82-小西灣 (藍灣半島)-2"
       ],
       "note": "82 往 小西灣 (藍灣半島)（ISR 自動配對）",
-      "updatedAt": "2026-11-26T09:51:31.990Z",
+      "updatedAt": "2026-11-26T13:03:48.658Z",
       "updatedBy": "Ken"
     },
     {
@@ -27545,7 +27545,7 @@
         "85-小西灣 (藍灣半島)-3"
       ],
       "note": "85 往 小西灣 (藍灣半島)（ISR 自動配對）",
-      "updatedAt": "2026-11-26T09:51:31.990Z",
+      "updatedAt": "2026-11-26T13:03:48.658Z",
       "updatedBy": "Ken"
     },
     {
@@ -27557,6 +27557,17 @@
       ],
       "note": "",
       "updatedAt": "2026-11-24T11:44:08.271Z",
+      "updatedBy": "Ken"
+    },
+    {
+      "audioPath": "audio/NWS HOF_Stopreporter/GX7767Electronics/GX7767_Telargosystem/Sound/HKOWS/8H_EHR.mp3",
+      "scope": "trips",
+      "routes": [],
+      "tripNames": [
+        "8H-東華東院-1"
+      ],
+      "note": "",
+      "updatedAt": "2026-11-26T13:03:53.769Z",
       "updatedBy": "Ken"
     },
     {
