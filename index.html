@@ -1403,13 +1403,147 @@ function resolveStudioWelcomeFiles() {
 }
 
 function buildWelcomeSegment() {
-  const rno = String(state.selectedRouteNo || '').trim().toUpperCase();
-  const isFlyer = /^(A|NA)\d+/.test(rno);
+  const rno = String(state.selectedRouteNo || '').replace(/^CTB-/i, '').trim().toUpperCase();
+  const files = resolveStudioWelcomeFiles() || getWelcomeAudioFiles();
+  const stops = Array.isArray(state.tripStops) ? state.tripStops : [];
+  const firstSt = stops[0] || null;
+  const lastSt = stops.length ? stops[stops.length - 1] : null;
+  const origTc = firstSt ? getStopNameTc(firstSt) : (state.selectedTrip?.origTc || '');
+  const origEn = firstSt ? getStopNameEn(firstSt) : (state.selectedTrip?.origEn || '');
+  const destTc = lastSt ? getStopNameTc(lastSt) : (state.selectedTrip?.destTc || '');
+  const destEn = lastSt ? getStopNameEn(lastSt) : (state.selectedTrip?.destEn || '');
+
+  // 1. 觀光城巴 H 系列
+  if (rno === 'H1S') {
+    return {
+      files,
+      tc: '你好啊！好開心你搵我同你一齊搭觀光城巴！唔知你嚟幾多次香港呢？無論你係第一次定係嚟過好多次，我都會將香港嘅一五一十講晒俾你知！',
+      en: 'Hello, or as we say in Hong Kong, Lei Ho Ar! We are excited to have you on the official HK City Sightseeing bus. Have you been to Hong Kong before? Whenever it is your first time here, or you are a frequent visitor, I am here to help and share everything about this vibrant city with you.',
+      sc: '你好呀！很开心能和你一起乘坐观光城巴！不知道你来过香港几次了吗？无论你是第一次来，还是来过了很多次，我都会把香港的一切讲给你听。'
+    };
+  }
+  if (rno === 'H2K') {
+    return {
+      files,
+      tc: '晚安！歡迎大家乘搭觀光城巴夜遊路線：H2K由中環經九龍返回香港島。旅程中，你可以隨時喺任何一個景點撳鐘落車。記得下載我哋嘅應用程式，睇吓景點附近有咩推介行程同埋開篷巴士嘅到達時間啦！',
+      en: 'Good evening, or as we say in Hong Kong, Maan On. Welcome aboard the HK City Sightseeing bus night tour H2K, travelling from the Central district to Kowloon and back to the Hong Kong Island. During your journey, feel free to ring the bell and hop off in any indicated bus stop. Do not forget to download our app to check out recommended attractions nearby and the bus routing and schedules.',
+      sc: '大家晚上好！欢迎大家乘坐观光城巴夜游路线H2K，从中环途经九龙返回香港岛。旅途中，你可以随时在任何一个景点按铃下车。记得下载我们的App，看看景点附近的行程推介和敞篷巴士的到站时间。'
+    };
+  }
+  if (rno === 'H1' || rno === 'H2') {
+    const openTopTc = rno === 'H2' ? '開篷巴士' : '';
+    const openTopSc = rno === 'H2' ? '敞篷巴士' : '';
+    return {
+      files,
+      tc: `你好啊！歡迎大家乘搭觀光城巴${openTopTc}${rno}由${origTc || '總站'}出發往${destTc || '目的地'}。旅程中，你可以隨時喺任何一個景點撳鐘落車。記得下載我哋嘅應用程式，睇吓景點附近有咩推介行程同埋開篷巴士嘅到達時間啦！`,
+      en: `Hello, or as we say in Hong Kong, Lei Ho Ar! Welcome aboard the HK City Sightseeing bus ${rno}, departing from ${origEn || 'the terminus'} to ${destEn || 'the destination'}. During your journey, feel free to ring the bell and hop off in any indicated bus stop, to explore the sight and sound of our city. Of course, do not forget to download our app to check out recommended attractions nearby and the bus routing and schedules.`,
+      sc: `你好呀！欢迎大家乘坐观光城巴${openTopSc}${rno}，从${origTc || '总站'}出发前往${destTc || '目的地'}。旅途中，你可以随时在任何一个景点按铃下车。记得下载我们的App，看看景点附近的行程推介和敞篷巴士的到站时间。`
+    };
+  }
+  if (rno === 'H3' || rno === 'H4') {
+    return {
+      files,
+      tc: `歡迎乘搭觀光城巴「海岸之旅」${rno}號線，經海洋公園前往${destTc || '目的地'}，祝旅途愉快。`,
+      en: `Welcome aboard Hong Kong City Sightseeing bus Coastliner route ${rno} towards ${destEn || 'the destination'}, via Ocean Park. Thank you and enjoy the journey.`,
+      sc: `欢迎乘搭观光城巴海岸之旅第${rno}路，经海洋公园前往${destTc || '目的地'}，祝旅途愉快。`
+    };
+  }
+  if (rno === 'H20') {
+    return {
+      files,
+      tc: '你好啊！歡迎大家乘搭觀光城巴H20，由啟德郵輪碼頭前往尖沙咀。旅程中，你可以喺開篷巴士欣賞沿途景色。記得下載我哋嘅觀光城巴手機應用程式，睇吓景點附近有咩推介行程同埋開篷巴士嘅到達時間啦！',
+      en: 'Lee Ho Ar! Welcome aboard the HK City Sightseeing bus route H20, departing from the Kai Tak Cruise Terminal to Tsim Sha Tsui, The Peninsula. During your journey, feel free to ring the bell and hop off in any indicated bus stop to explore the sight and sound of our city. Of course, do not forget to download our Citybus Sightseeing app to check out recommended attractions nearby and the bus routing and schedules.',
+      sc: '你好呀！欢迎大家搭乘观光城巴H20，从启德邮轮码头前往尖沙咀。在旅程中，你可以在敞篷巴士上欣赏街头风景。记得下载我们的观光城巴手机应用程式，看看景点附近的推介行程和开篷巴士的到站时间喔！'
+    };
+  }
+
+  // 2. 山頂探索號 15 線
+  if (rno === '15') {
+    const fromPeak = /山頂|Peak/i.test(origTc + ' ' + origEn);
+    if (fromPeak) {
+      return {
+        files,
+        tc: '歡迎乘搭山頂探索號，我哋即將帶領你回到市區。記得唔好錯過你身邊嘅景色。落車時，亦都要睇吓主要落車站提示呀！',
+        en: 'Welcome onboard the Peak Explorer. We will guide you back to the city. Do not miss the en route spectacular views, as well as the reminder for major bus stops.',
+        sc: '欢迎乘坐山顶探索号，我们即将带领你回到市区。别错过你身边的景色。下车时，也别忘留意主要下车站的提示。'
+      };
+    }
+    return {
+      files,
+      tc: '歡迎乘搭山頂探索號，我哋即將帶領你遊遍中環、金鐘、灣仔、山頂。帶你飽覽市區景色，體驗山頂魅力。',
+      en: 'Welcome onboard the Peak Explorer. We will guide you through Central, Admiralty, Wan Chai and The Peak. Do not forget to enjoy the en route city views, and feel the vitality of The Peak.',
+      sc: '欢迎乘坐山顶探索号，我们即将带领你游遍中环、金钟、湾仔、山顶。带你饱览市区景色，体验山顶魅力。'
+    };
+  }
+
+  // 3. 城巴機場快線（A / NA）
+  if (/^(A|NA)\d+/i.test(rno)) {
+    const fromAirport = /機場|客運大樓|地面運輸中心|大橋香港口岸|Airport/i.test(origTc + ' ' + origEn);
+    const isNewLecipFlyer = /^(A17|A23|A25)$/i.test(rno);
+    const hasHzmb = /^(A11|A21|A22|A29|NA)/i.test(rno);
+
+    if (fromAirport) {
+      if (isNewLecipFlyer) {
+        return {
+          files,
+          tc: `歡迎蒞臨香港，多謝選搭城巴機場快線${rno}號線，前往${destTc || '市區'}。宜家離市區第一個巴士站嘅車程，約為30分鐘。請安坐欣賞沿途景色，稍後我哋會播放落車站嘅位置資料。請小心看管您嘅財物，祝旅途愉快。`,
+          en: `Welcome to Hong Kong. Thank you for travelling with Cityflyer route ${rno}, bound for ${destEn || 'the city'}. We are about 30 minutes from the first stop in the City. Please sit back, relax and enjoy the scenery. We will broadcast the location information of the bus stop as we proceed. Please make sure your personal belongings are secured. We hope you a pleasant journey.`,
+          sc: `欢迎莅临香港，谢谢选乘城巴机场快线第${rno}路，前往${destTc || '市区'}。现在离市区第一个车站的车程，约为30分钟。请安坐欣赏沿途景色，稍后我们会播放下车站的位置资料。请小心看管您的财物，祝您旅途愉快。`
+        };
+      }
+      return {
+        files,
+        tc: `歡迎蒞臨香港，多謝選搭城巴機場快線${rno}號線，前往${destTc || '市區'}。宜家離市區第一個巴士站嘅車程，約為30分鐘。請安坐欣賞沿途景色，稍後我哋會播放落車站嘅位置資料。車廂內已設有視像錄影監察系統，請小心看管您嘅財物，並謹記於落車時攜帶您嘅行李，祝旅途愉快。座位上若已安裝安全帶，請即扣好，以保安全。`,
+        en: `Welcome to Hong Kong. Thank you for travelling with Cityflyer route ${rno}, bound for ${destEn || 'the city'}. We are about 30 minutes from the first stop in the City. Please sit back, relax and enjoy the scenery. We will broadcast the location information of the bus stop as we proceed. Video recording is in operation inside the bus compartment. Please make sure your personal belongings are secured and take all luggage with you when alighting. We hope you a pleasant journey. For your own safety, please buckle up if a seat belt is provided.`,
+        sc: `欢迎莅临香港，谢谢选乘城巴机场快线第${rno}路，前往${destTc || '市区'}。现在离市区第一个车站的车程，约为30分钟。请安坐欣赏沿途景色，稍后我们会播放下车站的位置资料。车厢内已设有视像录影监察系统，请小心看管您的财物，并谨记于下车时携带您的行李，祝您旅途愉快。座位上如果已经安装安全带，请即扣上，以保安全。`
+      };
+    }
+
+    if (isNewLecipFlyer) {
+      return {
+        files,
+        tc: '歡迎乘搭城巴機場快線，前往港珠澳大橋香港口岸同埋香港國際機場。請小心看管您嘅財物，祝旅途愉快。',
+        en: 'Welcome aboard Cityflyer. We are now proceeding to the Hong Kong-Zhuhai-Macao Bridge Hong Kong Port and the Hong Kong International Airport. Please make sure your personal belongings are secured. We hope you a pleasant journey.',
+        sc: '欢迎乘坐城巴机场快线，前往港珠澳大桥香港口岸和香港国际机场。请小心看管你的财物，祝您旅途愉快。'
+      };
+    }
+
+    const hzmbTc = hasHzmb ? '同埋港珠澳大橋香港口岸' : '';
+    const hzmbSc = hasHzmb ? '和港珠澳大桥香港口岸' : '';
+    const hzmbEn = hasHzmb ? ' and Hong Kong-Zhuhai-Macao Bridge Hong Kong Port' : '';
+    return {
+      files,
+      tc: `歡迎乘搭城巴機場快線，前往香港國際機場${hzmbTc}。請小心看管您嘅財物，祝旅途愉快。座位上若已安裝安全帶，請即扣好，以保安全。`,
+      en: `Welcome aboard Cityflyer. We are now proceeding to the Hong Kong International Airport${hzmbEn}. Please make sure your personal belongings are secured. We hope you a pleasant journey. For your own safety, please buckle up if a seat belt is provided.`,
+      sc: `欢迎乘坐城巴机场快线，前往香港国际机场${hzmbSc}。请小心看管你的财物，祝您旅途愉快。座位上如果已经安装安全带，请即扣上，以保安全。`
+    };
+  }
+
+  // 4. 城巴口岸線（B5 除外）
+  if (/^B\d+/i.test(rno) && rno !== 'B5') {
+    const withScenery = /^(B13|B14|B15)$/i.test(rno) || (/^(B3|B3A|B3X|B3M)$/i.test(rno) && /口岸|Port/i.test(origTc + ' ' + origEn));
+    if (withScenery) {
+      return {
+        files,
+        tc: `歡迎乘搭城巴${rno}號線，前往${destTc || '目的地'}。請安坐欣賞沿途景色，我哋會喺途中播放落車站嘅位置資料。請小心看管您嘅財物，祝您旅途愉快。`,
+        en: `Welcome aboard Citybus route ${rno} towards ${destEn || 'the destination'}. Please sit back, relax and enjoy the scenery. We will broadcast the location information of the bus stop as we proceed. Please make sure your personal belongings are secured. We hope you a pleasant journey.`,
+        sc: `欢迎乘搭城巴第${rno}路，前往${destTc || '目的地'}。请安坐欣赏沿途景色，我们会在途中播放下车站的位置资料。请小心看管您的财物，祝您旅途愉快。`
+      };
+    }
+    return {
+      files,
+      tc: `歡迎乘搭城巴${rno}號線，前往${destTc || '目的地'}，請小心看管您嘅財物，祝您旅途愉快。`,
+      en: `Welcome aboard Citybus route ${rno} towards ${destEn || 'the destination'}. Please make sure your personal belongings are secured. We hope you a pleasant journey.`,
+      sc: `欢迎乘搭城巴第${rno}路，前往${destTc || '目的地'}，请小心看管您的财物，祝您旅途愉快。`
+    };
+  }
+
+  // 5. 常規城巴路線
   return {
-    files: resolveStudioWelcomeFiles() || getWelcomeAudioFiles(),
-    tc: isFlyer ? '歡迎乘搭城巴機場快線。' : '歡迎乘搭城巴。',
-    en: isFlyer ? 'Welcome aboard Cityflyer.' : 'Welcome aboard Citybus.',
-    sc: isFlyer ? '欢迎乘坐城巴机场快线。' : '欢迎乘坐城巴。'
+    files,
+    tc: `歡迎乘搭城巴${rno}號線，前往${destTc || '目的地'}，祝旅途愉快。`,
+    en: `Welcome aboard Citybus route ${rno} towards ${destEn || 'the destination'}. Thank you and enjoy the journey.`,
+    sc: `欢迎乘坐城巴第${rno}路，前往${destTc || '目的地'}，祝您旅途愉快。`
   };
 }
 
@@ -1420,7 +1554,8 @@ function buildStopSegment(st) {
   if (st.approachAudioFile) files.push(st.approachAudioFile);
   const tcName = getStopNameTc(st);
   const enName = getStopNameEn(st);
-  const isHRoute = /^H\d/i.test(String(state.selectedRouteNo || '').replace(/^CTB-/i, '').trim());
+  const cleanRno = String(state.selectedRouteNo || '').replace(/^CTB-/i, '').trim().toUpperCase();
+  const isHRoute = /^(H1|H1S|H2|H2K|H20|15)$/i.test(cleanRno);
   if (isHRoute) {
     return {
       files,
@@ -1458,13 +1593,44 @@ function getTerminusAudioFile() {
 }
 
 function buildTerminusSegment(st) {
+  const rno = String(state.selectedRouteNo || '').replace(/^CTB-/i, '').trim().toUpperCase();
   const tcName = getStopNameTc(st);
   const enName = getStopNameEn(st);
+  const fullName = `${tcName} ${enName}`;
+
+  // 1. 會展站專屬終點站廣播
+  if (/會展站|Exhibition Centre/i.test(fullName)) {
+    return {
+      files: [getTerminusAudioFile()],
+      tc: '我哋已經到達終點站，乘客落車後請轉右，使用前方嘅行人過路處，拜拜！',
+      en: 'We have arrived at the terminus. Passengers alighting at this stop, please turn right to use the pedestrian crossing ahead, see you!',
+      sc: '我们已经到达终点站，乘客下车后请右转，使用前方的行人过路处，再见！'
+    };
+  }
+  // 2. H20 半島酒店總站
+  if (rno === 'H20' && /半島酒店|Peninsula/i.test(fullName)) {
+    return {
+      files: [getTerminusAudioFile()],
+      tc: '我哋已經到咗半島酒店。當巴士停定後，請記得拎齊你嘅隨身物品離開車廂，拜拜！',
+      en: 'We have arrived at The Peninsula terminus. Once the bus comes to a complete stop, please make sure your personal belongings are with you when alighting. Goodbye!',
+      sc: '我们已经到达半岛酒店总站。巴士停稳后，请记得带好你的随身物品离开车厢，再见！'
+    };
+  }
+  // 3. B3 系列深圳灣口岸
+  if (/^B3/i.test(rno) && /深圳灣口岸|Shenzhen Bay Port/i.test(fullName)) {
+    return {
+      files: [getTerminusAudioFile()],
+      tc: '我哋即將到達深圳灣口岸。巴士停定前，請勿離開座位。落車時，請緊記攜帶您嘅財物同行李。多謝選搭城巴，拜拜！',
+      en: 'We will soon be arriving at Shenzhen Bay Port. Please do not leave your seat until the bus is stopped. Make sure your personal belongings are with you when alighting. Thank you for travelling with Citybus, see you!',
+      sc: '我们即将抵达深圳湾口岸。巴士停稳前，请勿离开座位。下车时，请紧记携带您的财物和行李。多谢选乘城巴，再见！'
+    };
+  }
+  // 4. 常規城巴終點站廣播
   return {
     files: [getTerminusAudioFile()],
-    tc: `本班車已到達總站 ${tcName}，多謝乘搭城巴。`,
-    en: enName ? `This bus has arrived at the terminus, ${enName}. Thank you for riding Citybus.` : 'This bus has arrived at the terminus. Thank you for riding Citybus.',
-    sc: `本班车已到达总站 ${tcName}，感谢乘坐城巴。`
+    tc: '我哋已經到達終點站，落車時，請緊記攜帶您嘅隨身物品，多謝選搭城巴，拜拜！',
+    en: 'We have arrived at the terminus. Please make sure all your personal belongings are with you when alighting. Thank you for travelling with Citybus, see you!',
+    sc: '我们已经到达终点站，下车时，请紧记携带您的随身物品，谢谢选搭城巴，再见！'
   };
 }
 
@@ -5615,6 +5781,99 @@ runBootSequence(false);
   }
 })();
 // === LECIP TAB CORNERS JS END ===
+
+// === LECIP LONG-GAP & INTERRUPT REPLAY START ===
+(function initLecipReplayBehaviors() {
+  if (window._lecipReplayPatched) return;
+  window._lecipReplayPatched = true;
+
+  function calcMetersBetween(lat1, lng1, lat2, lng2) {
+    const a1 = Number(lat1), o1 = Number(lng1), a2 = Number(lat2), o2 = Number(lng2);
+    if (![a1, o1, a2, o2].every(Number.isFinite)) return 0;
+    const R = 6371000;
+    const dLat = (a2 - a1) * Math.PI / 180;
+    const dLng = (o2 - o1) * Math.PI / 180;
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(a1 * Math.PI / 180) * Math.cos(a2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(Math.min(1, h)));
+  }
+
+  // A. 兩站相距超過 5 公里，於距離下一站約 1 公里內自動重播下一站站名
+  if (typeof syncStopArrivalSkin === 'function') {
+    const origSyncSkin = syncStopArrivalSkin;
+    window.syncStopArrivalSkin = function patchedSyncStopArrivalSkin(...args) {
+      const ret = origSyncSkin.apply(this, args);
+      try {
+        const isArrived = Boolean(state.gpsEnabled && (state.gpsArrivedCur || state.stopProgressPct >= 100));
+        if (state.gpsEnabled && !isArrived && state.currentTab === 'route' && state.routeStage === 'stops' && state.incidentState.stage === 'idle') {
+          const idx = state.currentStopIdx;
+          const stops = state.tripStops || [];
+          if (idx > 0 && idx < stops.length) {
+            const prevSt = stops[idx - 1];
+            const curSt = stops[idx];
+            const gapM = calcMetersBetween(prevSt?.lat, prevSt?.lng, curSt?.lat, curSt?.lng);
+            const distM = Number(state.gpsDistanceM);
+            if (gapM > 5000 && Number.isFinite(distM) && distM <= 1050 && distM > 80) {
+              const rKey = `${state.selectedRouteNo || ''}|${state.selectedTrip?.bound || ''}|${state.selectedTripSeq || ''}|${idx}`;
+              if (state._longGapReplayedKey !== rKey) {
+                state._longGapReplayedKey = rKey;
+                triggerStopAnnouncement(idx, true);
+              }
+            }
+          }
+        }
+      } catch (_) {}
+      return ret;
+    };
+  }
+
+  // B. 特別廣播中斷正常報站後，若播完仍未到站則自動重播報站錄音
+  let _stopAnnPlaying = false;
+  let _stopAnnIdx = -1;
+  let _interruptedBySpecial = false;
+
+  if (typeof triggerStopAnnouncement === 'function') {
+    const origTriggerStop = triggerStopAnnouncement;
+    window.triggerStopAnnouncement = function patchedTriggerStop(idx, force = false) {
+      _stopAnnIdx = idx;
+      _stopAnnPlaying = true;
+      _interruptedBySpecial = false;
+      return origTriggerStop.call(this, idx, force);
+    };
+  }
+
+  if (typeof playAnnouncementSegments === 'function') {
+    const origPlaySegs = playAnnouncementSegments;
+    window.playAnnouncementSegments = function patchedPlaySegs(segments, ...rest) {
+      const isNormalStopCall = _stopAnnPlaying && !_interruptedBySpecial && Array.isArray(segments) && segments.some(s => s && (s.tc?.includes('下一站') || s.tc?.includes('即將抵達')));
+      const wasInterrupted = !isNormalStopCall && _stopAnnPlaying && _activeAnnCount > 0;
+      if (wasInterrupted) _interruptedBySpecial = true;
+
+      const p = origPlaySegs.call(this, segments, ...rest);
+      const snapIdx = _stopAnnIdx;
+      const snapNonce = _audioStopNonce;
+
+      Promise.resolve(p).then(() => {
+        if (isNormalStopCall) {
+          if (_audioStopNonce === snapNonce) _stopAnnPlaying = false;
+          return;
+        }
+        if (wasInterrupted && _interruptedBySpecial) {
+          _interruptedBySpecial = false;
+          _stopAnnPlaying = false;
+          if (_audioStopNonce !== snapNonce) return;
+          if (state.currentTab !== 'route' || state.routeStage !== 'stops') return;
+          if (state.incidentState.stage !== 'idle') return;
+          const isArrived = Boolean(state.gpsEnabled && (state.gpsArrivedCur || state.stopProgressPct >= 100));
+          if (!isArrived && state.currentStopIdx === snapIdx && snapIdx >= 0) {
+            triggerStopAnnouncement(snapIdx, true);
+          }
+        }
+      });
+      return p;
+    };
+  }
+})();
+// === LECIP LONG-GAP & INTERRUPT REPLAY END ===
 </script>
 </body>
 </html>
