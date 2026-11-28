@@ -5862,26 +5862,40 @@ runBootSequence(false);
     };
   }
 
-  // B. 特別廣播中斷正常報站後，若播完仍未到站則自動重播報站錄音
+  // B. 特別廣播中斷正常中途報站後，若播完仍未到站則自動重播報站錄音（排除歡迎詞並限制每站最多重播 1 次）
+  let _inTriggerStopCall = false;
   let _stopAnnPlaying = false;
   let _stopAnnIdx = -1;
   let _interruptedBySpecial = false;
+  let _lastInterruptReplayedKey = '';
 
   if (typeof triggerStopAnnouncement === 'function') {
     const origTriggerStop = triggerStopAnnouncement;
     window.triggerStopAnnouncement = function patchedTriggerStop(idx, force = false) {
-      _stopAnnIdx = idx;
-      _stopAnnPlaying = true;
-      _interruptedBySpecial = false;
-      return origTriggerStop.call(this, idx, force);
+      if (idx > 0) {
+        _stopAnnIdx = idx;
+        _stopAnnPlaying = true;
+        _interruptedBySpecial = false;
+      } else {
+        // 起點歡迎詞（idx === 0）不納入中途報站中斷重播，避免無限循環
+        _stopAnnIdx = -1;
+        _stopAnnPlaying = false;
+        _interruptedBySpecial = false;
+      }
+      _inTriggerStopCall = true;
+      try {
+        return origTriggerStop.call(this, idx, force);
+      } finally {
+        _inTriggerStopCall = false;
+      }
     };
   }
 
   if (typeof playAnnouncementSegments === 'function') {
     const origPlaySegs = playAnnouncementSegments;
     window.playAnnouncementSegments = function patchedPlaySegs(segments, ...rest) {
-      const isNormalStopCall = _stopAnnPlaying && !_interruptedBySpecial && Array.isArray(segments) && segments.some(s => s && (s.tc?.includes('下一站') || s.tc?.includes('即將抵達')));
-      const wasInterrupted = !isNormalStopCall && _stopAnnPlaying && _activeAnnCount > 0;
+      const isNormalStopCall = _inTriggerStopCall;
+      const wasInterrupted = !isNormalStopCall && _stopAnnPlaying && _stopAnnIdx > 0 && _activeAnnCount > 0;
       if (wasInterrupted) _interruptedBySpecial = true;
 
       const p = origPlaySegs.call(this, segments, ...rest);
@@ -5900,7 +5914,9 @@ runBootSequence(false);
           if (state.currentTab !== 'route' || state.routeStage !== 'stops') return;
           if (state.incidentState.stage !== 'idle') return;
           const isArrived = Boolean(state.gpsEnabled && (state.gpsArrivedCur || state.stopProgressPct >= 100));
-          if (!isArrived && state.currentStopIdx === snapIdx && snapIdx >= 0) {
+          const repKey = `${state.selectedRouteNo || ''}|${state.selectedTrip?.bound || ''}|${snapIdx}`;
+          if (!isArrived && state.currentStopIdx === snapIdx && snapIdx > 0 && _lastInterruptReplayedKey !== repKey) {
+            _lastInterruptReplayedKey = repKey;
             triggerStopAnnouncement(snapIdx, true);
           }
         }
